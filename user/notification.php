@@ -214,6 +214,11 @@ $isAdmin = $_SESSION['isAdmin'];
             var dropdownContent = document.querySelector(".dropdown-content");
             dropdownContent.classList.toggle("show");
         }
+        function handleLogout() {
+            if (confirm('Are you sure you want to log out?')) {
+                window.location.href = 'auth/logout.php';
+            }
+        }
     </script>
 <div class="notification-container">
     <?php
