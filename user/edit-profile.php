@@ -110,7 +110,7 @@ $conn->close();
                     <a href="settings.php">Settings</a>
                 </div>
             </div>
-            <a href="auth/login.php">Log Out</a>
+            <a href="#" onclick="handleLogout()">Log Out</a>
         </div>
     </div>
 

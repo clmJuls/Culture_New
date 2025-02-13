@@ -1,5 +1,6 @@
 <?php
 require 'db_conn.php';
+require 'dialog.php';
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
@@ -10,6 +11,14 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 $currentUserId = $_SESSION['user_id'];
+
+function checkLoginStatus() {
+    if (!isset($_SESSION['user_id'])) {
+        showLoginDialog();
+        return false;
+    }
+    return true;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -55,7 +64,7 @@ $currentUserId = $_SESSION['user_id'];
                         <a href="settings.php">Settings</a>
                     </div>
                 </div>
-                <a href="auth/login.php">Log Out</a>
+                <a href="#" onclick="handleLogout()">Log Out</a>
             </div>
     </div>
 
@@ -149,6 +158,36 @@ $currentUserId = $_SESSION['user_id'];
         function toggleDropdown() {
             var dropdownContent = document.querySelector(".dropdown-content");
             dropdownContent.classList.toggle("show");
+        }
+
+        function handleUnauthorizedAction(action) {
+            <?php if (!isset($_SESSION['user_id'])): ?>
+                if (confirm('Please log in to ' + action + '. Click OK to go to login page.')) {
+                    window.location.href = 'auth/login.php';
+                }
+                return false;
+            <?php endif; ?>
+            return true;
+        }
+
+        function handleLikeClick(postId) {
+            if (!handleUnauthorizedAction('like posts')) {
+                return;
+            }
+            // Your existing like functionality
+        }
+
+        function handleCommentClick(postId) {
+            if (!handleUnauthorizedAction('comment on posts')) {
+                return;
+            }
+            // Your existing comment functionality
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to log out?')) {
+                window.location.href = 'auth/logout.php';
+            }
         }
     </script>
 

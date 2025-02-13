@@ -169,7 +169,7 @@ if (!isset($_SESSION['isAdmin']) || $_SESSION['isAdmin'] != 1) {
                     </div>
                 </div>
                 <a href="generate_report.php" class="active">Generate Report</a>
-                <a href="auth/login.php">Log Out</a>
+                <a href="#" onclick="handleLogout()">Log Out</a>
             </div>
     </div>
 

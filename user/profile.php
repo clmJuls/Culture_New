@@ -84,7 +84,7 @@ $conn->close();
                 </div>
             </div>
             <a href="generate_report.php">Generate Report</a>
-            <a href="auth/login.php">Log Out</a>
+            <a href="#" onclick="handleLogout()">Log Out</a>
         </div>
     </div>
 
