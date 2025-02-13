@@ -8,44 +8,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username_error = '';
     $password_error = '';
 
-    // Check if the input is an email address or a username
+    // First validate if the username/email exists
     if (filter_var($input, FILTER_VALIDATE_EMAIL)) {
-        // Query to check if the email exists
-        $query = "SELECT * FROM users WHERE email = '$input'";
+        $query = "SELECT * FROM users WHERE email = ?";
     } else {
-        // Query to check if the username exists
-        $query = "SELECT * FROM users WHERE username = '$input'";
+        $query = "SELECT * FROM users WHERE username = ?";
     }
 
-    $result = $conn->query($query);
+    // Use prepared statement to prevent SQL injection
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $input);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    if ($result->num_rows > 0) {
-        $user = $result->fetch_assoc();
-        // Verify the password with the hashed password stored in the database
-        if (password_verify($password, $user['password'])) {
-            // Start session and set session variables
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['email'] = $user['email'];
-            $_SESSION['isAdmin'] = $user['isAdmin']; // Add isAdmin session variable
-
-            // Remember me functionality (store username in cookie)
-            if (isset($_POST['remember_me'])) {
-                setcookie('username', $user['username'], time() + (86400 * 30), "/"); // 30 days
-            }
-
-            header('Location: ../home.php');
-            exit();
-        } else {
-            $_SESSION['password_error'] = 'Invalid password!';
-            header('Location: login.php');
-            exit();
-        }
-    } else {
-        $_SESSION['username_error'] = 'Username or email does not exist!';
+    if ($result->num_rows === 0) {
+        // Username/email doesn't exist
+        $_SESSION['username_error'] = 'Username does not exist!';
         header('Location: login.php');
         exit();
     }
+
+    // If we get here, the username exists, now check password
+    $user = $result->fetch_assoc();
+    if (!password_verify($password, $user['password'])) {
+        // Invalid password
+        $_SESSION['password_error'] = 'Invalid password!';
+        header('Location: login.php');
+        exit();
+    }
+
+    // If we get here, both username and password are valid
+    // Start session and set session variables
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['username'] = $user['username'];
+    $_SESSION['email'] = $user['email'];
+    $_SESSION['isAdmin'] = $user['isAdmin'];
+
+    // Remember me functionality
+    if (isset($_POST['remember_me'])) {
+        setcookie('username', $user['username'], time() + (86400 * 30), "/"); // 30 days
+    }
+
+    header('Location: ../home.php');
+    exit();
 }
 
 // Get any error messages
@@ -96,7 +101,7 @@ $conn->close();
             <h1>Kulturabase</h1>
         </div>
         <div>
-            <a href="explore.php">Explore</a>
+            <a href="../explore.php">Explore</a>
         </div>
     </div>
 

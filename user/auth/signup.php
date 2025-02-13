@@ -106,17 +106,7 @@ $conn->close();
             <h1>Kulturabase</h1>
         </div>
         <div>
-            <a href="home.php">Home</a>
-            <a href="create-post.php">+ Create</a>
-            <a href="notification.php">Notification</a>
-            <div class="dropdown">
-                <a href="#" class="dropdown-btn" onclick="toggleDropdown()">Menu</a>
-                <div class="dropdown-content">
-                    <a href="#">Profile</a>
-                    <a href="settings.php">Settings</a>
-                </div>
-            </div>
-            <a href="login.php" class="active">Log Out</a>
+            <a href="../explore.php">Explore</a>
         </div>
     </div>
 
