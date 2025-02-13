@@ -1,5 +1,5 @@
 <?php
-require 'db_conn.php';
+require '../db_conn.php';
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
@@ -146,13 +146,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div>
             <a href="Home.php">Home</a>
             <a href="create-post.php" class="active">+ Create</a>
-            <a href="explore.php">Explore</a>
+            <a href="explore/explore.php">Explore</a>
             <a href="notification.php">Notification</a>
             <div class="dropdown">
                 <a href="#" class="dropdown-btn" onclick="toggleDropdown()">Menu</a>
                 <div class="dropdown-content">
-                    <a href="profile.php">Profile</a>
-                    <a href="settings.php">Settings</a>
+                    <a href="account/profile.php">Profile</a>
+                    <a href="account/settings.php">Settings</a>
                 </div>
             </div>
             <a href="auth/login.php">Log Out</a>
