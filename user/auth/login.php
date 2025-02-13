@@ -5,6 +5,8 @@ session_start();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $input = $_POST['username'];  // This could be either a username or email
     $password = $_POST['password'];
+    $username_error = '';
+    $password_error = '';
 
     // Check if the input is an email address or a username
     if (filter_var($input, FILTER_VALIDATE_EMAIL)) {
@@ -32,24 +34,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 setcookie('username', $user['username'], time() + (86400 * 30), "/"); // 30 days
             }
 
-            // Redirect to home page after successful login
-            echo "<script>
-                    alert('Login Successful!');
-                    window.location.href = '../home.php'; // Redirect to home page
-                  </script>";
+            header('Location: ../home.php');
+            exit();
         } else {
-            echo "<script>
-                    alert('Invalid password!');
-                    window.location.href = 'login.php';
-                  </script>";
+            $_SESSION['password_error'] = 'Invalid password!';
+            header('Location: login.php');
+            exit();
         }
     } else {
-        echo "<script>
-                alert('Username or email does not exist!');
-                window.location.href = 'login.php';
-              </script>";
+        $_SESSION['username_error'] = 'Username or email does not exist!';
+        header('Location: login.php');
+        exit();
     }
 }
+
+// Get any error messages
+$username_error = isset($_SESSION['username_error']) ? $_SESSION['username_error'] : '';
+$password_error = isset($_SESSION['password_error']) ? $_SESSION['password_error'] : '';
+
+// Clear the error messages from session
+unset($_SESSION['username_error']);
+unset($_SESSION['password_error']);
 
 $conn->close();
 ?>
@@ -192,12 +197,18 @@ $conn->close();
     <div class="main-container">
         <div class="login-container">
             <h2>Login</h2>
-            <form method="POST">
+            <form method="POST" autocomplete="off">
                 <div class="input-container">
                     <input type="text" name="username" placeholder="Username" required>
+                    <?php if (!empty($username_error)): ?>
+                        <div class="error-message"><?php echo $username_error; ?></div>
+                    <?php endif; ?>
                 </div>
                 <div class="input-container">
                     <input type="password" name="password" placeholder="Password" required>
+                    <?php if (!empty($password_error)): ?>
+                        <div class="error-message"><?php echo $password_error; ?></div>
+                    <?php endif; ?>
                 </div>
                 <div class="remember-forgot">
                     <label><input type="checkbox" name="remember_me"> Remember me</label>
@@ -251,8 +262,20 @@ $conn->close();
             background-color: #f9f9f9;
         }
 
+        .input-container .error-message {
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 5px 0;
+        }
+
         .input-container input:focus {
             border-color: #4a6ea5;
+        }
+
+        /* When there's an error, change the input border color */
+        .input-container input.error {
+            border-color: #dc3545;
         }
 
         .remember-forgot {
@@ -304,6 +327,17 @@ $conn->close();
 
         .signup-link a:hover {
             text-decoration: underline;
+        }
+
+        .error-message {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 0.9rem;
         }
     </style>
 </body>
