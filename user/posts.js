@@ -56,7 +56,7 @@ $(document).ready(function() {
         displayPosts(filteredPosts);
     }
 
-    // Modified fetchPosts function
+    // Modified fetchPosts function to handle non-logged-in users
     function fetchPosts() {
         $.ajax({
             url: 'posts_management.php',
@@ -65,8 +65,8 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(response) {
                 currentUserId = response.current_user_id;
-                allPosts = response.posts; // Store all posts
-                filterAndDisplayPosts(); // Apply any active filters
+                allPosts = response.posts;
+                filterAndDisplayPosts();
             },
             error: function(xhr, status, error) {
                 console.error('Error fetching posts:', error);
@@ -90,7 +90,7 @@ fetchPosts();
         }
     });
     
-    // Create post element function
+    // Modified createPostElement function to handle non-logged-in state
     function createPostElement(post) {
         const comments = post.comments.map(comment => `
             <div class="comment">
@@ -127,6 +127,26 @@ fetchPosts();
             </div>
         ` : '';
     
+        const interactionsHtml = currentUserId ? `
+            <div class="post-interactions">
+                <button class="like-btn ${post.user_liked > 0 ? 'liked' : ''}">
+                    👍 ${post.like_count} Likes
+                </button>
+                <button class="comment-toggle">
+                    💬 ${post.comment_count} Comments
+                </button>
+            </div>
+        ` : `
+            <div class="post-interactions">
+                <button class="like-btn-disabled" onclick="requireLogin('like')">
+                    👍 ${post.like_count} Likes
+                </button>
+                <button class="comment-toggle-disabled" onclick="requireLogin('comment')">
+                    💬 ${post.comment_count} Comments
+                </button>
+            </div>
+        `;
+    
         const postHtml = `
             <div class="post" data-post-id="${post.id}">
                 <div class="post-header">
@@ -143,23 +163,18 @@ fetchPosts();
                 </div>
                 ${cultureElements}
                 ${learningStyles}
-                <div class="post-interactions">
-                    <button class="like-btn ${post.user_liked > 0 ? 'liked' : ''}">
-                        👍 ${post.like_count} Likes
-                    </button>
-                    <button class="comment-toggle">
-                        💬 ${post.comment_count} Comments
-                    </button>
-                </div>
-                <div class="comments-section" style="display:none;">
-                    <div class="comments-list">
-                        ${comments}
+                ${interactionsHtml}
+                ${currentUserId ? `
+                    <div class="comments-section" style="display:none;">
+                        <div class="comments-list">
+                            ${comments}
+                        </div>
+                        <div class="comment-input">
+                            <input type="text" placeholder="Write a comment..." class="comment-text">
+                            <button class="submit-comment">Send</button>
+                        </div>
                     </div>
-                    <div class="comment-input">
-                        <input type="text" placeholder="Write a comment..." class="comment-text">
-                        <button class="submit-comment">Send</button>
-                    </div>
-                </div>
+                ` : ''}
             </div>
         `;
     
@@ -272,6 +287,13 @@ fetchPosts();
             }
         });
     });
+
+    // Add this function to handle login requirement
+    window.requireLogin = function(action) {
+        if (confirm(`Please log in to ${action} posts. Click OK to go to login page.`)) {
+            window.location.href = 'auth/login.php';
+        }
+    };
 
     // Initial fetch of posts
     fetchPosts();

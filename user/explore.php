@@ -3,14 +3,8 @@ require 'db_conn.php';
 require 'dialog.php';
 session_start();
 
-if (!isset($_SESSION['user_id'])) {
-    echo "<script>
-            alert('Please log in to update your information.');
-            window.location.href = 'login.php';
-          </script>";
-    exit();
-}
-$currentUserId = $_SESSION['user_id'];
+// Remove the forced redirect if not logged in
+$currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
 function checkLoginStatus() {
     if (!isset($_SESSION['user_id'])) {
@@ -49,10 +43,12 @@ function checkLoginStatus() {
     <!-- Navigation Bar -->
     <div class="navbar">
         <div style="display: flex; align-items: center;">
-          <img src="logo.png" alt="Kulturifiko Logo">
+            <img src="logo.png" alt="Kulturifiko Logo">
             <h1>Kulturabase</h1>
         </div>
-            <div>
+        <div>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <!-- Show full navigation for logged in users -->
                 <a href="home.php">Home</a>
                 <a href="create-post.php">+ Create</a>
                 <a href="explore.php" class="active">Explore</a>
@@ -65,7 +61,12 @@ function checkLoginStatus() {
                     </div>
                 </div>
                 <a href="#" onclick="handleLogout()">Log Out</a>
-            </div>
+            <?php else: ?>
+                <!-- Show limited navigation for non-logged in users -->
+                <a href="explore.php" class="active">Explore</a>
+                <a href="auth/login.php">Log In</a>
+            <?php endif; ?>
+        </div>
     </div>
 
     <style>
@@ -340,6 +341,22 @@ function checkLoginStatus() {
     font-size: 14px;
     cursor: pointer;
     border-radius: 5px;
+}
+
+/* Add the new styles here */
+.like-btn-disabled, .comment-toggle-disabled {
+    background: #ccc;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+    opacity: 0.7;
+}
+
+.like-btn-disabled:hover, .comment-toggle-disabled:hover {
+    opacity: 1;
 }
 
    .explore-container {

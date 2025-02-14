@@ -2,7 +2,13 @@
 require 'db_conn.php';
 session_start();
 
-// Ensure user is logged in
+// Allow fetching posts without login
+if ($_POST['action'] === 'fetch_posts') {
+    fetchPosts($conn, isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null);
+    exit();
+}
+
+// Require login for all other actions
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['error' => 'Please log in']);
     exit();
@@ -44,7 +50,7 @@ function fetchPosts($conn, $user_id) {
             u.profile_picture,
             (SELECT COUNT(*) FROM likes WHERE post_id = p.id) as like_count,
             (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count,
-            (SELECT COUNT(*) FROM likes WHERE post_id = p.id AND user_id = $user_id) as user_liked
+            " . ($user_id ? "(SELECT COUNT(*) FROM likes WHERE post_id = p.id AND user_id = $user_id) as user_liked" : "0 as user_liked") . "
         FROM posts p
         JOIN users u ON p.user_id = u.id
         ORDER BY p.created_at DESC

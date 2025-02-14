@@ -5,7 +5,7 @@ session_start();
 if (!isset($_SESSION['user_id'])) {
     echo "<script>
             alert('Please log in to access this page.');
-            window.location.href = 'login.php';
+            window.location.href = '../user/auth/login.php';
           </script>";
     exit();
 }

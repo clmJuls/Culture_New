@@ -5,7 +5,7 @@ session_start();
 if (!isset($_SESSION['user_id'])) {
     echo "<script>
             alert('Please log in to edit your profile.');
-            window.location.href = 'login.php';
+            window.location.href = '../auth/login.php';
           </script>";
     exit();
 }
