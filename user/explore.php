@@ -43,7 +43,7 @@ function checkLoginStatus() {
     <!-- Navigation Bar -->
     <div class="navbar">
         <div style="display: flex; align-items: center;">
-            <img src="logo.png" alt="Kulturifiko Logo">
+            <img src="assets/logo/logo.png" alt="Kulturifiko Logo">
             <h1>Kulturabase</h1>
         </div>
         <div>
@@ -201,12 +201,19 @@ function checkLoginStatus() {
     /* Post container */
 .post {
     background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin: 20px 0;
-    padding: 15px;
-    /* max-width: 600px; */
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin: 0 0 20px 0;
+    padding: 20px;
     width: 100%;
+    display: inline-block;
+    break-inside: avoid;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.post:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .post-header {
@@ -231,8 +238,21 @@ function checkLoginStatus() {
 .delete-post {
     background: transparent;
     border: none;
-    font-size: 18px;
     cursor: pointer;
+    padding: 5px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    width: 24px;
+    height: 24px;
+}
+
+.delete-post img {
+    width: 100%;
+    height: 100%;
+}
+
+.delete-post:hover {
+    opacity: 1;
 }
 
 .post-content h3 {
@@ -247,9 +267,9 @@ function checkLoginStatus() {
 }
 
 .post-content img {
-    max-width: 100%;
+    width: 100%;
     border-radius: 8px;
-    margin-top: 10px;
+    margin: 10px 0;
 }
 
 .post-interactions {
@@ -360,21 +380,27 @@ function checkLoginStatus() {
 }
 
    .explore-container {
-      max-width: 800px;
+      max-width: 1600px;
       margin: 20px auto;
+      margin-left: 260px;
       padding: 20px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: calc(100% - 280px);
+    }
+
+    #post-display {
+        columns: 4;
+        column-gap: 20px;
+        padding: 0;
+        width: 100%;
     }
 
     .post-container {
       border: 1px solid #ccc;
-      padding: 15px;
-      margin-bottom: 20px;
+      padding: 20px;
+      margin-bottom: 25px;
       border-radius: 10px;
       background-color: #fff;
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .post-header {
@@ -459,6 +485,248 @@ function checkLoginStatus() {
     .tag:hover {
       background-color: #007bff;
       color: #fff;
+    }
+
+    /* Add responsive media queries */
+    @media screen and (min-width: 1801px) {
+        .explore-container {
+            margin-left: calc((100% - 1600px) / 2 + 260px);
+        }
+    }
+
+    @media screen and (max-width: 1800px) {
+        #post-display {
+            columns: 3;
+        }
+    }
+
+    @media screen and (max-width: 1400px) {
+        #post-display {
+            columns: 3;
+        }
+    }
+
+    @media screen and (max-width: 1200px) {
+        #post-display {
+            columns: 2;
+        }
+    }
+
+    @media screen and (max-width: 992px) {
+        .explore-container {
+            margin-left: 260px;
+            width: calc(100% - 280px);
+            padding: 15px;
+        }
+        #post-display {
+            columns: 2;
+        }
+    }
+
+    @media screen and (max-width: 768px) {
+        .sidebar {
+            width: 200px;
+        }
+        
+        .explore-container {
+            margin-left: 210px;
+            width: calc(100% - 220px);
+            padding: 10px;
+        }
+        #post-display {
+            columns: 1;
+        }
+    }
+
+    @media screen and (max-width: 576px) {
+        .sidebar {
+            display: none;
+        }
+        
+        .explore-container {
+            width: 100%;
+            margin: 10px auto;
+            padding: 10px;
+        }
+        
+        #post-display {
+            columns: 1;
+            padding: 0;
+        }
+    }
+
+    /* Learning Styles Section */
+    .learning-styles {
+        margin: 15px 0;
+        padding: 0;
+    }
+
+    .learning-styles h4 {
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .learning-styles ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .learning-styles li {
+        display: inline-block;
+        background-color: #f0f0f0;
+        padding: 6px 12px;
+        border-radius: 15px;
+        margin: 0 8px 8px 0;
+        font-size: 14px;
+        color: #555;
+    }
+
+    /* Like Button Styling */
+    .like-button {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 10px;
+        transition: background-color 0.2s ease;
+    }
+
+    .like-button:hover {
+        background-color: #218838;
+    }
+
+    .like-button i {
+        font-size: 16px;
+    }
+
+    .like-count {
+        font-weight: 500;
+    }
+
+    /* Post Elements Styling */
+    .post {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin: 0 0 20px 0;
+        padding: 20px;
+        width: 100%;
+        display: inline-block;
+        break-inside: avoid;
+        word-wrap: break-word;
+    }
+
+    /* Culture Elements & Learning Styles Sections */
+    .culture-elements,
+    .learning-styles {
+        margin: 15px 0;
+    }
+
+    .culture-elements h4,
+    .learning-styles h4 {
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 12px;
+        font-weight: 600;
+    }
+
+    .elements-list,
+    .styles-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .elements-list li,
+    .styles-list li {
+        display: inline-block;
+        background-color: #f0f0f0;
+        padding: 6px 12px;
+        border-radius: 15px;
+        margin: 0 8px 8px 0;
+        font-size: 14px;
+        color: #555;
+        transition: all 0.2s ease;
+    }
+
+    .elements-list li:hover,
+    .styles-list li:hover {
+        background-color: #e0e0e0;
+        transform: translateY(-1px);
+    }
+
+    /* Like Button Styling */
+    .like-button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 15px;
+        transition: background-color 0.2s ease;
+    }
+
+    .like-button:hover {
+        background-color: #0056b3;
+    }
+
+    .like-button i {
+        font-size: 16px;
+    }
+
+    .like-count {
+        font-weight: 500;
+    }
+
+    /* Image container */
+    .post-image {
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .post-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    /* Category label */
+    .category-label {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 14px;
+    }
+
+    /* Hover effects */
+    .post {
+        cursor: pointer;
+    }
+
+    .post:hover .post-image img {
+        transform: scale(1.02);
+        transition: transform 0.3s ease;
     }
   </style>
 

@@ -18,6 +18,7 @@ if (!isset($_SESSION['user_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kulturabase</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <body>
     <style>
     /* General */
@@ -32,14 +33,17 @@ if (!isset($_SESSION['user_id'])) {
             background-color: #f7f7f7;
             color: #4A4947;
             line-height: 1.6;
-            padding-top: 80px;
+            padding-top: 60px;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
     </style>
     
     <!-- Navigation Bar -->
     <div class="navbar">
         <div style="display: flex; align-items: center;">
-            <img src="logo.png "alt="Kulturifiko Logo">
+            <img src="assets/logo/logo.png "alt="Kulturifiko Logo">
             <h1>Kulturabase</h1>
         </div>
         <div>
@@ -172,58 +176,53 @@ if (!isset($_SESSION['user_id'])) {
 <style>
 /* Search Section */
     .search {
+        background: linear-gradient(45deg, #1e3c72, #2a5298);
+        padding: 40px 20px;
         text-align: center;
-        padding: 50px 20px;
-        background: linear-gradient(45deg, #1e3c72, #2a5298)
+        width: 100%;
+        margin-bottom: 30px;
     }
 
     .search h1 {
         font-size: 2.5rem;
-        font-weight: bold;
-        margin-bottom: 10px;
         color: #fff;
+        margin-bottom: 15px;
     }
 
     .search p {
-        font-size: 1rem;
-        margin-bottom: 20px;
         color: #fff;
+        margin-bottom: 25px;
     }
 
-/* Search Bar */
+    .search-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
     .search-bar {
         display: flex;
-        justify-content: center;
-        align-items: center;
         gap: 10px;
-        border: 1px solid #ddd;
+        background: white;
         border-radius: 50px;
-        padding: 10px 20px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        width: 60%;
+        padding: 5px;
+        max-width: 600px;
         margin: 0 auto;
     }
 
     .search-bar input {
-        border: none;
-        outline: none;
-        font-size: 1rem;
         flex: 1;
-        padding: 10px;
-        border-radius: 50px;
-    }
-
-    .search-bar input::placeholder {
-        color: #aaa;
-    }
-
-    .search-bar button {
-        background-color: #000;
-        color: #ffffff;
         border: none;
         padding: 10px 20px;
         border-radius: 50px;
-        font-size: 1rem;
+        font-size: 16px;
+    }
+
+    .search-bar button {
+        background: #000;
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 50px;
         cursor: pointer;
         transition: transform 0.3s ease;
     }
@@ -253,7 +252,7 @@ categories.forEach(category => {
       <div class="hero-content">
         <h1>Experience the Culture</h1>
         <p>Explore the beauty of global traditions and connect with communities worldwide. Start your journey with Kulturifiko today.</p>
-        <a href="explore.html" class="cta-btn explore-btn">Explore Now</a>
+        <a href="explore.php" class="cta-btn explore-btn">Start Exploring</a>
       </div>
       <br>
       <div class="hero-image">
@@ -273,22 +272,22 @@ categories.forEach(category => {
   <!-- Features Section -->
   <section id="features" class="features">
     <div class="container">
-      <h2>Our Features</h2>
-      <div class="feature-grid">
+      <h2>Discover Our Features</h2>
+      <div class="features-grid">
         <div class="feature-card">
-          <i class="icon fas fa-globe"></i>
+          <i class="fas fa-globe"></i>
           <h3>Global Community</h3>
-          <p>Connect with like-minded people across the globe.</p>
+          <p>Connect with people from different cultures worldwide.</p>
         </div>
         <div class="feature-card">
-          <i class="icon fas fa-calendar-alt"></i>
-          <h3>Event Listings</h3>
-          <p>Discover events near you or share your own.</p>
+          <i class="fas fa-book"></i>
+          <h3>Cultural Learning</h3>
+          <p>Learn about diverse traditions and customs.</p>
         </div>
         <div class="feature-card">
-          <i class="icon fas fa-photo-video"></i>
-          <h3>Interactive Media</h3>
-          <p>Engage with cultural photos, videos, and more.</p>
+          <i class="fas fa-users"></i>
+          <h3>Interactive Sharing</h3>
+          <p>Share and discuss cultural experiences.</p>
         </div>
       </div>
     </div>
@@ -333,8 +332,11 @@ categories.forEach(category => {
 
 /* Hero Section */
 .hero {
-  background-color: #f0f8ff;
-  padding: 60px 20px;
+  padding: 40px;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  background: #f0f8ff;
 }
 
 .hero-container {
@@ -346,7 +348,7 @@ categories.forEach(category => {
 
 .hero-content {
   flex: 1;
-  max-width: 50%;
+  max-width: 600px;
 }
 
 .hero-content h1 {
@@ -379,10 +381,14 @@ categories.forEach(category => {
 
 .hero-image {
   flex: 1;
-  max-width: 50%;
-  text-align: right;
+  max-width: 500px;
 }
 
+.hero-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
 
 /* Features Section */
 .features {
@@ -390,24 +396,35 @@ categories.forEach(category => {
   padding: 40px 20px;
 }
 
-.feature-grid {
+.features h2 {
+  text-align: center;
+  margin-bottom: 40px;
+  color: #365486;
+}
+
+.features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+  gap: 30px;
 }
 
 .feature-card {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
   text-align: center;
-  padding: 20px;
-  background-color: #ffffff;
-  border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
 }
 
-.feature-card .icon {
-  font-size: 40px;
-  color: #007bff;
-  margin-bottom: 10px;
+.feature-card:hover {
+  transform: translateY(-5px);
+}
+
+.feature-card i {
+  font-size: 2rem;
+  color: #365486;
+  margin-bottom: 20px;
 }
 
 /* Gallery Section */
@@ -500,6 +517,67 @@ categories.forEach(category => {
 
 .partners-grid img:hover {
   transform: scale(1.1);
+}
+
+/* Responsive breakpoints */
+@media screen and (max-width: 1400px) {
+    .hero {
+        padding: 30px;
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .main-container {
+        width: calc(100% - 240px);
+    }
+}
+
+@media screen and (max-width: 992px) {
+    .hero {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .hero-content, .hero-image {
+        max-width: 100%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .main-container {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+    }
+    
+    .search h1 {
+        font-size: 2rem;
+    }
+    
+    .search-bar {
+        flex-direction: column;
+        padding: 10px;
+    }
+    
+    .search-bar input,
+    .search-bar button {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .main-container {
+        margin-left: 0;
+        width: 100%;
+        padding: 10px;
+    }
+    
+    .hero {
+        padding: 20px;
+    }
+    
+    .search h1 {
+        font-size: 1.8rem;
+    }
 }
   </style>
 

@@ -68,7 +68,7 @@ $conn->close();
     <!-- Navigation Bar -->
     <div class="navbar">
         <div style="display: flex; align-items: center;">
-            <img src="logo.png" alt="Kulturifiko Logo">
+           <img src="assets/logo/logo.png "alt="Kulturifiko Logo">
             <h1>Kulturabase</h1>
         </div>
         <div>
@@ -389,37 +389,35 @@ $conn->close();
     // JavaScript for Tab Navigation
     const postsTab = document.getElementById('posts-tab');
     const aboutTab = document.getElementById('about-tab');
-    const friendsTab = document.getElementById('friends-tab');
+    // const friendsTab = document.getElementById('friends-tab'); // Comment out or remove
     const postsSection = document.getElementById('posts-section');
     const aboutSection = document.getElementById('about-section');
-    const friendsSection = document.getElementById('friends-section');
+    // const friendsSection = document.getElementById('friends-section'); // Comment out or remove
 
     postsTab.addEventListener('click', () => {
       postsTab.classList.add('active-tab');
       aboutTab.classList.remove('active-tab');
-      friendsTab.classList.remove('active-tab');
+      // friendsTab.classList.remove('active-tab'); // Remove this line
       postsSection.classList.add('active-section');
       aboutSection.classList.remove('active-section');
-      friendsSection.classList.remove('active-section');
+      // friendsSection.classList.remove('active-section'); // Remove this line
     });
 
     aboutTab.addEventListener('click', () => {
       aboutTab.classList.add('active-tab');
       postsTab.classList.remove('active-tab');
-      friendsTab.classList.remove('active-tab');
+      // friendsTab.classList.remove('active-tab'); // Remove this line
       aboutSection.classList.add('active-section');
       postsSection.classList.remove('active-section');
-      friendsSection.classList.remove('active-section');
+      // friendsSection.classList.remove('active-section'); // Remove this line
     });
 
+    // Remove the entire friendsTab click event listener since the element doesn't exist
+    /* 
     friendsTab.addEventListener('click', () => {
-      friendsTab.classList.add('active-tab');
-      postsTab.classList.remove('active-tab');
-      aboutTab.classList.remove('active-tab');
-      friendsSection.classList.add('active-section');
-      postsSection.classList.remove('active-section');
-      aboutSection.classList.remove('active-section');
+      // ... removed code ...
     });
+    */
   </script>
 
   <style>

@@ -107,10 +107,10 @@ fetchPosts();
     
         const cultureElements = post.culture_elements ? `
             <div class="culture-elements">
-                <strong>Culture Elements:</strong>
-                <ul>
+                <h4>Culture Elements:</h4>
+                <ul class="elements-list">
                     ${post.culture_elements.split(',').map(element => `
-                        <li>${element}</li>
+                        <li>${element.trim()}</li>
                     `).join('')}
                 </ul>
             </div>
@@ -118,10 +118,10 @@ fetchPosts();
     
         const learningStyles = post.learning_styles ? `
             <div class="learning-styles">
-                <strong>Learning Styles:</strong>
-                <ul>
+                <h4>Learning Styles:</h4>
+                <ul class="styles-list">
                     ${post.learning_styles.split(',').map(style => `
-                        <li>${style}</li>
+                        <li>${style.trim()}</li>
                     `).join('')}
                 </ul>
             </div>
@@ -153,7 +153,9 @@ fetchPosts();
                     <img src="${post.profile_picture}" alt="${post.username}" class="profile-pic">
                     <span>${post.username}</span>
                     ${post.user_id == currentUserId ? `
-                        <button class="delete-post">🗑️</button>
+                        <button class="delete-post">
+                            <img class="delete-post-icon" src="assets/icons/delete-svgrepo-com.svg" alt="Delete post" style="width: 20px; height: 20px;">
+                        </button>
                     ` : ''}
                 </div>
                 <div class="post-content">

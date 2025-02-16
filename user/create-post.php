@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Navigation Bar -->
     <div class="navbar">
         <div style="display: flex; align-items: center;">
-            <img src="logo.png" alt="Kulturifiko Logo">
+           <img src="assets/logo/logo.png "alt="Kulturifiko Logo">
             <h1>Kulturabase</h1>
         </div>
         <div>

@@ -26,7 +26,7 @@
     <!-- Navigation Bar -->
     <div class="navbar">
         <div style="display: flex; align-items: center;">
-            <img src="logo.png" alt="Kulturifiko Logo">
+           <img src="assets/logo/logo.png "alt="Kulturifiko Logo">
             <h1>Kulturabase</h1>
         </div>
         <div>
@@ -171,7 +171,7 @@
         <div class="journal-grid">
             <!-- Journal Card 1 -->
             <div class="journal-card">
-                <img src="ancient.jpg" alt="Ancient Civilizations">
+                <img src="assets/journal/ancient.jpg" alt="Ancient Civilizations">
                 <div class="journal-card-content">
                     <h3>Ancient Civilizations</h3>
                     <p>Discover the rise and fall of ancient civilizations and their cultural legacies.</p>
@@ -181,7 +181,7 @@
 
             <!-- Journal Card 2 -->
             <div class="journal-card">
-                <img src="wars.jpg" alt="World Wars">
+                <img src="assets/journal/wars.jpg" alt="World Wars">
                 <div class="journal-card-content">
                     <h3>The World Wars</h3>
                     <p>Learn about the impact of the two World Wars on global culture and politics.</p>
@@ -191,7 +191,7 @@
 
             <!-- Journal Card 3 -->
             <div class="journal-card">
-                <img src="renaissance.jpg" alt="Renaissance">
+                <img src="assets/journal/renaissance.jpg" alt="Renaissance">
                 <div class="journal-card-content">
                     <h3>The Renaissance</h3>
                     <p>Explore the cultural and intellectual rebirth that changed the course of history.</p>
@@ -201,7 +201,7 @@
 
             <!-- Journal Card 4 -->
             <div class="journal-card">
-                <img src="movements.jpg" alt="Revolutionary Movements">
+                <img src="assets/journal/movements.jpg" alt="Revolutionary Movements">
                 <div class="journal-card-content">
                     <h3>Revolutionary Movements</h3>
                     <p>Understand how revolutions, from the French Revolution to civil rights movements, have shaped modern societies.</p>
@@ -211,7 +211,7 @@
 
             <!-- Journal Card 5 -->
             <div class="journal-card">
-                <img src="colonialiam.jpg" alt="Colonialism">
+                <img src="assets/journal/colonialiam.jpg" alt="Colonialism">
                 <div class="journal-card-content">
                     <h3>The Age of Colonialism</h3>
                     <p>Examine the lasting effects of colonialism on cultures around the world.</p>
@@ -221,7 +221,7 @@
 
             <!-- Journal Card 6 -->
             <div class="journal-card">
-                <img src="cultural_evolution.jpg" alt="Cultural Evolution">
+                <img src="assets/journal/cultural_evolution.jpg" alt="Cultural Evolution">
                 <div class="journal-card-content">
                     <h3>Cultural Evolution</h3>
                     <p>Explore the evolution of cultural practices, beliefs, and traditions through history.</p>
@@ -231,7 +231,7 @@
 
             <!-- Journal Card 7 -->
             <div class="journal-card">
-                <img src="figures.jpg" alt="Historic Figures">
+                <img src="assets/journal/figures.jpg" alt="Historic Figures">
                 <div class="journal-card-content">
                     <h3>Influential Historical Figures</h3>
                     <p>Learn about the lives of historical figures who shaped the course of human history.</p>
@@ -241,7 +241,7 @@
 
             <!-- Journal Card 8 -->
             <div class="journal-card">
-                <img src="heritage.jpg" alt="Cultural Heritage">
+                <img src="assets/journal/heritage.jpg" alt="Cultural Heritage">
                 <div class="journal-card-content">
                     <h3>Cultural Heritage</h3>
                     <p>Discover how historical events and practices influence modern cultural heritage preservation.</p>
