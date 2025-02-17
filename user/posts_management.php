@@ -49,6 +49,10 @@ switch($action) {
 
 function fetchPosts($conn, $user_id) {
     try {
+        $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
+        $per_page = isset($_POST['per_page']) ? (int)$_POST['per_page'] : 6;
+        $offset = ($page - 1) * $per_page;
+
         $query = "
             SELECT 
                 p.*, 
@@ -60,6 +64,7 @@ function fetchPosts($conn, $user_id) {
             FROM posts p
             JOIN users u ON p.user_id = u.id
             ORDER BY p.created_at DESC
+            LIMIT $per_page OFFSET $offset
         ";
         
         $result = mysqli_query($conn, $query);
@@ -99,7 +104,7 @@ function fetchPosts($conn, $user_id) {
             'posts' => $posts,
             'current_user_id' => $user_id,
             'isAdmin' => isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] ? true : false
-        ], JSON_PRETTY_PRINT);
+        ]);
     } catch (Exception $e) {
         echo json_encode([
             'success' => false,

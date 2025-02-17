@@ -22,9 +22,8 @@ function checkLoginStatus() {
     <title>Kulturabase</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <body>
     <style>
-    /* General */
+        /* General */
         * {
             margin: 0;
             padding: 0;
@@ -37,6 +36,64 @@ function checkLoginStatus() {
             color: #4A4947;
             line-height: 1.6;
             padding-top: 80px;
+        }
+
+        /* Add the new comment styles here */
+        .comments-section {
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        .comment {
+            display: flex;
+            align-items: start;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .comment-profile-pic {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-content strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .comment-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .comment-text {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .submit-comment {
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .submit-comment:hover {
+            background: #0056b3;
         }
     </style>
     
@@ -206,14 +263,16 @@ function checkLoginStatus() {
     margin: 0 0 20px 0;
     padding: 20px;
     width: 100%;
-    display: inline-block;
-    break-inside: avoid;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    min-height: 400px; /* Set a minimum height for consistency */
+    position: relative; /* For absolute positioning of interactions */
 }
 
 .post:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
 }
 
 .post-header {
@@ -255,6 +314,12 @@ function checkLoginStatus() {
     opacity: 1;
 }
 
+.post-content {
+    flex: 1;
+    overflow: hidden;
+    margin-bottom: 60px; /* Space for the interaction buttons */
+}
+
 .post-content h3 {
     margin: 10px 0;
     font-size: 18px;
@@ -273,19 +338,32 @@ function checkLoginStatus() {
 }
 
 .post-interactions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
     display: flex;
     justify-content: space-between;
-    margin-top: 10px;
+    padding: 15px 20px;
+    background-color: #fff;
+    border-top: 1px solid #eee;
+    border-radius: 0 0 12px 12px;
 }
 
 .like-btn, .comment-toggle {
     background: #007bff;
     color: #fff;
     border: none;
-    padding: 8px 12px;
+    padding: 8px 16px;
     font-size: 14px;
     cursor: pointer;
     border-radius: 5px;
+    flex: 1;
+    margin: 0 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
 }
 
 .like-btn.liked {
@@ -293,7 +371,17 @@ function checkLoginStatus() {
 }
 
 .comments-section {
-    margin-top: 20px;
+    position: absolute;
+    bottom: 60px; /* Height of interaction buttons */
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+    z-index: 1;
 }
 
 .comment {
@@ -339,9 +427,11 @@ function checkLoginStatus() {
 }
 
 .comment-input {
-    display: flex;
-    align-items: center;
-    margin-top: 15px;
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding: 10px 0;
+    border-top: 1px solid #eee;
 }
 
 .comment-text {
@@ -368,11 +458,17 @@ function checkLoginStatus() {
     background: #ccc;
     color: #fff;
     border: none;
-    padding: 8px 12px;
+    padding: 8px 16px;
     font-size: 14px;
     cursor: pointer;
     border-radius: 5px;
     opacity: 0.7;
+    flex: 1;
+    margin: 0 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
 }
 
 .like-btn-disabled:hover, .comment-toggle-disabled:hover {
@@ -380,7 +476,7 @@ function checkLoginStatus() {
 }
 
    .explore-container {
-      max-width: 1600px;
+      max-width: 1200px;
       margin: 20px auto;
       margin-left: 260px;
       padding: 20px;
@@ -388,36 +484,37 @@ function checkLoginStatus() {
     }
 
     #post-display {
-        columns: 4;
-        column-gap: 20px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
         padding: 0;
         width: 100%;
     }
 
     .post-container {
       border: 1px solid #ccc;
-      padding: 20px;
+        padding: 20px;
       margin-bottom: 25px;
       border-radius: 10px;
-      background-color: #fff;
+        background-color: #fff;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .post-header {
-      display: flex;
-      align-items: center;
+        display: flex;
+        align-items: center;
       margin-bottom: 15px;
     }
 
     .profile-pic {
       width: 50px;
       height: 50px;
-      border-radius: 50%;
-      margin-right: 10px;
+        border-radius: 50%;
+        margin-right: 10px;
     }
 
     .post-header div {
-      font-size: 14px;
+        font-size: 14px;
     }
 
     .post-header strong {
@@ -432,23 +529,23 @@ function checkLoginStatus() {
     }
 
     .post-body img {
-      width: 100%;
+        width: 100%;
       max-height: 500px;
-      object-fit: cover;
+        object-fit: cover;
       margin-top: 15px;
-      border-radius: 5px;
+        border-radius: 5px;
     }
 
     .post-footer {
-      display: flex;
-      justify-content: space-between;
+        display: flex;
+        justify-content: space-between;
       margin-top: 15px;
     }
 
     .post-footer button {
       background: none;
-      border: none;
-      cursor: pointer;
+        border: none;
+        cursor: pointer;
       color: #555;
       font-size: 16px;
       transition: color 0.3s;
@@ -467,7 +564,7 @@ function checkLoginStatus() {
     /* Tag Style for Elements */
     .tags-container {
       margin-top: 10px;
-      display: flex;
+        display: flex;
       flex-wrap: wrap;
       gap: 10px;
     }
@@ -477,81 +574,43 @@ function checkLoginStatus() {
       color: #007bff;
       border-radius: 20px;
       padding: 5px 15px;
-      font-size: 14px;
+        font-size: 14px;
       border: 1px solid #007bff;
       transition: all 0.3s ease;
     }
 
     .tag:hover {
       background-color: #007bff;
-      color: #fff;
+        color: #fff;
     }
 
     /* Add responsive media queries */
-    @media screen and (min-width: 1801px) {
-        .explore-container {
-            margin-left: calc((100% - 1600px) / 2 + 260px);
-        }
-    }
-
-    @media screen and (max-width: 1800px) {
-        #post-display {
-            columns: 3;
-        }
-    }
-
-    @media screen and (max-width: 1400px) {
-        #post-display {
-            columns: 3;
-        }
-    }
-
     @media screen and (max-width: 1200px) {
         #post-display {
-            columns: 2;
+            grid-template-columns: repeat(2, 1fr);
         }
-    }
-
-    @media screen and (max-width: 992px) {
-        .explore-container {
-            margin-left: 260px;
-            width: calc(100% - 280px);
-            padding: 15px;
-        }
-        #post-display {
-            columns: 2;
+        
+        .post {
+            min-height: 350px;
         }
     }
 
     @media screen and (max-width: 768px) {
-        .sidebar {
-            width: 200px;
+        #post-display {
+            grid-template-columns: repeat(1, 1fr);
         }
         
-        .explore-container {
-            margin-left: 210px;
-            width: calc(100% - 220px);
-            padding: 10px;
-        }
-        #post-display {
-            columns: 1;
-        }
+        .post {
+            min-height: 300px;
     }
 
-    @media screen and (max-width: 576px) {
-        .sidebar {
-            display: none;
-        }
-        
-        .explore-container {
-            width: 100%;
-            margin: 10px auto;
-            padding: 10px;
-        }
-        
-        #post-display {
-            columns: 1;
-            padding: 0;
+    .post-interactions {
+            padding: 10px 15px;
+    }
+
+    .like-btn, .comment-toggle {
+            padding: 6px 12px;
+        font-size: 13px;
         }
     }
 
@@ -755,10 +814,10 @@ function checkLoginStatus() {
     /* Add this to your existing CSS */
     .post-media {
         width: 100%;
+        max-height: 250px; /* Limit media height */
+        object-fit: cover;
         border-radius: 8px;
         margin: 10px 0;
-        max-height: 500px;
-        object-fit: contain;
     }
 
     video.post-media {
@@ -826,33 +885,33 @@ function checkLoginStatus() {
   .sidebar {
     position: fixed;
     top: 60px; 
-    left: 0;
+        left: 0;
     width: 240px;  
     height: 100vh;
     background-color: #365486;
     padding-top: 30px;
     z-index: 999; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow-y: auto;
     flex-grow: 1;
     box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
     border-radius: 0 5px 5px 0;
-}
+    }
 
 /* Logo Section */
 .logo-section {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
   margin-top: 15px;
-  margin-bottom: 15px;
+        margin-bottom: 15px;
 }
 
 .logo-section img {
   max-width: 100px;
-  border-radius: 5px;
+        border-radius: 5px;
 }
 
 /* Section Menus */
@@ -869,10 +928,10 @@ function checkLoginStatus() {
 /* Menu Items */
 .menu-item {
   display: inline-block;
-  align-items: center;
+        align-items: center;
   justify-content: flex-start;
   margin: 3px 0;
-  cursor: pointer;
+        cursor: pointer;
   transition: background 0.2s ease;
   padding: 5px 5px;
   border-radius: 4px;
@@ -895,7 +954,7 @@ function checkLoginStatus() {
 
 .menu-item a.active {
     background-color: #1e3c72;
-    color: #fff;
+        color: #fff;
 }
 
 .menu-item ul {
@@ -918,7 +977,7 @@ input[type="checkbox"] {
 }
 
 #chosen-location-container label {
-    font-size: 12px; 
+        font-size: 12px;
     color: #ffffff;
 }
 </style>
@@ -927,6 +986,10 @@ input[type="checkbox"] {
 // Add this to help with debugging
 const currentUserId = <?php echo isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'null' ?>;
 const isAdmin = <?php echo isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] ? 'true' : 'false' ?>;
+
+// Add these variables for use in posts.js
+const currentUsername = <?php echo isset($_SESSION['username']) ? "'".$_SESSION['username']."'" : 'null' ?>;
+const currentUserProfilePic = <?php echo isset($_SESSION['profile_picture']) ? "'".$_SESSION['profile_picture']."'" : 'null' ?>;
 
 $(document).ready(function() {
     loadPosts();
