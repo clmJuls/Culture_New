@@ -5,6 +5,11 @@ $(document).ready(function() {
         cultureElements: [],
         learningStyles: []
     };
+    let currentPage = 1;
+    const postsPerPage = 6;
+    let isLoading = false;
+    let hasMorePosts = true;
+
     function initializeFilters() {
         // Culture Elements filters
         $('.menu-section a[href^="geography"], .menu-section a[href^="history"], .menu-section a[href^="demographics"], .menu-section a[href^="culture"]').click(function(e) {
@@ -75,9 +80,12 @@ $(document).ready(function() {
     }
 
     // Display posts function
-    function displayPosts(posts) {
+    function displayPosts(posts, clearExisting = false) {
         const postDisplay = document.getElementById('post-display');
-        postDisplay.innerHTML = '';
+        
+        if (clearExisting) {
+            postDisplay.innerHTML = '';
+        }
 
         posts.forEach(post => {
             const postElement = document.createElement('div');
@@ -392,6 +400,53 @@ fetchPosts();
         }
     };
 
-    // Initial fetch of posts
-    fetchPosts();
+    // Infinite scroll handler
+    $(window).scroll(function() {
+        if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+            if (!isLoading && hasMorePosts) {
+                loadMorePosts();
+            }
+        }
+    });
+
+    function loadPosts() {
+        isLoading = true;
+        $.ajax({
+            url: 'posts_management.php',
+            type: 'POST',
+            data: { 
+                action: 'fetch_posts',
+                page: currentPage,
+                per_page: postsPerPage
+            },
+            success: function(response) {
+                try {
+                    const data = typeof response === 'object' ? response : JSON.parse(response);
+                    if (data.posts) {
+                        if (data.posts.length < postsPerPage) {
+                            hasMorePosts = false;
+                        }
+                        displayPosts(data.posts, currentPage === 1);
+                    } else {
+                        console.error('No posts data in response');
+                    }
+                } catch (e) {
+                    console.error('Error parsing response:', e);
+                }
+                isLoading = false;
+            },
+            error: function(xhr, status, error) {
+                console.error('Ajax error:', error);
+                isLoading = false;
+            }
+        });
+    }
+
+    function loadMorePosts() {
+        currentPage++;
+        loadPosts();
+    }
+
+    // Initial load
+    loadPosts();
 });
