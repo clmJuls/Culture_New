@@ -728,6 +728,29 @@ function checkLoginStatus() {
         transform: scale(1.02);
         transition: transform 0.3s ease;
     }
+
+    /* Like Button Animation */
+    .like-btn {
+        transition: all 0.2s ease-in-out;
+    }
+
+    .like-animation {
+        transform: scale(1.2);
+    }
+
+    .liked {
+        background-color: #28a745;
+        transform: scale(1);
+    }
+
+    .like-btn:active {
+        transform: scale(0.95);
+    }
+
+    /* Smooth transition for all button states */
+    .like-btn, .comment-toggle {
+        transition: all 0.2s ease-in-out;
+    }
   </style>
 
 <!-- Sidebar -->

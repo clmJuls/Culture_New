@@ -784,6 +784,9 @@ input[type="checkbox"] {
 }
 </style>
 
+<!-- Include Chat Widget -->
+<?php include 'widgets/chat.php'; ?>
+
 </body>
 </head>
 </html>

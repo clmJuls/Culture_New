@@ -48,9 +48,9 @@ function fetchPosts($conn, $user_id) {
             p.*, 
             u.username, 
             u.profile_picture,
-            (SELECT COUNT(*) FROM likes WHERE post_id = p.id) as like_count,
+            (SELECT COUNT(*) FROM likes WHERE post_id = p.id AND is_active = 1) as like_count,
             (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count,
-            " . ($user_id ? "(SELECT COUNT(*) FROM likes WHERE post_id = p.id AND user_id = $user_id) as user_liked" : "0 as user_liked") . "
+            " . ($user_id ? "(SELECT COUNT(*) FROM likes WHERE post_id = p.id AND user_id = $user_id AND is_active = 1) as user_liked" : "0 as user_liked") . "
         FROM posts p
         JOIN users u ON p.user_id = u.id
         ORDER BY p.created_at DESC
@@ -86,16 +86,30 @@ function fetchPosts($conn, $user_id) {
 
 function toggleLike($conn, $user_id) {
     $post_id = $_POST['post_id'];
-    $check_like = "SELECT id FROM likes WHERE post_id = $post_id AND user_id = $user_id";
+    
+    // Sanitize inputs
+    $post_id = (int)$post_id;
+    $user_id = (int)$user_id;
+    
+    // Check if like exists
+    $check_like = "SELECT id, is_active FROM likes 
+                   WHERE post_id = $post_id AND user_id = $user_id";
     $result = mysqli_query($conn, $check_like);
 
     if (mysqli_num_rows($result) > 0) {
-        $unlike = "DELETE FROM likes WHERE post_id = $post_id AND user_id = $user_id";
-        mysqli_query($conn, $unlike);
-        echo json_encode(['status' => 'unliked']);
+        $like = mysqli_fetch_assoc($result);
+        // Toggle is_active status
+        $new_status = $like['is_active'] ? 0 : 1;
+        $update = "UPDATE likes 
+                   SET is_active = $new_status 
+                   WHERE post_id = $post_id AND user_id = $user_id";
+        mysqli_query($conn, $update);
+        echo json_encode(['status' => $new_status ? 'liked' : 'unliked']);
     } else {
-        $like = "INSERT INTO likes (post_id, user_id) VALUES ($post_id, $user_id)";
-        mysqli_query($conn, $like);
+        // Create new like record
+        $insert = "INSERT INTO likes (post_id, user_id, is_active) 
+                  VALUES ($post_id, $user_id, 1)";
+        mysqli_query($conn, $insert);
         echo json_encode(['status' => 'liked']);
     }
 }

@@ -184,29 +184,72 @@ fetchPosts();
     }
     
 
-    // Event Delegation for Dynamic Elements
+    // Like functionality
     $(document).on('click', '.like-btn', function() {
         const postId = $(this).closest('.post').data('post-id');
         const likeBtn = $(this);
+        
+        // Prevent multiple clicks while processing
+        if (likeBtn.hasClass('processing')) return;
+        likeBtn.addClass('processing');
+        
+        // Safer number parsing with fallback
+        let currentLikeCount = 0;
+        try {
+            currentLikeCount = parseInt(likeBtn.text().match(/\d+/) || [0])[0];
+            if (isNaN(currentLikeCount)) currentLikeCount = 0;
+        } catch (e) {
+            currentLikeCount = 0;
+        }
+        
+        const isCurrentlyLiked = likeBtn.hasClass('liked');
+        
+        // Format like count with safeguard
+        const formatLikeCount = (count) => {
+            count = Math.max(0, count);
+            return `👍 ${count} ${count === 1 ? 'Like' : 'Likes'}`;
+        };
 
+        // Add animation class
+        likeBtn.addClass('like-animation');
+        setTimeout(() => {
+            likeBtn.removeClass('like-animation');
+        }, 200);
+
+        // Make AJAX call
         $.ajax({
             url: 'posts_management.php',
             type: 'POST',
             data: { 
                 action: 'toggle_like', 
-                post_id: postId 
+                post_id: postId,
+                final_state: !isCurrentlyLiked ? 1 : 0
             },
             dataType: 'json',
             success: function(response) {
-                if (response.status === 'liked') {
-                    likeBtn.addClass('liked');
-                    const likeCount = parseInt(likeBtn.text().split(' ')[0]);
-                    likeBtn.text(`👍 ${likeCount + 1} Likes`);
-                } else {
-                    likeBtn.removeClass('liked');
-                    const likeCount = parseInt(likeBtn.text().split(' ')[0]);
-                    likeBtn.text(`👍 ${likeCount - 1} Likes`);
+                if (response.status === 'success') {
+                    // Update UI only after successful response
+                    if (isCurrentlyLiked) {
+                        likeBtn.removeClass('liked');
+                    } else {
+                        likeBtn.addClass('liked');
+                    }
+                    
+                    // Update like count if provided
+                    if (response.like_count !== undefined) {
+                        likeBtn.html(formatLikeCount(response.like_count));
+                    } else {
+                        // Fallback to calculated count if server doesn't provide it
+                        likeBtn.html(formatLikeCount(isCurrentlyLiked ? currentLikeCount - 1 : currentLikeCount + 1));
+                    }
                 }
+            },
+            error: function() {
+                // On error, no state change needed since we didn't update UI yet
+                console.error('Failed to update like status');
+            },
+            complete: function() {
+                likeBtn.removeClass('processing');
             }
         });
     });
