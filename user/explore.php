@@ -751,6 +751,31 @@ function checkLoginStatus() {
     .like-btn, .comment-toggle {
         transition: all 0.2s ease-in-out;
     }
+
+    /* Add this to your existing CSS */
+    .post-media {
+        width: 100%;
+        border-radius: 8px;
+        margin: 10px 0;
+        max-height: 500px;
+        object-fit: contain;
+    }
+
+    video.post-media {
+        background-color: #000;
+    }
+
+    /* Optional: Add a custom video player style */
+    video.post-media::-webkit-media-controls {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 0 0 8px 8px;
+    }
+
+    /* Ensure proper video container sizing */
+    .post-content {
+        width: 100%;
+        overflow: hidden;
+    }
   </style>
 
 <!-- Sidebar -->
@@ -898,6 +923,175 @@ input[type="checkbox"] {
 }
 </style>
 
+<script>
+// Add this to help with debugging
+const currentUserId = <?php echo isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'null' ?>;
+const isAdmin = <?php echo isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] ? 'true' : 'false' ?>;
+
+$(document).ready(function() {
+    loadPosts();
+});
+
+function loadPosts() {
+    $.ajax({
+        url: 'posts_management.php',
+        type: 'POST',
+        data: { action: 'fetch_posts' },
+        success: function(response) {
+            try {
+                // If response is already a JavaScript object, use it directly
+                const data = typeof response === 'object' ? response : JSON.parse(response);
+                if (data.posts) {
+                    displayPosts(data.posts);
+                } else {
+                    console.error('No posts data in response');
+                }
+            } catch (e) {
+                console.error('Error parsing response:', e);
+                console.log('Raw response:', response);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Ajax error:', error);
+        }
+    });
+}
+
+function displayPosts(posts) {
+    const postDisplay = document.getElementById('post-display');
+    postDisplay.innerHTML = '';
+
+    posts.forEach(post => {
+        const postElement = document.createElement('div');
+        postElement.className = 'post';
+        
+        // Determine if the file is an image or video based on file extension
+        let mediaHTML = '';
+        if (post.file_path) {
+            const fileExtension = post.file_path.split('.').pop().toLowerCase();
+            const isVideo = ['mp4', 'webm', 'mov'].includes(fileExtension);
+            
+            if (isVideo) {
+                mediaHTML = `
+                    <video class="post-media" controls>
+                        <source src="${post.file_path}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>`;
+            } else {
+                mediaHTML = `<img class="post-media" src="${post.file_path}" alt="Post media">`;
+            }
+        }
+
+        postElement.innerHTML = `
+            <div class="post-header">
+                <div style="display: flex; align-items: center;">
+                    <img src="${post.profile_picture || 'assets/default-profile.png'}" class="profile-pic" alt="Profile Picture">
+                    <span>${post.username}</span>
+                </div>
+                ${post.user_id == currentUserId || isAdmin ? 
+                    `<button class="delete-post" onclick="deletePost(${post.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>` : ''
+                }
+            </div>
+            <div class="post-content">
+                <h3>${post.title}</h3>
+                <p>${post.description}</p>
+                ${mediaHTML}
+            </div>
+            <div class="post-interactions">
+                <button class="like-btn ${post.user_liked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+                    <i class="fas fa-heart"></i> ${post.like_count} Likes
+                </button>
+                <button class="comment-toggle" onclick="toggleComments(${post.id})">
+                    <i class="fas fa-comment"></i> ${post.comment_count} Comments
+                </button>
+            </div>
+            <div class="comments-section" id="comments-${post.id}" style="display: none;">
+                ${renderComments(post.comments)}
+            </div>`;
+
+        postDisplay.appendChild(postElement);
+    });
+}
+
+function renderComments(comments) {
+    if (!comments || comments.length === 0) {
+        return '<p>No comments yet.</p>';
+    }
+
+    return comments.map(comment => `
+        <div class="comment">
+            <img src="${comment.profile_picture || 'assets/default-profile.png'}" class="comment-profile-pic" alt="Profile Picture">
+            <div class="comment-content">
+                <strong>${comment.username}</strong>
+                <p>${comment.comment_text}</p>
+            </div>
+            ${comment.user_id == currentUserId || isAdmin ? 
+                `<button class="delete-comment" onclick="deleteComment(${comment.id})">
+                    <i class="fas fa-trash"></i>
+                </button>` : ''
+            }
+        </div>
+    `).join('');
+}
+
+function toggleLike(postId) {
+    if (!currentUserId) {
+        handleUnauthorizedAction('like posts');
+        return;
+    }
+
+    $.ajax({
+        url: 'posts_management.php',
+        type: 'POST',
+        data: { 
+            action: 'toggle_like',
+            post_id: postId
+        },
+        success: function(response) {
+            loadPosts(); // Reload posts to update like status
+        }
+    });
+}
+
+function toggleComments(postId) {
+    const commentsSection = document.getElementById(`comments-${postId}`);
+    commentsSection.style.display = commentsSection.style.display === 'none' ? 'block' : 'none';
+}
+
+function deletePost(postId) {
+    if (confirm('Are you sure you want to delete this post?')) {
+        $.ajax({
+            url: 'posts_management.php',
+            type: 'POST',
+            data: { 
+                action: 'delete_post',
+                post_id: postId
+            },
+            success: function(response) {
+                loadPosts(); // Reload posts after deletion
+            }
+        });
+    }
+}
+
+function deleteComment(commentId) {
+    if (confirm('Are you sure you want to delete this comment?')) {
+        $.ajax({
+            url: 'posts_management.php',
+            type: 'POST',
+            data: { 
+                action: 'delete_comment',
+                comment_id: commentId
+            },
+            success: function(response) {
+                loadPosts(); // Reload posts after comment deletion
+            }
+        });
+    }
+}
+</script>
 </body>
 </head>
 </html>

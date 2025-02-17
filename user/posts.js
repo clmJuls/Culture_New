@@ -76,12 +76,64 @@ $(document).ready(function() {
 
     // Display posts function
     function displayPosts(posts) {
-        const postDisplay = $('#post-display');
-        postDisplay.empty();
+        const postDisplay = document.getElementById('post-display');
+        postDisplay.innerHTML = '';
 
-        posts.forEach(function(post) {
-            const postElement = createPostElement(post);
-            postDisplay.append(postElement);
+        posts.forEach(post => {
+            const postElement = document.createElement('div');
+            postElement.className = 'post';
+            
+            // Determine if the file is an image or video based on file extension
+            const isVideo = post.file_path && (
+                post.file_path.endsWith('.mp4') || 
+                post.file_path.endsWith('.webm') || 
+                post.file_path.endsWith('.mov')
+            );
+
+            // Create the media element (image or video)
+            let mediaHTML = '';
+            if (post.file_path) {
+                if (isVideo) {
+                    mediaHTML = `
+                        <video class="post-media" controls>
+                            <source src="${post.file_path}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>`;
+                } else {
+                    mediaHTML = `<img class="post-media" src="${post.file_path}" alt="Post media">`;
+                }
+            }
+
+            postElement.innerHTML = `
+                <div class="post-header">
+                    <div style="display: flex; align-items: center;">
+                        <img src="${post.profile_picture || 'assets/default-profile.png'}" class="profile-pic" alt="Profile Picture">
+                        <span>${post.username}</span>
+                    </div>
+                    ${post.user_id === currentUserId || isAdmin ? 
+                        `<button class="delete-post" onclick="deletePost(${post.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>` : ''
+                    }
+                </div>
+                <div class="post-content">
+                    <h3>${post.title}</h3>
+                    <p>${post.description}</p>
+                    ${mediaHTML}
+                </div>
+                <div class="post-interactions">
+                    <button class="like-btn ${post.user_liked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+                        <i class="fas fa-heart"></i> ${post.like_count} Likes
+                    </button>
+                    <button class="comment-toggle" onclick="toggleComments(${post.id})">
+                        <i class="fas fa-comment"></i> ${post.comment_count} Comments
+                    </button>
+                </div>
+                <div class="comments-section" id="comments-${post.id}" style="display: none;">
+                    <!-- Comments will be loaded here -->
+                </div>`;
+
+            postDisplay.appendChild(postElement);
         });
     }
     document.addEventListener('click', function (event) {
