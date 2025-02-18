@@ -9,9 +9,9 @@
             <h1>Kulturabase</h1>
         </div>
         <div class="nav-links">
-            <a href="home.php" class="active">Home</a>
+            <a href="home.php" <?php echo basename($_SERVER['PHP_SELF']) == 'home.php' ? 'class="active"' : ''; ?>>Home</a>
             <a href="create-post.php">+ Create</a>
-            <a href="explore.php">Explore</a>
+            <a href="explore.php" <?php echo basename($_SERVER['PHP_SELF']) == 'explore.php' ? 'class="active"' : ''; ?>>Explore</a>
             <div class="notification-dropdown">
                 <div class="notification-icon" onclick="toggleNotificationDropdown()">
                     <i class="fas fa-bell"></i>
