@@ -73,29 +73,20 @@ $avatar_text = $first_initial . $last_name;
     </div> -->
 
     <!-- Profile Header -->
-    <div class="profile-header" style="margin-top: 100px; text-align: center;">
-          <div class="profile-picture" style="margin-bottom: 20px; display: flex; justify-content: center; align-items: center;">
-            <div class="profile-img" style="display: inline-block;">
-              <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" id="profile-img" class="profile-img-preview" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
+    <div class="profile-header" style="margin-top: 100px;">
+        <div class="profile-picture">
+            <div class="profile-img">
+                <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" id="profile-img" class="profile-img-preview">
             </div>
         </div>
         <div class="user-info">
             <h2><?php echo $full_name; ?></h2>
-            <p>@<?php echo $username; ?></p>
-            <div class="user-stats" style="margin: 10px 0;">
-                <!-- <span><strong>1,234</strong> Followers</span>
-                <span style="margin-left: 15px;"><strong>567</strong> Following</span> -->
+            <p class="username">@<?php echo $username; ?></p>
+            <div class="user-stats">
+                <!-- Stats content -->
             </div>
-            <a href="edit-profile.php">
-                <button class="edit-profile-btn" style="
-                    padding: 10px 20px; 
-                    font-size: 16px; 
-                    color: white; 
-                    background-color: #007bff; 
-                    border: none; 
-                    border-radius: 4px; 
-                    cursor: pointer;">Edit Profile
-                </button>
+            <a href="edit-profile.php" class="edit-profile-link">
+                <button class="edit-profile-btn">Edit Profile</button>
             </a>
         </div>
     </div>
@@ -324,105 +315,127 @@ $avatar_text = $first_initial . $last_name;
   position: relative;
   padding: 20px;
   background-color: #fff;
-  margin-top: -75px;
+  max-width: 600px;
+  margin: 100px auto 0;
 }
 
 .profile-picture {
-  position: relative;
-  width: 150px;
-  height: 150px;
-  margin: 0 auto;
-  border-radius: 50%;
-  border: 4px solid #fff;
-  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
-.profile-picture img {
+.profile-img {
+  width: 150px;
+  height: 150px;
+}
+
+.profile-img-preview {
   width: 100%;
   height: 100%;
+  border-radius: 50%;
   object-fit: cover;
 }
 
-.user-info h2 {
-  margin: 10px 0 5px;
-  font-size: 24px;
-  font-weight: bold;
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 15px 0;
+  background: none;
+  border: none;
+  cursor: default;
 }
 
-.user-info p {
-  margin: 0;
-  color: #666;
+.user-info:hover {
+  background: none;
+  border: none;
+}
+
+.user-info h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.user-info .username {
   font-size: 16px;
+  color: #666;
+  margin-bottom: 15px;
 }
 
 .user-stats {
   margin: 10px 0;
-  font-size: 16px;
-  color: #444;
 }
 
-.user-stats span {
-  margin-right: 20px;
+.edit-profile-link {
+  text-decoration: none;
 }
 
-/* Edit Profile Button */
 .edit-profile-btn {
-  background-color: #1877f2;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
+  background-color: transparent;
+  color: #1a1a1a;
+  border: 1px solid #dadde1;
+  padding: 8px 20px;
+  border-radius: 20px;
   font-size: 14px;
-  transition: background-color 0.3s;
-}
-
-.edit-profile-btn:hover {
-  background-color: #145dbf;
+  font-weight: 500;
+  cursor: pointer;
 }
 
 /* Navigation Tabs */
 .profile-nav {
   display: flex;
-  justify-content: space-around;
-  padding: 10px 0;
+  justify-content: center;
+  gap: 20px;
+  padding: 15px 0;
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
-  background-color: #f9f9f9;
+  background-color: #fff;
+  margin-top: 20px;
 }
 
 .profile-nav button {
   background: none;
   border: none;
   font-size: 16px;
-  font-weight: bold;
-  color: #1877f2;
+  font-weight: 500;
+  color: #666;
   cursor: pointer;
-  padding: 10px 20px;
-  border-radius: 4px;
-  transition: background-color 0.3s;
+  padding: 8px 24px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
 }
 
 .profile-nav button:hover {
-  background-color: #e4e6eb;
+  background-color: #f0f2f5;
+  color: #1877f2;
 }
 
-.active-tab {
-  color: #fff;
-  background-color: #1877f2;
+.profile-nav button.active-tab {
+  color: #1877f2;
+  background-color: #e7f3ff;
+  font-weight: 600;
 }
 
 /* Content Sections */
 .content-sections {
   padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .content-section {
   display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.active-section {
+.content-section.active-section {
   display: block;
+  opacity: 1;
 }
 
 .post {
@@ -560,12 +573,9 @@ $avatar_text = $first_initial . $last_name;
 /* About Section */
 .about-section {
   background-color: #fff;
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  max-width: 800px;
-  margin: 20px auto;
-  font-size: 16px;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .about-section h2 {
@@ -668,6 +678,7 @@ $avatar_text = $first_initial . $last_name;
 
 <!-- Sidebar -->
 <?php include 'components/layout/guest/sidebar.php'; ?>
+<?php include 'components/widgets/chat.php'; ?>
 
 </body>
 </head>

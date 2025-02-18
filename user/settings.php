@@ -100,7 +100,6 @@ if ($result->num_rows > 0) {
     exit();
 }
 
-$conn->close();
 ?>
 
 
@@ -523,3 +522,6 @@ input[type="checkbox"] {
 </body>
 </head>
 </html>
+<?php
+$conn->close();
+?>

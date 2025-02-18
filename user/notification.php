@@ -495,6 +495,7 @@ $isAdmin = $_SESSION['isAdmin'];
 
 <!-- Sidebar -->
 <?php include 'components/layout/guest/sidebar.php'; ?>
+<?php include 'components/widgets/chat.php'; ?>
 
 </body>
 </head>

@@ -331,6 +331,7 @@ function previewCoverImage(event) {
 
 <!-- Sidebar -->
 <?php include 'components/layout/guest/sidebar.php'; ?>
+<?php include 'components/widgets/chat.php'; ?>
 
 </body>
 </head>
