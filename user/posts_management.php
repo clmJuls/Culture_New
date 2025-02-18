@@ -1,6 +1,11 @@
 <?php
 require 'db_conn.php';
 session_start();
+header('Content-Type: application/json');
+
+// At the start of the file
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 // Allow fetching posts without login
 if ($_POST['action'] === 'fetch_posts') {
@@ -43,44 +48,69 @@ switch($action) {
 }
 
 function fetchPosts($conn, $user_id) {
-    $query = "
-        SELECT 
-            p.*, 
-            u.username, 
-            u.profile_picture,
-            (SELECT COUNT(*) FROM likes WHERE post_id = p.id AND is_active = 1) as like_count,
-            (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count,
-            " . ($user_id ? "(SELECT COUNT(*) FROM likes WHERE post_id = p.id AND user_id = $user_id AND is_active = 1) as user_liked" : "0 as user_liked") . "
-        FROM posts p
-        JOIN users u ON p.user_id = u.id
-        ORDER BY p.created_at DESC
-    ";
-    $result = mysqli_query($conn, $query);
+    try {
+        $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
+        $per_page = isset($_POST['per_page']) ? (int)$_POST['per_page'] : 6;
+        $offset = ($page - 1) * $per_page;
 
-    $posts = [];
-    while ($post = mysqli_fetch_assoc($result)) {
-        $post_id = $post['id'];
-        $comments_query = "
-            SELECT c.*, u.username, u.profile_picture 
-            FROM comments c
-            JOIN users u ON c.user_id = u.id
-            WHERE c.post_id = $post_id
-            ORDER BY c.created_at ASC
+        $query = "
+            SELECT 
+                p.*, 
+                u.username, 
+                u.profile_picture,
+                (SELECT COUNT(*) FROM likes WHERE post_id = p.id AND is_active = 1) as like_count,
+                (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count,
+                " . ($user_id ? "(SELECT COUNT(*) FROM likes WHERE post_id = p.id AND user_id = $user_id AND is_active = 1) as user_liked" : "0 as user_liked") . "
+            FROM posts p
+            JOIN users u ON p.user_id = u.id
+            ORDER BY p.created_at DESC
+            LIMIT $per_page OFFSET $offset
         ";
-        $comments_result = mysqli_query($conn, $comments_query);
-        $post['comments'] = [];
-        while ($comment = mysqli_fetch_assoc($comments_result)) {
-            $post['comments'][] = $comment;
+        
+        $result = mysqli_query($conn, $query);
+        
+        if (!$result) {
+            throw new Exception(mysqli_error($conn));
         }
-        $posts[] = $post;
+
+        $posts = [];
+        while ($post = mysqli_fetch_assoc($result)) {
+            // Add file type checking
+            if ($post['file_path']) {
+                $file_extension = strtolower(pathinfo($post['file_path'], PATHINFO_EXTENSION));
+                $post['is_video'] = in_array($file_extension, ['mp4', 'webm', 'mov']);
+            }
+
+            // Fetch comments for this post
+            $post_id = $post['id'];
+            $comments_query = "
+                SELECT c.*, u.username, u.profile_picture 
+                FROM comments c
+                JOIN users u ON c.user_id = u.id
+                WHERE c.post_id = $post_id
+                ORDER BY c.created_at ASC
+            ";
+            $comments_result = mysqli_query($conn, $comments_query);
+            $post['comments'] = [];
+            while ($comment = mysqli_fetch_assoc($comments_result)) {
+                $post['comments'][] = $comment;
+            }
+            
+            $posts[] = $post;
+        }
+
+        echo json_encode([
+            'success' => true,
+            'posts' => $posts,
+            'current_user_id' => $user_id,
+            'isAdmin' => isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] ? true : false
+        ]);
+    } catch (Exception $e) {
+        echo json_encode([
+            'success' => false,
+            'error' => $e->getMessage()
+        ]);
     }
-
-
-    echo json_encode([
-        'posts' => $posts,
-        'current_user_id' => $user_id,
-        'isAdmin' => isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] ? true : false
-    ]);
 }
 
 

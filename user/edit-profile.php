@@ -63,8 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               </script>";
     }
 }
-
-$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -93,124 +91,7 @@ $conn->close();
     </style>
     
     <!-- Navigation Bar -->
-    <div class="navbar">
-        <div style="display: flex; align-items: center;">
-           <img src="assets/logo/logo.png "alt="Kulturifiko Logo">
-            <h1>Kulturabase</h1>
-        </div>
-        <div>
-            <a href="home.php">Home</a>
-            <a href="create-post.php">+ Create</a>
-            <a href="explore.php">Explore</a>
-            <a href="notification.php">Notification</a>
-            <div class="dropdown">
-                <a href="#" class="dropdown-btn" onclick="toggleDropdown()">Menu</a>
-                <div class="dropdown-content">
-                    <a href="profile.php">Profile</a>
-                    <a href="settings.php">Settings</a>
-                </div>
-            </div>
-            <a href="#" onclick="handleLogout()">Log Out</a>
-        </div>
-    </div>
-
-    <style>
-    /* Navigation Bar */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #365486;
-            padding: 20px 40px;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar img {
-            height: 50px;
-            width: auto;
-        }
-
-        .navbar h1 {
-            color: #DCF2F1;
-            font-size: 2rem;
-            font-weight: 600;
-            margin-left: 10px;
-        }
-
-        .navbar a {
-            color: #DCF2F1;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 1rem;
-            font-weight: 500;
-            padding: 10px 20px;
-            border-radius: 30px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .navbar a:hover {
-            background-color: #7FC7D9;
-            color: #0F1035;
-        }
-
-        .navbar a.active {
-            background-color: #1e3c72;
-            color: #fff;
-        }
-        
-    /* Dropdown */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: white;
-            min-width: 150px;
-            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-            z-index: 1;
-            border-radius: 4px;
-        }
-
-        .dropdown-content a {
-            color: black;
-            padding: 10px 15px;
-            text-decoration: none;
-            display: block;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .dropdown-content a:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-content a:hover {
-            background-color: #f1f1f1;
-        }
-
-    /* Toggle class for show/hide */
-        .show {
-            display: block;
-        }
-    </style>
-
-    <script>
-        function toggleDropdown() {
-            var dropdownContent = document.querySelector(".dropdown-content");
-            dropdownContent.classList.toggle("show");
-        }
-        function handleLogout() {
-            if (confirm('Are you sure you want to log out?')) {
-                window.location.href = 'auth/logout.php';
-            }
-        }
-    </script>
+    <?php include 'components/layout/guest/navbar.php'; ?>
 
 
 <div class="edit-profile-container" style="max-width: 500px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); background-color: #f9f9f9;">
@@ -449,150 +330,14 @@ function previewCoverImage(event) {
 </script>
 
 <!-- Sidebar -->
-<div class="sidebar">
-    <div class="logo-section">
-    </div>
-
-        <div class="menu-section">
-            <h3>Elements of Culture</h3>
-            <div class="menu-item">
-                <ul>
-                <li><a href="geography.php">Geography</a></li>
-                <li><a href="history.php" class="active">History</a></li>
-                <li><a href="demographics.php">Demographics</a></li>
-                <li><a href="culture.php">Culture</a></li>
-                </ul>
-            </div>
-
-        <div class="menu-section">
-            <h3>Learning Styles</h3>
-            <div class="menu-item">
-                <ul>
-                    <li><input type="checkbox">Visual</li>
-                    <li><input type="checkbox">Auditory & Oral</li>
-                    <li><input type="checkbox">Read & Write</li>
-                    <li><input type="checkbox">Kinesthetic</li>
-                </ul>
-            </div>
-
-        <div class="menu-section">
-            <h3>Location</h3>
-            <div class="menu-item">
-                <a href="choose-loc.php"><span>+</span> Choose a location</a>
-            </div>
-        </div>
-        
-    <div class="menu-section">
-      <h3>Resources</h3>
-      <div class="menu-item">
-        <span>🔗</span>
-        <a href="#">About Kulturifiko</a>
-      </div>
-    </div>
-  </div>
-
-<style>
-  /* Sidebar */
-  .sidebar {
-    position: fixed;
-    top: 60px; 
-    left: 0;
-    width: 240px;  
-    height: 100vh;
-    background-color: #365486;
-    padding-top: 30px;
-    z-index: 999; 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-y: auto;
-    flex-grow: 1;
-    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
-    border-radius: 0 5px 5px 0;
-}
-
-/* Logo Section */
-.logo-section {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 15px;
-  margin-bottom: 15px;
-}
-
-.logo-section img {
-  max-width: 100px;
-  border-radius: 5px;
-}
-
-/* Section Menus */
-.menu-section {
-  margin-bottom: 10px;
-}
-
-.menu-section h3 {
-  font-size: 15px;
-  margin-bottom: 8px;
-  color: #DCF2F1;
-}
-
-/* Menu Items */
-.menu-item {
-  display: inline-block;
-  align-items: center;
-  justify-content: flex-start;
-  margin: 3px 0;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  padding: 5px 5px;
-  border-radius: 4px;
-  color: #ffffff;
-}
-
-.menu-item a {
-    color: #ffffff;
-    text-decoration: none;
-    font-size: .8rem;
-    font-weight: 500;
-    padding: 5px 10px;
-    border-radius: 30px;
-}
-
-.menu-item a:hover {
-    background-color: #7FC7D9;
-    color: #0F1035;
-}
-
-.menu-item a.active {
-    background-color: #1e3c72;
-    color: #fff;
-}
-
-.menu-item ul {
-    list-style: none;
-    padding: 0;
-}
-  
-.menu-item li {
-    margin-bottom: 10px;
-    font-size: .8rem;
-}
-  
-input[type="checkbox"] {
-    margin-right: 5px;
-}
-
-#chosen-location-container {
-    margin-top: 20px; 
-    display: block;
-}
-
-#chosen-location-container label {
-    font-size: 12px; 
-    color: #ffffff;
-}
-</style>
+<?php include 'components/layout/guest/sidebar.php'; ?>
+<?php include 'components/widgets/chat.php'; ?>
 
 </body>
 </head>
 </html>
+
+<?php
+// Add database connection close here, after all components are included
+$conn->close();
+?>
