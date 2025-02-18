@@ -31,7 +31,11 @@
     require_once 'db_conn.php';
     
     // Include navbar
-    include 'components/layout/guest/navbar.php';
+    if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1) {
+        include 'components/layout/admin/navbar.php';
+    } else {
+        include 'components/layout/guest/navbar.php';
+    }
     ?>
 
 <!-- Geography Section -->
