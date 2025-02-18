@@ -34,9 +34,11 @@ if ($result->num_rows > 0) {
     exit();
 }
 $name_parts = explode(' ', $full_name);
-$first_initial = strtoupper(substr($name_parts[0], 0, 1)); // First letter of first name
-$last_name = isset($name_parts[1]) ? strtoupper(substr($name_parts[1], 0, 1)) : ''; // First letter of last name (if exists)
+$first_initial = strtoupper(substr($name_parts[0], 0, 1)); // First letter of first 
+$last_name = strtoupper(substr($name_parts[1], 0, 1));
+// $last_name = isset($name_parts[1]) ? strtoupper($name_parts[1]) : ''; // Full last name (if available)
 $avatar_text = $first_initial . $last_name;
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -64,7 +66,125 @@ $avatar_text = $first_initial . $last_name;
     </style>
     
     <!-- Navigation Bar -->
-    <?php include 'components/layout/guest/navbar.php'; ?>
+    <div class="navbar">
+        <div style="display: flex; align-items: center;">
+           <img src="assets/logo/logo.png "alt="Kulturifiko Logo">
+            <h1>Kulturabase</h1>
+        </div>
+        <div>
+            <a href="home.php">Home</a>
+            <a href="create-post.php">+ Create</a>
+            <a href="explore.php">Explore</a>
+            <a href="notification.php">Notification</a>
+            <div class="dropdown">
+                <a href="#" class="dropdown-btn active" onclick="toggleDropdown()">Menu</a>
+                <div class="dropdown-content">
+                    <a href="profile.php">Profile</a>
+                    <a href="settings.php">Settings</a>
+                </div>
+            </div>
+            <a href="generate_report.php">Generate Report</a>
+            <a href="#" onclick="handleLogout()">Log Out</a>
+        </div>
+    </div>
+
+    <style>
+    /* Navigation Bar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #365486;
+            padding: 20px 40px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar img {
+            height: 50px;
+            width: auto;
+        }
+
+        .navbar h1 {
+            color: #DCF2F1;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .navbar a {
+            color: #DCF2F1;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1rem;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 30px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            background-color: #7FC7D9;
+            color: #0F1035;
+        }
+
+        .navbar a.active {
+            background-color: #1e3c72;
+            color: #fff;
+        }
+        
+    /* Dropdown */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 150px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border-radius: 4px;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 10px 15px;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+    /* Toggle class for show/hide */
+        .show {
+            display: block;
+        }
+    </style>
+
+    <script>
+        function toggleDropdown() {
+            var dropdownContent = document.querySelector(".dropdown-content");
+            dropdownContent.classList.toggle("show");
+        }
+        function handleLogout() {
+            if (confirm('Are you sure you want to log out?')) {
+                window.location.href = 'auth/logout.php';
+            }
+        }
+    </script>
 
 <div class="profile-page">
     <!-- Cover Photo -->
@@ -73,20 +193,29 @@ $avatar_text = $first_initial . $last_name;
     </div> -->
 
     <!-- Profile Header -->
-    <div class="profile-header" style="margin-top: 100px;">
-        <div class="profile-picture">
-            <div class="profile-img">
-                <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" id="profile-img" class="profile-img-preview">
+    <div class="profile-header" style="margin-top: 100px; text-align: center;">
+          <div class="profile-picture" style="margin-bottom: 20px; display: flex; justify-content: center; align-items: center;">
+            <div class="profile-img" style="display: inline-block;">
+              <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" id="profile-img" class="profile-img-preview" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
             </div>
         </div>
         <div class="user-info">
             <h2><?php echo $full_name; ?></h2>
-            <p class="username">@<?php echo $username; ?></p>
-            <div class="user-stats">
-                <!-- Stats content -->
+            <p>@<?php echo $username; ?></p>
+            <div class="user-stats" style="margin: 10px 0;">
+                <!-- <span><strong>1,234</strong> Followers</span>
+                <span style="margin-left: 15px;"><strong>567</strong> Following</span> -->
             </div>
-            <a href="edit-profile.php" class="edit-profile-link">
-                <button class="edit-profile-btn">Edit Profile</button>
+            <a href="edit-profile.php">
+                <button class="edit-profile-btn" style="
+                    padding: 10px 20px; 
+                    font-size: 16px; 
+                    color: white; 
+                    background-color: #007bff; 
+                    border: none; 
+                    border-radius: 4px; 
+                    cursor: pointer;">Edit Profile
+                </button>
             </a>
         </div>
     </div>
@@ -315,127 +444,105 @@ $avatar_text = $first_initial . $last_name;
   position: relative;
   padding: 20px;
   background-color: #fff;
-  max-width: 600px;
-  margin: 100px auto 0;
+  margin-top: -75px;
 }
 
 .profile-picture {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.profile-img {
+  position: relative;
   width: 150px;
   height: 150px;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  overflow: hidden;
 }
 
-.profile-img-preview {
+.profile-picture img {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
   object-fit: cover;
 }
 
-.user-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  padding: 15px 0;
-  background: none;
-  border: none;
-  cursor: default;
-}
-
-.user-info:hover {
-  background: none;
-  border: none;
-}
-
 .user-info h2 {
+  margin: 10px 0 5px;
   font-size: 24px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 5px;
+  font-weight: bold;
 }
 
-.user-info .username {
-  font-size: 16px;
+.user-info p {
+  margin: 0;
   color: #666;
-  margin-bottom: 15px;
+  font-size: 16px;
 }
 
 .user-stats {
   margin: 10px 0;
+  font-size: 16px;
+  color: #444;
 }
 
-.edit-profile-link {
-  text-decoration: none;
+.user-stats span {
+  margin-right: 20px;
 }
 
+/* Edit Profile Button */
 .edit-profile-btn {
-  background-color: transparent;
-  color: #1a1a1a;
-  border: 1px solid #dadde1;
-  padding: 8px 20px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
+  background-color: #1877f2;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
   cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.edit-profile-btn:hover {
+  background-color: #145dbf;
 }
 
 /* Navigation Tabs */
 .profile-nav {
   display: flex;
-  justify-content: center;
-  gap: 20px;
-  padding: 15px 0;
+  justify-content: space-around;
+  padding: 10px 0;
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
-  background-color: #fff;
-  margin-top: 20px;
+  background-color: #f9f9f9;
 }
 
 .profile-nav button {
   background: none;
   border: none;
   font-size: 16px;
-  font-weight: 500;
-  color: #666;
+  font-weight: bold;
+  color: #1877f2;
   cursor: pointer;
-  padding: 8px 24px;
-  border-radius: 20px;
-  transition: all 0.3s ease;
+  padding: 10px 20px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
 }
 
 .profile-nav button:hover {
-  background-color: #f0f2f5;
-  color: #1877f2;
+  background-color: #e4e6eb;
 }
 
-.profile-nav button.active-tab {
-  color: #1877f2;
-  background-color: #e7f3ff;
-  font-weight: 600;
+.active-tab {
+  color: #fff;
+  background-color: #1877f2;
 }
 
 /* Content Sections */
 .content-sections {
   padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
 }
 
 .content-section {
   display: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
 }
 
-.content-section.active-section {
+.active-section {
   display: block;
-  opacity: 1;
 }
 
 .post {
@@ -573,9 +680,12 @@ $avatar_text = $first_initial . $last_name;
 /* About Section */
 .about-section {
   background-color: #fff;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 20px auto;
+  font-size: 16px;
 }
 
 .about-section h2 {
@@ -677,14 +787,133 @@ $avatar_text = $first_initial . $last_name;
   </style>
 
 <!-- Sidebar -->
-<?php include 'components/layout/guest/sidebar.php'; ?>
-<?php include 'components/widgets/chat.php'; ?>
+<div class="sidebar">
+    <div class="logo-section">
+    </div>
+
+        <div class="menu-section">
+            <h3>Elements of Culture</h3>
+            <div class="menu-item">
+                <ul>
+                    <li><a href="geography.php">Geography</a></li>
+                    <li><a href="history.php">History</a></li>
+                    <li><a href="demographics.php">Demographics</a></li>
+                    <li><a href="culture.php">Culture</a></li>
+                </ul>
+            </div>
+
+        
+    <div class="menu-section">
+      <h3>Resources</h3>
+      <div class="menu-item">
+        <span>🔗</span>
+        <a href="#">About Kulturifiko</a>
+      </div>
+    </div>
+  </div>
+
+<style>
+  /* Sidebar */
+  .sidebar {
+    position: fixed;
+    top: 60px; 
+    left: 0;
+    width: 240px;  
+    height: 100vh;
+    background-color: #365486;
+    padding-top: 30px;
+    z-index: 999; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    flex-grow: 1;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+    border-radius: 0 5px 5px 0;
+}
+
+/* Logo Section */
+.logo-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.logo-section img {
+  max-width: 100px;
+  border-radius: 5px;
+}
+
+/* Section Menus */
+.menu-section {
+  margin-bottom: 10px;
+}
+
+.menu-section h3 {
+  font-size: 15px;
+  margin-bottom: 8px;
+  color: #DCF2F1;
+}
+
+/* Menu Items */
+.menu-item {
+  display: inline-block;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 3px 0;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  padding: 5px 5px;
+  border-radius: 4px;
+  color: #ffffff;
+}
+
+.menu-item a {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: .8rem;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 30px;
+}
+
+.menu-item a:hover {
+    background-color: #7FC7D9;
+    color: #0F1035;
+}
+
+.menu-item a.active {
+    background-color: #1e3c72;
+    color: #fff;
+}
+
+.menu-item ul {
+    list-style: none;
+    padding: 0;
+}
+  
+.menu-item li {
+    margin-bottom: 10px;
+    font-size: .8rem;
+}
+  
+input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+#chosen-location-container {
+    margin-top: 20px; 
+    display: block;
+}
+
+#chosen-location-container label {
+    font-size: 12px; 
+    color: #ffffff;
+}
+</style>
 
 </body>
 </head>
 </html>
-
-<?php 
-// Move database connection close to the end of the file
-$conn->close(); 
-?>

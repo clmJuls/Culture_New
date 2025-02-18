@@ -608,7 +608,6 @@ input[type="checkbox"] {
     color: #ffffff;
 }
 </style>
-<?php include 'components/widgets/chat.php'; ?>
 
 </body>
 </head>
