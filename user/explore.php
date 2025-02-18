@@ -260,12 +260,12 @@ function checkLoginStatus() {
     background-color: #fff;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin: 0 0 20px 0;
-    padding: 20px;
+    margin: 0 0 5px 0;
+    padding: 5px;
     width: 100%;
     display: flex;
     flex-direction: column;
-    min-height: 400px; /* Set a minimum height for consistency */
+    min-height: 350px; /* Set a minimum height for consistency */
     position: relative; /* For absolute positioning of interactions */
 }
 
@@ -486,7 +486,7 @@ function checkLoginStatus() {
     #post-display {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+        gap: 10px;
         padding: 0;
         width: 100%;
     }
@@ -814,7 +814,7 @@ function checkLoginStatus() {
     /* Add this to your existing CSS */
     .post-media {
         width: 100%;
-        max-height: 250px; /* Limit media height */
+        max-height: 150px; /* Limit media height */
         object-fit: cover;
         border-radius: 8px;
         margin: 10px 0;
@@ -1066,9 +1066,9 @@ function displayPosts(posts) {
                 <button class="like-btn ${post.user_liked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
                     <i class="fas fa-heart"></i> ${post.like_count} Likes
                 </button>
-                <button class="comment-toggle" onclick="toggleComments(${post.id})">
+                <!-- <button class="comment-toggle" onclick="toggleComments(${post.id})">
                     <i class="fas fa-comment"></i> ${post.comment_count} Comments
-                </button>
+                </button> -->
             </div>
             <div class="comments-section" id="comments-${post.id}" style="display: none;">
                 ${renderComments(post.comments)}
