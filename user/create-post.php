@@ -70,12 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-image: url('https://socialstudieshelp.com/wp-content/uploads/2024/02/Exploring-the-Cultural-Diversity-of-Europe.webp');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
             min-height: 100vh;
             display: flex;
             justify-content: center; 
-            align-items: flex-start;
-            padding-top: 80px;
+            align-items: center;
         }
         .drag-drop-zone {
         width: 100%;
@@ -112,10 +110,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .file-preview {
         margin-top: 15px;
         text-align: center;
-        background-color: #f8f9fa;
-        padding: 15px;
-        border-radius: 8px;
-        border: 2px solid #ddd;
     }
 
     .file-preview img, 
@@ -140,11 +134,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         border-radius: 4px;
         cursor: pointer;
         margin-top: 8px;
-        transition: background-color 0.3s ease;
-    }
-
-    .remove-file:hover {
-        background: #cc0000;
     }
     </style>
     
@@ -285,57 +274,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p>Drag & drop your file here</p>
             <p>or</p>
             <p>Click to select a file</p>
-            <input type="file" name="file" id="file-input" 
-                   accept="image/*,video/mp4,video/webm,video/mov" 
-                   style="display: none;">
+            <input type="file" name="file" id="file-input" accept="image/*,video/*" style="display: none;">
         </div>
         <div class="file-preview" id="file-preview"></div>
         <!-- Culture Elements (Hidden for Non-Admin Users) -->
         <?php if ($_SESSION['isAdmin'] == 1) { ?>
-            <div style="background-color: #fff; padding: 15px; border-radius: 8px; border: 2px solid #ddd; margin: 15px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
-                <h3 style="color: #365486; font-size: 18px; font-weight: 500; margin-bottom: 8px;">Select Culture Elements</h3>
-                <div style="display: grid; gap: 8px;">
-                    <label style="display: flex; align-items: center; margin: 0;">
-                        <input type="checkbox" name="culture_elements[]" value="Geography" style="margin-right: 8px;">
-                        <span style="font-size: 15px; color: #444;">Geography</span>
-                    </label>
-                    <label style="display: flex; align-items: center; margin: 0;">
-                        <input type="checkbox" name="culture_elements[]" value="History" style="margin-right: 8px;">
-                        <span style="font-size: 15px; color: #444;">History</span>
-                    </label>
-                    <label style="display: flex; align-items: center; margin: 0;">
-                        <input type="checkbox" name="culture_elements[]" value="Demographics" style="margin-right: 8px;">
-                        <span style="font-size: 15px; color: #444;">Demographics</span>
-                    </label>
-                    <label style="display: flex; align-items: center; margin: 0;">
-                        <input type="checkbox" name="culture_elements[]" value="Culture" style="margin-right: 8px;">
-                        <span style="font-size: 15px; color: #444;">Culture</span>
-                    </label>
-                </div>
+            <div id="culture-elements" style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                <h3 style="margin-bottom: 10px;">Select Culture Elements</h3>
+                <label><input type="checkbox" name="culture_elements[]" value="Geography"> Geography</label><br>
+                <label><input type="checkbox" name="culture_elements[]" value="History"> History</label><br>
+                <label><input type="checkbox" name="culture_elements[]" value="Demographics"> Demographics</label><br>
+                <label><input type="checkbox" name="culture_elements[]" value="Culture"> Culture</label><br>
             </div>
         <?php } ?>
 
         <!-- Learning Styles -->
-        <div style="background-color: #fff; padding: 15px; border-radius: 8px; border: 2px solid #ddd; margin: 15px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
-            <h3 style="color: #365486; font-size: 18px; font-weight: 500; margin-bottom: 8px;">Select Learning Styles</h3>
-            <div style="display: grid; gap: 8px;">
-                <label style="display: flex; align-items: center; margin: 0;">
-                    <input type="checkbox" name="learning_styles[]" value="Visual" style="margin-right: 8px;">
-                    <span style="font-size: 15px; color: #444;">Visual</span>
-                </label>
-                <label style="display: flex; align-items: center; margin: 0;">
-                    <input type="checkbox" name="learning_styles[]" value="Auditory & Oral" style="margin-right: 8px;">
-                    <span style="font-size: 15px; color: #444;">Auditory & Oral</span>
-                </label>
-                <label style="display: flex; align-items: center; margin: 0;">
-                    <input type="checkbox" name="learning_styles[]" value="Read & Write" style="margin-right: 8px;">
-                    <span style="font-size: 15px; color: #444;">Read & Write</span>
-                </label>
-                <label style="display: flex; align-items: center; margin: 0;">
-                    <input type="checkbox" name="learning_styles[]" value="Kinesthetic" style="margin-right: 8px;">
-                    <span style="font-size: 15px; color: #444;">Kinesthetic</span>
-                </label>
-            </div>
+        <div style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+            <h3 style="margin-bottom: 10px;">Select Learning Styles</h3>
+            <label><input type="checkbox" name="learning_styles[]" value="Visual"> Visual</label><br>
+            <label><input type="checkbox" name="learning_styles[]" value="Auditory & Oral"> Auditory & Oral</label><br>
+            <label><input type="checkbox" name="learning_styles[]" value="Read & Write"> Read & Write</label><br>
+            <label><input type="checkbox" name="learning_styles[]" value="Kinesthetic"> Kinesthetic</label><br>
         </div>
 
         <!-- Submit Button -->
@@ -398,8 +357,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const file = files[0];
             fileInput.files = files;
             showPreview(file);
-            // Hide drag-drop zone after file is added
-            dragDropZone.style.display = 'none';
         }
     }
 
@@ -409,9 +366,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (file.type.startsWith('image/')) {
             const img = document.createElement('img');
             img.file = file;
-            img.style.maxWidth = '100%';
-            img.style.maxHeight = '200px';
-            img.style.borderRadius = '8px';
             filePreview.appendChild(img);
 
             const reader = new FileReader();
@@ -420,9 +374,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else if (file.type.startsWith('video/')) {
             const video = document.createElement('video');
             video.controls = true;
-            video.style.maxWidth = '100%';
-            video.style.maxHeight = '200px';
-            video.style.borderRadius = '8px';
             filePreview.appendChild(video);
 
             const reader = new FileReader();
@@ -447,8 +398,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         e.preventDefault();
         fileInput.value = '';
         filePreview.innerHTML = '';
-        // Show drag-drop zone after file is removed
-        dragDropZone.style.display = 'flex';
     }
     function previewFile() {
         const fileInput = document.querySelector('input[name="file"]');
@@ -473,146 +422,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   
 
 <style>
-.container {
-    position: relative;
-    background-color: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    width: 100%;
-    max-width: 800px;
-    padding: 40px;
-    margin: 120px auto 40px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  .container {
+    position: fixed;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            width: 100%;
+            max-width: 600px;
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 30px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            margin-top: 10px;
+            background-color: #fff;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        textarea {
+            height: 100px;
+            resize: none;
+        }
+
+/* Styling for file preview */
+.file-preview {
+  margin-top: 10px;
+  text-align: center;
 }
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background-image: url('https://socialstudieshelp.com/wp-content/uploads/2024/02/Exploring-the-Cultural-Diversity-of-Europe.webp');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 80px 20px;
+.file-preview-image {
+  max-width: 100%;
+  max-height: 250px;
+  border: 1px solid #ddd;
+  padding: 10px;
 }
 
-/* Form container */
-form {
-    max-height: 80vh;
-    overflow-y: auto;
-    padding-right: 10px;
+.file-preview-video {
+  max-width: 100%;
+  max-height: 250px;
+  border: 1px solid #ddd;
+  padding: 10px;
 }
 
-/* Scrollbar styling */
-form::-webkit-scrollbar {
-    width: 8px;
-}
+        .post-btn {
+            display: block;
+            width: 100%;
+            background-color: #0d11d6;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
 
-form::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
-
-form::-webkit-scrollbar-thumb {
-    background: #365486;
-    border-radius: 4px;
-}
-
-form::-webkit-scrollbar-thumb:hover {
-    background: #2a4268;
-}
-
-/* Form elements styling */
-input[type="text"], textarea {
-    width: 100%;
-    padding: 15px;
-    border-radius: 8px;
-    border: 2px solid #ddd;
-    font-size: 16px;
-    margin-top: 10px;
-    background-color: #fff;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-input[type="text"]:focus, textarea:focus {
-    border-color: #007bff;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-}
-
-/* Culture Elements and Learning Styles sections */
-#culture-elements, 
-div[style*="padding: 10px; border: 1px solid #ccc;"] {
-    background-color: #fff;
-    padding: 20px !important;
-    border-radius: 8px !important;
-    border: 2px solid #ddd !important;
-    margin: 15px 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-/* Checkbox styling */
-input[type="checkbox"] {
-    margin-right: 10px;
-    transform: scale(1.2);
-}
-
-label {
-    display: flex;
-    align-items: center;
-    margin: 10px 0;
-    font-size: 15px;
-    color: #444;
-}
-
-/* Submit button styling */
-button[type="submit"] {
-    background-color: #365486;
-    color: white;
-    padding: 15px 30px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: 100%;
-    margin-top: 20px;
-    font-weight: 600;
-}
-
-button[type="submit"]:hover {
-    background-color: #2a4268;
-}
-
-/* Drag and drop zone enhancement */
-.drag-drop-zone {
-    background-color: #fff;
-    border: 2px dashed #365486;
-    padding: 30px;
-}
-
-.drag-drop-zone.dragover {
-    background-color: #f0f7ff;
-    border-color: #007bff;
-}
-
-/* Title styling */
-h1 {
-    color: #365486;
-    font-size: 28px;
-    font-weight: 600;
-    margin-bottom: 30px;
-    text-align: center;
-}
-
-h3 {
-    color: #365486;
-    font-size: 18px;
-    font-weight: 500;
-    margin-bottom: 15px;
-}
+        .post-btn:hover {
+            background-color: #1062c0;
+        }
 </style>
 
 <style>
@@ -634,47 +516,7 @@ h3 {
     color: #333;
     margin-bottom: 20px;
 }
-
-/* Learning Styles Container */
-.learning-styles-container {
-    background-color: #fff;
-    padding: 15px;
-    border-radius: 8px;
-    border: 2px solid #ddd;
-    margin: 15px 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-/* Learning Styles Grid */
-.learning-styles-grid {
-    display: grid;
-    gap: 8px;
-}
-
-/* Checkbox Labels */
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    margin: 0;
-}
-
-.checkbox-label input[type="checkbox"] {
-    margin-right: 8px;
-}
-
-.checkbox-label span {
-    font-size: 15px;
-    color: #444;
-}
-
-/* Section Title */
-.section-title {
-    color: #365486;
-    font-size: 18px;
-    font-weight: 500;
-    margin-bottom: 8px;
-}
-</style>
+    </style>
 
 </body>
 </head>
