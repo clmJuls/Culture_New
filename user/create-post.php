@@ -31,9 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param('isssss', $user_id, $title, $description, $uploaded_file, $culture_elements, $learning_styles); // Add learning_styles
 
     if ($stmt->execute()) {
+        // Replace the alert with a success response
         echo "<script>
-                alert('Post created successfully!');
-                window.location.href = 'create-post.php';
+                document.addEventListener('DOMContentLoaded', function() {
+                    showSuccessModal();
+                });
               </script>";
     } else {
         echo "<script>
@@ -49,16 +51,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kulturabase</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
-  </head>
-    <body>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
     <style>
-    /* General */
+        /* General */
         * {
             margin: 0;
             padding: 0;
@@ -73,82 +77,84 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-attachment: fixed;
             min-height: 100vh;
             display: flex;
-            justify-content: center; 
+            justify-content: center;
             align-items: flex-start;
             padding-top: 80px;
         }
+
         .drag-drop-zone {
-        width: 100%;
-        height: 200px;
-        border: 2px dashed #ccc;
-        border-radius: 8px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        background-color: #f8f9fa;
-        transition: all 0.3s ease;
-        cursor: pointer;
-        margin: 15px 0;
-    }
+            width: 100%;
+            height: 200px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin: 15px 0;
+        }
 
-    .drag-drop-zone.dragover {
-        background-color: #e3f2fd;
-        border-color: #2196f3;
-    }
+        .drag-drop-zone.dragover {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
 
-    .drag-drop-zone i {
-        font-size: 48px;
-        color: #666;
-        margin-bottom: 10px;
-    }
+        .drag-drop-zone i {
+            font-size: 48px;
+            color: #666;
+            margin-bottom: 10px;
+        }
 
-    .drag-drop-zone p {
-        margin: 0;
-        color: #666;
-        text-align: center;
-    }
+        .drag-drop-zone p {
+            margin: 0;
+            color: #666;
+            text-align: center;
+        }
 
-    .file-preview {
-        margin-top: 15px;
-        text-align: center;
-        background-color: #f8f9fa;
-        padding: 15px;
-        border-radius: 8px;
-        border: 2px solid #ddd;
-    }
+        .file-preview {
+            margin-top: 15px;
+            text-align: center;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
 
-    .file-preview img, 
-    .file-preview video {
-        max-width: 100%;
-        max-height: 200px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
+        .file-preview img,
+        .file-preview video {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-    .file-name {
-        margin-top: 8px;
-        font-size: 14px;
-        color: #666;
-    }
+        .file-name {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #666;
+        }
 
-    .remove-file {
-        background: #ff4444;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 4px;
-        cursor: pointer;
-        margin-top: 8px;
-        transition: background-color 0.3s ease;
-    }
+        .remove-file {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background-color 0.3s ease;
+        }
 
-    .remove-file:hover {
-        background: #cc0000;
-    }
+        .remove-file:hover {
+            background: #cc0000;
+        }
     </style>
-    
+
     <!-- Navigation Bar -->
+
     <?php 
     if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1) {
         include 'components/layout/admin/navbar.php';
@@ -157,51 +163,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     ?>
 
+    <div class="container" style="max-width: 600px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); background-color: #f9f9f9; position: relative; display: flex; flex-direction: column; height: 500px;">
+        <h1 style="text-align: center; margin-bottom: 20px;">Create a Post</h1>
 
-<div class="container" style="max-width: 600px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); background-color: #f9f9f9; position: relative; display: flex; flex-direction: column; height: 500px;">
-    <h1 style="text-align: center; margin-bottom: 20px;">Create a Post</h1>
+        <form method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; padding-bottom: 50px;">
+            <!-- Title Input -->
+            <input type="text" name="title" placeholder="Title" maxlength="300" required style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 100%;">
 
-    <form method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 15px; flex: 1; overflow-y: auto; padding-bottom: 50px;">
-        <!-- Title Input -->
-        <input type="text" name="title" placeholder="Title" maxlength="300" required style="padding: 10px; border: 1px solid #ccc; border-radius: 4px; width: 100%;">
+            <!-- Description Input -->
+            <textarea name="description" placeholder="Caption..." style="padding: 30px; border: 1px solid #ccc; border-radius: 4px; width: 100%; height: 120px;" required></textarea>
 
-        <!-- Description Input -->
-        <textarea name="description" placeholder="Caption..." style="padding: 30px; border: 1px solid #ccc; border-radius: 4px; width: 100%; height: 120px;" required></textarea>
-
-        <!-- File Upload -->
-        <div class="drag-drop-zone" id="drag-drop-zone">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <p>Drag & drop your file here</p>
-            <p>or</p>
-            <p>Click to select a file</p>
-            <input type="file" name="file" id="file-input" 
-                   accept="image/*,video/mp4,video/webm,video/mov" 
-                   style="display: none;">
-        </div>
-        <div class="file-preview" id="file-preview"></div>
-        <!-- Culture Elements (Hidden for Non-Admin Users) -->
-
-            <div style="background-color: #fff; padding: 15px; border-radius: 8px; border: 2px solid #ddd; margin: 15px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
-                <h3 style="color: #365486; font-size: 18px; font-weight: 500; margin-bottom: 8px;">Select Culture Elements</h3>
-                <div style="display: grid; gap: 8px;">
-                    <label style="display: flex; align-items: center; margin: 0;">
-                        <input type="checkbox" name="culture_elements[]" value="Geography" style="margin-right: 8px;">
-                        <span style="font-size: 15px; color: #444;">Geography</span>
-                    </label>
-                    <label style="display: flex; align-items: center; margin: 0;">
-                        <input type="checkbox" name="culture_elements[]" value="History" style="margin-right: 8px;">
-                        <span style="font-size: 15px; color: #444;">History</span>
-                    </label>
-                    <label style="display: flex; align-items: center; margin: 0;">
-                        <input type="checkbox" name="culture_elements[]" value="Demographics" style="margin-right: 8px;">
-                        <span style="font-size: 15px; color: #444;">Demographics</span>
-                    </label>
-                    <label style="display: flex; align-items: center; margin: 0;">
-                        <input type="checkbox" name="culture_elements[]" value="Culture" style="margin-right: 8px;">
-                        <span style="font-size: 15px; color: #444;">Culture</span>
-                    </label>
-                </div>
+            <!-- File Upload -->
+            <div class="drag-drop-zone" id="drag-drop-zone">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Drag & drop your file here</p>
+                <p>or</p>
+                <p>Click to select a file</p>
+                <input type="file" name="file" id="file-input"
+                    accept="image/*,video/mp4,video/webm,video/mov"
+                    style="display: none;">
             </div>
+            <div class="file-preview" id="file-preview"></div>
+            <!-- Culture Elements (Hidden for Non-Admin Users) -->
+            <?php if ($_SESSION['isAdmin'] == 1) { ?>
+                <div style="background-color: #fff; padding: 15px; border-radius: 8px; border: 2px solid #ddd; margin: 15px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
+                    <h3 style="color: #365486; font-size: 18px; font-weight: 500; margin-bottom: 8px;">Select Culture Elements</h3>
+                    <div style="display: grid; gap: 8px;">
+                        <label style="display: flex; align-items: center; margin: 0;">
+                            <input type="checkbox" name="culture_elements[]" value="Geography" style="margin-right: 8px;">
+                            <span style="font-size: 15px; color: #444;">Geography</span>
+                        </label>
+                        <label style="display: flex; align-items: center; margin: 0;">
+                            <input type="checkbox" name="culture_elements[]" value="History" style="margin-right: 8px;">
+                            <span style="font-size: 15px; color: #444;">History</span>
+                        </label>
+                        <label style="display: flex; align-items: center; margin: 0;">
+                            <input type="checkbox" name="culture_elements[]" value="Demographics" style="margin-right: 8px;">
+                            <span style="font-size: 15px; color: #444;">Demographics</span>
+                        </label>
+                        <label style="display: flex; align-items: center; margin: 0;">
+                            <input type="checkbox" name="culture_elements[]" value="Culture" style="margin-right: 8px;">
+                            <span style="font-size: 15px; color: #444;">Culture</span>
+                        </label>
+                    </div>
+                </div>
+            <?php } ?>
 
         <!-- Learning Styles -->
         <div style="background-color: #fff; padding: 15px; border-radius: 8px; border: 2px solid #ddd; margin: 15px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
@@ -226,265 +232,267 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
 
-        <!-- Submit Button -->
-        <button type="submit" style="padding: 10px; background-color: #007bff; color: white; font-size: 16px; border: none; border-radius: 4px; cursor: pointer;">Post</button>
-    </form>
-</div>
+            <!-- Submit Button -->
+            <button type="submit" style="padding: 10px; background-color: #007bff; color: white; font-size: 16px; border: none; border-radius: 4px; cursor: pointer;">Post</button>
+        </form>
+    </div>
 
 
 
-  
-  <script>
+
+    <script>
         const dragDropZone = document.getElementById('drag-drop-zone');
-    const fileInput = document.getElementById('file-input');
-    const filePreview = document.getElementById('file-preview');
-    const form = document.getElementById('post-form');
-
-    // Handle click on drag-drop zone
-    dragDropZone.addEventListener('click', () => fileInput.click());
-
-    // Handle drag events
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dragDropZone.addEventListener(eventName, preventDefaults, false);
-    });
-
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    // Add/remove dragover class
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dragDropZone.addEventListener(eventName, () => {
-            dragDropZone.classList.add('dragover');
-        }, false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        dragDropZone.addEventListener(eventName, () => {
-            dragDropZone.classList.remove('dragover');
-        }, false);
-    });
-
-    // Handle dropped files
-    dragDropZone.addEventListener('drop', handleDrop, false);
-    fileInput.addEventListener('change', handleFileSelect, false);
-
-    function handleDrop(e) {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        handleFiles(files);
-    }
-
-    function handleFileSelect(e) {
-        const files = e.target.files;
-        handleFiles(files);
-    }
-
-    function handleFiles(files) {
-        if (files.length > 0) {
-            const file = files[0];
-            fileInput.files = files;
-            showPreview(file);
-            // Hide drag-drop zone after file is added
-            dragDropZone.style.display = 'none';
-        }
-    }
-
-    function showPreview(file) {
-        filePreview.innerHTML = '';
-        
-        if (file.type.startsWith('image/')) {
-            const img = document.createElement('img');
-            img.file = file;
-            img.style.maxWidth = '100%';
-            img.style.maxHeight = '200px';
-            img.style.borderRadius = '8px';
-            filePreview.appendChild(img);
-
-            const reader = new FileReader();
-            reader.onload = (e) => { img.src = e.target.result; };
-            reader.readAsDataURL(file);
-        } else if (file.type.startsWith('video/')) {
-            const video = document.createElement('video');
-            video.controls = true;
-            video.style.maxWidth = '100%';
-            video.style.maxHeight = '200px';
-            video.style.borderRadius = '8px';
-            filePreview.appendChild(video);
-
-            const reader = new FileReader();
-            reader.onload = (e) => { video.src = e.target.result; };
-            reader.readAsDataURL(file);
-        }
-
-        // Add file name and remove button
-        const fileInfo = document.createElement('div');
-        fileInfo.className = 'file-name';
-        fileInfo.textContent = file.name;
-        filePreview.appendChild(fileInfo);
-
-        const removeButton = document.createElement('button');
-        removeButton.className = 'remove-file';
-        removeButton.textContent = 'Remove';
-        removeButton.onclick = removeFile;
-        filePreview.appendChild(removeButton);
-    }
-
-    function removeFile(e) {
-        e.preventDefault();
-        fileInput.value = '';
-        filePreview.innerHTML = '';
-        // Show drag-drop zone after file is removed
-        dragDropZone.style.display = 'flex';
-    }
-    function previewFile() {
-        const fileInput = document.querySelector('input[name="file"]');
+        const fileInput = document.getElementById('file-input');
         const filePreview = document.getElementById('file-preview');
+        const form = document.getElementById('post-form');
 
-        filePreview.innerHTML = '';
+        // Handle click on drag-drop zone
+        dragDropZone.addEventListener('click', () => fileInput.click());
 
-        if (fileInput.files && fileInput.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const previewElement = document.createElement('img');
-                previewElement.src = e.target.result;
-                previewElement.style.maxWidth = '100%';
-                previewElement.style.height = 'auto';
-                filePreview.appendChild(previewElement);
-            };
-            reader.readAsDataURL(fileInput.files[0]);
+        // Handle drag events
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dragDropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
         }
-    }
 
-  </script>
-  
+        // Add/remove dragover class
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dragDropZone.addEventListener(eventName, () => {
+                dragDropZone.classList.add('dragover');
+            }, false);
+        });
 
-<style>
-.container {
-    position: relative;
-    background-color: rgba(255, 255, 255, 0.95);
-    border-radius: 15px;
-    width: 100%;
-    max-width: 800px;
-    padding: 40px;
-    margin: 120px auto 40px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
+        ['dragleave', 'drop'].forEach(eventName => {
+            dragDropZone.addEventListener(eventName, () => {
+                dragDropZone.classList.remove('dragover');
+            }, false);
+        });
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background-image: url('https://socialstudieshelp.com/wp-content/uploads/2024/02/Exploring-the-Cultural-Diversity-of-Europe.webp');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 80px 20px;
-}
+        // Handle dropped files
+        dragDropZone.addEventListener('drop', handleDrop, false);
+        fileInput.addEventListener('change', handleFileSelect, false);
 
-/* Form container */
-form {
-    max-height: 80vh;
-    overflow-y: auto;
-    padding-right: 10px;
-}
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
 
-/* Scrollbar styling */
-form::-webkit-scrollbar {
-    width: 8px;
-}
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            handleFiles(files);
+        }
 
-form::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
+        function handleFiles(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                fileInput.files = files;
+                showPreview(file);
+                // Hide drag-drop zone after file is added
+                dragDropZone.style.display = 'none';
+            }
+        }
 
-form::-webkit-scrollbar-thumb {
-    background: #365486;
-    border-radius: 4px;
-}
+        function showPreview(file) {
+            filePreview.innerHTML = '';
 
-form::-webkit-scrollbar-thumb:hover {
-    background: #2a4268;
-}
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.file = file;
+                img.style.maxWidth = '100%';
+                img.style.maxHeight = '200px';
+                img.style.borderRadius = '8px';
+                filePreview.appendChild(img);
 
-/* Form elements styling */
-input[type="text"], textarea {
-    width: 100%;
-    padding: 15px;
-    border-radius: 8px;
-    border: 2px solid #ddd;
-    font-size: 16px;
-    margin-top: 10px;
-    background-color: #fff;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else if (file.type.startsWith('video/')) {
+                const video = document.createElement('video');
+                video.controls = true;
+                video.style.maxWidth = '100%';
+                video.style.maxHeight = '200px';
+                video.style.borderRadius = '8px';
+                filePreview.appendChild(video);
 
-input[type="text"]:focus, textarea:focus {
-    border-color: #007bff;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-}
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    video.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
 
-/* Culture Elements and Learning Styles sections */
-#culture-elements, 
-div[style*="padding: 10px; border: 1px solid #ccc;"] {
-    background-color: #fff;
-    padding: 20px !important;
-    border-radius: 8px !important;
-    border: 2px solid #ddd !important;
-    margin: 15px 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
+            // Add file name and remove button
+            const fileInfo = document.createElement('div');
+            fileInfo.className = 'file-name';
+            fileInfo.textContent = file.name;
+            filePreview.appendChild(fileInfo);
 
-/* Checkbox styling */
-input[type="checkbox"] {
-    margin-right: 10px;
-    transform: scale(1.2);
-}
+            const removeButton = document.createElement('button');
+            removeButton.className = 'remove-file';
+            removeButton.textContent = 'Remove';
+            removeButton.onclick = removeFile;
+            filePreview.appendChild(removeButton);
+        }
 
-label {
-    display: flex;
-    align-items: center;
-    margin: 10px 0;
-    font-size: 15px;
-    color: #444;
-}
+        function removeFile(e) {
+            e.preventDefault();
+            fileInput.value = '';
+            filePreview.innerHTML = '';
+            // Show drag-drop zone after file is removed
+            dragDropZone.style.display = 'flex';
+        }
 
-/* Submit button styling */
-button[type="submit"] {
-    background-color: #365486;
-    color: white;
-    padding: 15px 30px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: 100%;
-    margin-top: 20px;
-    font-weight: 600;
-}
+        function previewFile() {
+            const fileInput = document.querySelector('input[name="file"]');
+            const filePreview = document.getElementById('file-preview');
 
-button[type="submit"]:hover {
-    background-color: #2a4268;
-}
+            filePreview.innerHTML = '';
 
-/* Drag and drop zone enhancement */
-.drag-drop-zone {
-    background-color: #fff;
-    border: 2px dashed #365486;
-    padding: 30px;
-}
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewElement = document.createElement('img');
+                    previewElement.src = e.target.result;
+                    previewElement.style.maxWidth = '100%';
+                    previewElement.style.height = 'auto';
+                    filePreview.appendChild(previewElement);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+    </script>
 
-.drag-drop-zone.dragover {
-    background-color: #f0f7ff;
-    border-color: #007bff;
-}
+
+    <style>
+        .container {
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            width: 100%;
+            max-width: 800px;
+            padding: 40px;
+            margin: 120px auto 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-image: url('https://socialstudieshelp.com/wp-content/uploads/2024/02/Exploring-the-Cultural-Diversity-of-Europe.webp');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 80px 20px;
+        }
+
+        /* Form container */
+        form {
+            max-height: 80vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        /* Scrollbar styling */
+        form::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        form::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        form::-webkit-scrollbar-thumb {
+            background: #365486;
+            border-radius: 4px;
+        }
+
+        form::-webkit-scrollbar-thumb:hover {
+            background: #2a4268;
+        }
+
+        /* Form elements styling */
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            font-size: 16px;
+            margin-top: 10px;
+            background-color: #fff;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        /* Culture Elements and Learning Styles sections */
+        #culture-elements,
+        div[style*="padding: 10px; border: 1px solid #ccc;"] {
+            background-color: #fff;
+            padding: 20px !important;
+            border-radius: 8px !important;
+            border: 2px solid #ddd !important;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Checkbox styling */
+        input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            font-size: 15px;
+            color: #444;
+        }
+
+        /* Submit button styling */
+        button[type="submit"] {
+            background-color: #365486;
+            color: white;
+            padding: 15px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #2a4268;
+        }
+
+        /* Drag and drop zone enhancement */
+        .drag-drop-zone {
+            background-color: #fff;
+            border: 2px dashed #365486;
+            padding: 30px;
+        }
+
 
 /* Title styling */
 h1 {
@@ -493,76 +501,281 @@ h1 {
     font-weight: 600;
     text-align: center;
 }
+        .drag-drop-zone.dragover {
+            background-color: #f0f7ff;
+            border-color: #007bff;
+        }
 
-h3 {
-    color: #365486;
-    font-size: 18px;
-    font-weight: 500;
-    margin-bottom: 15px;
-}
-</style>
+        /* Title styling */
 
-<style>
-  /* Container for main content */
-  .main-container {
-    position: fixed;
-    width: 80%; 
-    max-height: 160px;
-    max-width: 200px; 
-    background: rgba(255, 255, 255, 0.8); 
-    padding: 20px;
-    border-radius: 8px;
-    margin-left: 900px; 
-}
+        h3 {
+            color: #365486;
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+    </style>
 
-.right-bar h2 {
-    font-size: 22px;
-    text-align: center;
-    color: #333;
-    margin-bottom: 20px;
-}
+    <style>
+        /* Container for main content */
+        .main-container {
+            position: fixed;
+            width: 80%;
+            max-height: 160px;
+            max-width: 200px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            margin-left: 900px;
+        }
 
-/* Learning Styles Container */
-.learning-styles-container {
-    background-color: #fff;
-    padding: 15px;
-    border-radius: 8px;
-    border: 2px solid #ddd;
-    margin: 15px 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
+        .right-bar h2 {
+            font-size: 22px;
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
 
-/* Learning Styles Grid */
-.learning-styles-grid {
-    display: grid;
-    gap: 8px;
-}
+        /* Learning Styles Container */
+        .learning-styles-container {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
 
-/* Checkbox Labels */
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    margin: 0;
-}
+        /* Learning Styles Grid */
+        .learning-styles-grid {
+            display: grid;
+            gap: 8px;
+        }
 
-.checkbox-label input[type="checkbox"] {
-    margin-right: 8px;
-}
+        /* Checkbox Labels */
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin: 0;
+        }
 
-.checkbox-label span {
-    font-size: 15px;
-    color: #444;
-}
+        .checkbox-label input[type="checkbox"] {
+            margin-right: 8px;
+        }
 
-/* Section Title */
-.section-title {
-    color: #365486;
-    font-size: 18px;
-    font-weight: 500;
-    margin-bottom: 8px;
-}
-</style>
+        .checkbox-label span {
+            font-size: 15px;
+            color: #444;
+        }
+
+        /* Section Title */
+        .section-title {
+            color: #365486;
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+    </style>
+
+    <div id="successModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Success!</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <i class="fas fa-check-circle success-icon"></i>
+                <p>Your post has been created successfully!</p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="redirectToExplore()" class="modal-btn explore-btn">View in Explore</button>
+                <button onclick="createNewPost()" class="modal-btn create-btn">Create Another Post</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 400px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s;
+        }
+
+        .modal-header {
+            padding: 20px;
+            background-color: #365486;
+            color: white;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .close {
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            opacity: 0.8;
+        }
+
+        .modal-body {
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .success-icon {
+            color: #28a745;
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .modal-body p {
+            font-size: 1.1rem;
+            color: #444;
+            margin: 0;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            border-top: 1px solid #eee;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+
+        .cancel-btn {
+            background-color: #f8f9fa;
+            color: #365486;
+            border: 1px solid #365486;
+        }
+
+        .cancel-btn:hover {
+            background-color: #e9ecef;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Loading spinner styles */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #365486;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <script>
+        function showSuccessModal() {
+            const modal = document.getElementById('successModal');
+            modal.style.display = 'block';
+        }
+
+        // Close modal when clicking the X
+        document.querySelector('.close').onclick = function() {
+            document.getElementById('successModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('successModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        function redirectToExplore() {
+            window.location.href = 'explore.php';
+        }
+
+        function createNewPost() {
+            document.getElementById('successModal').style.display = 'none';
+            // Reset form
+            document.querySelector('form').reset();
+            document.getElementById('file-preview').innerHTML = '';
+            document.getElementById('drag-drop-zone').style.display = 'flex';
+        }
+
+        function confirmLogout() {
+            // Show loading state
+            const logoutBtn = document.querySelector('.logout-btn');
+            logoutBtn.innerHTML = '<div class="loading-spinner"></div>Logging out...';
+            logoutBtn.disabled = true;
+            document.querySelector('.cancel-btn').disabled = true;
+
+            // Redirect to logout page after a brief delay
+            setTimeout(() => {
+                window.location.href = 'auth/logout.php';
+            }, 1000);
+        }
+
+        function cancelLogout() {
+            document.getElementById('logoutModal').style.display = 'none';
+        }
+    </script>
 
 </body>
 </head>
+
 </html>

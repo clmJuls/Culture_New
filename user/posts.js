@@ -133,9 +133,9 @@ $(document).ready(function() {
                     <button class="like-btn ${post.user_liked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
                         <i class="fas fa-heart"></i> ${post.like_count} Likes
                     </button>
-                    <button class="comment-toggle" onclick="toggleComments(${post.id})">
+                    <!-- <button class="comment-toggle" onclick="toggleComments(${post.id})">
                         <i class="fas fa-comment"></i> ${post.comment_count} Comments
-                    </button>
+                    </button> -->
                 </div>
                 <div class="comments-section" id="comments-${post.id}" style="display: none;">
                     <!-- Comments will be loaded here -->
