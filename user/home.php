@@ -41,7 +41,13 @@ if (!isset($_SESSION['user_id'])) {
     </style>
     
     <!-- Navigation Bar -->
-    <?php include 'components/layout/guest/navbar.php'; ?>
+    <?php 
+    if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1) {
+        include 'components/layout/admin/navbar.php';
+    } else {
+        include 'components/layout/guest/navbar.php';
+    }
+    ?>
 
 <!-- Search Section -->
 <div class="search">

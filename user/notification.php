@@ -101,7 +101,13 @@ $isAdmin = $_SESSION['isAdmin'];
     </style>
     
     <!-- Navigation Bar -->
-    <?php include 'components/layout/guest/navbar.php'; ?>
+    <?php 
+    if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1) {
+        include 'components/layout/admin/navbar.php';
+    } else {
+        include 'components/layout/guest/navbar.php';
+    }
+    ?>
     
 <div class="notification-container">
     <?php

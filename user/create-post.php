@@ -149,124 +149,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
     
     <!-- Navigation Bar -->
-    <div class="navbar">
-        <div style="display: flex; align-items: center;">
-           <img src="assets/logo/logo.png "alt="Kulturifiko Logo">
-            <h1>Kulturabase</h1>
-        </div>
-        <div>
-            <a href="Home.php">Home</a>
-            <a href="create-post.php" class="active">+ Create</a>
-            <a href="explore.php">Explore</a>
-            <a href="notification.php">Notification</a>
-            <div class="dropdown">
-                <a href="#" class="dropdown-btn" onclick="toggleDropdown()">Menu</a>
-                <div class="dropdown-content">
-                    <a href="profile.php">Profile</a>
-                    <a href="settings.php">Settings</a>
-                </div>
-            </div>
-            <a href="#" onclick="handleLogout()">Log Out</a>
-        </div>
-    </div>
-
-    <style>
-    /* Navigation Bar */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #365486;
-            padding: 20px 40px;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar img {
-            height: 50px;
-            width: auto;
-        }
-
-        .navbar h1 {
-            color: #DCF2F1;
-            font-size: 2rem;
-            font-weight: 600;
-            margin-left: 10px;
-        }
-
-        .navbar a {
-            color: #DCF2F1;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 1rem;
-            font-weight: 500;
-            padding: 10px 20px;
-            border-radius: 30px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .navbar a:hover {
-            background-color: #7FC7D9;
-            color: #0F1035;
-        }
-
-        .navbar a.active {
-            background-color: #1e3c72;
-            color: #fff;
-        }
-        
-    /* Dropdown */
-        .dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: white;
-            min-width: 150px;
-            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-            z-index: 1;
-            border-radius: 4px;
-        }
-
-        .dropdown-content a {
-            color: black;
-            padding: 10px 15px;
-            text-decoration: none;
-            display: block;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .dropdown-content a:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-content a:hover {
-            background-color: #f1f1f1;
-        }
-
-    /* Toggle class for show/hide */
-        .show {
-            display: block;
-        }
-    </style>
-
-    <script>
-        function toggleDropdown() {
-            var dropdownContent = document.querySelector(".dropdown-content");
-            dropdownContent.classList.toggle("show");
-        }
-        function handleLogout() {
-            if (confirm('Are you sure you want to log out?')) {
-                window.location.href = 'auth/logout.php';
-            }
-        }
-    </script>
+    <?php 
+    if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1) {
+        include 'components/layout/admin/navbar.php';
+    } else {
+        include 'components/layout/guest/navbar.php';
+    }
+    ?>
 
 
 <div class="container" style="max-width: 600px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); background-color: #f9f9f9; position: relative; display: flex; flex-direction: column; height: 500px;">
@@ -291,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div class="file-preview" id="file-preview"></div>
         <!-- Culture Elements (Hidden for Non-Admin Users) -->
-        <?php if ($_SESSION['isAdmin'] == 1) { ?>
+
             <div style="background-color: #fff; padding: 15px; border-radius: 8px; border: 2px solid #ddd; margin: 15px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
                 <h3 style="color: #365486; font-size: 18px; font-weight: 500; margin-bottom: 8px;">Select Culture Elements</h3>
                 <div style="display: grid; gap: 8px;">
@@ -313,7 +202,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </label>
                 </div>
             </div>
-        <?php } ?>
 
         <!-- Learning Styles -->
         <div style="background-color: #fff; padding: 15px; border-radius: 8px; border: 2px solid #ddd; margin: 15px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
@@ -603,7 +491,6 @@ h1 {
     color: #365486;
     font-size: 28px;
     font-weight: 600;
-    margin-bottom: 30px;
     text-align: center;
 }
 
