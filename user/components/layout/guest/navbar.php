@@ -10,7 +10,7 @@
         </div>
         <div class="nav-links">
             <a href="home.php" <?php echo basename($_SERVER['PHP_SELF']) == 'home.php' ? 'class="active"' : ''; ?>>Home</a>
-            <a href="create-post.php">+ Create</a>
+            <a href="create-post.php" <?php echo basename($_SERVER['PHP_SELF']) == 'create-post.php' ? 'class="active"' : ''; ?>>+ Create</a>
             <a href="explore.php" <?php echo basename($_SERVER['PHP_SELF']) == 'explore.php' ? 'class="active"' : ''; ?>>Explore</a>
             <div class="notification-dropdown">
                 <div class="notification-icon" onclick="toggleNotificationDropdown()">
@@ -43,7 +43,7 @@
                     if ($user && !empty($user['profile_picture'])) {
                         $avatar_url = $user['profile_picture'];
                     } else {
-                        $avatar_url = 'assets/default-avatar.png';
+                        $avatar_url = 'assets/hero/v07_20@Shanks.png';
                     }
                     ?>
                     <img src="<?php echo htmlspecialchars($avatar_url); ?>" alt="Profile" class="user-avatar">

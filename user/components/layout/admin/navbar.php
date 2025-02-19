@@ -4,10 +4,10 @@
             <h1>Kulturabase</h1>
         </div>
         <div class="nav-links">
-            <a href="home.php" class="active">Home</a>
-            <a href="create-post.php">+ Create</a>
-            <a href="explore.php">Explore</a>
-            <a href="generate_report.php">Generate Report</a>
+            <a href="home.php" <?php echo basename($_SERVER['PHP_SELF']) == 'home.php' ? 'class="active"' : ''; ?>>Home</a>
+            <a href="create-post.php" <?php echo basename($_SERVER['PHP_SELF']) == 'create-post.php' ? 'class="active"' : ''; ?>>+ Create</a>
+            <a href="explore.php" <?php echo basename($_SERVER['PHP_SELF']) == 'explore.php' ? 'class="active"' : ''; ?>>Explore</a>
+            <a href="generate_report.php" <?php echo basename($_SERVER['PHP_SELF']) == 'generate_report.php' ? 'class="active"' : ''; ?>>Generate Report</a>
             <div class="notification-dropdown">
                 <div class="notification-icon" onclick="toggleNotificationDropdown()">
                     <i class="fas fa-bell"></i>
@@ -52,7 +52,7 @@
                         <i class="fas fa-cog"></i> Settings
                     </a>
                     <hr class="dropdown-divider">
-                    <a href="#" onclick="handleLogout()">
+                    <a href="#" onclick="showLogoutDialog()">
                         <i class="fas fa-sign-out-alt"></i> Log Out
                     </a>
                 </div>
@@ -320,10 +320,8 @@
             });
         }
 
-        function handleLogout() {
-            if (confirm('Are you sure you want to log out?')) {
-                window.location.href = 'auth/logout.php';
-            }
+        function showLogoutDialog() {
+            document.getElementById('logoutDialog').style.display = 'flex';
         }
 
         function toggleNotificationDropdown() {
@@ -358,3 +356,5 @@
                 });
         }
     </script>
+
+<?php include 'components/dialog/logout.php'; ?>

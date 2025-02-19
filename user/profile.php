@@ -64,7 +64,13 @@ $avatar_text = $first_initial . $last_name;
     </style>
     
     <!-- Navigation Bar -->
-    <?php include 'components/layout/guest/navbar.php'; ?>
+    <?php 
+    if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1) {
+        include 'components/layout/admin/navbar.php';
+    } else {
+        include 'components/layout/guest/navbar.php';
+    }
+    ?>
 
 <div class="profile-page">
     <!-- Cover Photo -->
@@ -130,12 +136,6 @@ $avatar_text = $first_initial . $last_name;
               </div>
           </div>
       </div>
-
-  <div class="social-links">
-    <a href="https://facebook.com" class="social-icon">Facebook</a>
-    <a href="https://linkedin.com" class="social-icon">LinkedIn</a>
-    <a href="https://github.com" class="social-icon">GitHub</a>
-  </div>
 </div>
 
       <!-- Friends Section -->
