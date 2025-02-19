@@ -113,23 +113,27 @@ $conn->close();
                 <div class="input-group">
                     <input type="email" 
                            name="email" 
+                           id="email"
                            placeholder="Email Address"
+                           class="<?php echo isset($errors['email']) ? 'error' : ''; ?>"
+                           value="<?php echo isset($old_data['email']) ? htmlspecialchars($old_data['email']) : ''; ?>"
                            required>
-                    <div class="error-text" id="email-error">
-                        <i class="fas fa-exclamation-circle"></i> Please enter a valid email
+                    <div class="error-text" id="email-error" <?php echo isset($errors['email']) ? 'style="display: block;"' : ''; ?>>
+                        <?php echo isset($errors['email']) ? $errors['email'] : '<i class="fas fa-exclamation-circle"></i> Please enter a valid email'; ?>
                     </div>
                 </div>
 
                 <div class="input-group">
                     <input type="text" 
                            name="username" 
+                           id="username"
                            placeholder="Username"
                            class="<?php echo isset($errors['username']) ? 'error' : ''; ?>"
                            value="<?php echo isset($old_data['username']) ? htmlspecialchars($old_data['username']) : ''; ?>"
                            required>
-                    <?php if (isset($errors['username'])): ?>
-                        <span class="error-text"><?php echo $errors['username']; ?></span>
-                    <?php endif; ?>
+                    <div class="error-text" id="username-error" <?php echo isset($errors['username']) ? 'style="display: block;"' : ''; ?>>
+                        <?php echo isset($errors['username']) ? $errors['username'] : '<i class="fas fa-exclamation-circle"></i> Please enter a username'; ?>
+                    </div>
                 </div>
 
                 <div class="input-group">
