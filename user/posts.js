@@ -219,7 +219,7 @@ fetchPosts();
                     ` : ''}
                 </div>
                 <div class="post-content">
-                    <h3>${post.title}</h3>
+                    <span class="post-title">${post.title}</span>
                     <p>${post.description}</p>
                     ${post.file_path ? `<img src="${post.file_path}" alt="${post.title}" style="width: 100%;">` : ''}
                 </div>
