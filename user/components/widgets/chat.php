@@ -55,6 +55,7 @@
             transition: all 0.3s ease;
             opacity: 0;
             transform: translateY(20px);
+            z-index: 1000;
         }
 
         .chat-container.active {
@@ -78,6 +79,7 @@
             padding: 15px;
             display: flex;
             flex-direction: column;
+            padding-bottom: 80px; /* Increase bottom padding */
         }
 
         .message {
@@ -101,30 +103,6 @@
             align-self: flex-end;
         }
 
-        .options-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding: 15px;
-            background: #f8f9fa;
-        }
-
-        .option-button {
-            background: #365486;
-            color: white;
-            border: none;
-            padding: 12px 16px;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1em; /* Increased font size */
-        }
-
-        .option-button:hover {
-            background: #7FC7D9;
-            transform: translateY(-2px);
-        }
-
         /* Animation for chat bubble */
         @keyframes pulse {
             0% { transform: scale(1); }
@@ -134,6 +112,77 @@
 
         .pulse {
             animation: pulse 2s infinite;
+        }
+
+        /* Add these new styles */
+        .chat-input-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+            z-index: 1001;
+        }
+
+        .chat-input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #e9ecef;
+            border-radius: 20px;
+            outline: none;
+            font-size: 1em;
+        }
+
+        .chat-input:focus {
+            border-color: #365486;
+        }
+
+        .send-button {
+            background: #365486;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .send-button:hover {
+            background: #7FC7D9;
+            transform: scale(1.1);
+        }
+
+        /* Add new typing animation styles */
+        .typing-indicator {
+            display: inline-block;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            opacity: 0.4;
+            animation: typingAnimation 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingAnimation {
+            0% { opacity: 0.4; transform: translateY(0); }
+            50% { opacity: 1; transform: translateY(-4px); }
+            100% { opacity: 0.4; transform: translateY(0); }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -150,134 +199,73 @@
             <div class="chat-messages" id="chatMessages">
                 <!-- Messages will appear here -->
             </div>
-            <div class="options-container" id="optionsContainer">
-                <!-- Options will appear here -->
+            <!-- Add this new input container -->
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Type your message...">
+                <button class="send-button" id="sendButton">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
             </div>
         </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        const chatData = {
-            start: {
-                message: "Hello! How can I help you today?",
-                options: [
-                    { text: "What is Kulturifiko?", next: "about" },
-                    { text: "How do I use this platform?", next: "usage" },
-                    { text: "I need help with my account", next: "account" }
-                ]
-            },
-            about: {
-                message: "Kulturifiko is a platform for cultural exchange and learning. Would you like to know more about:",
-                options: [
-                    { text: "Our Mission", next: "mission" },
-                    { text: "Features", next: "features" },
-                    { text: "Back to Main Menu", next: "start" }
-                ]
-            },
-            usage: {
-                message: "Here's how you can use Kulturifiko. What would you like to learn about?",
-                options: [
-                    { text: "Creating Posts", next: "posting" },
-                    { text: "Interacting with Others", next: "interaction" },
-                    { text: "Back to Main Menu", next: "start" }
-                ]
-            },
-            account: {
-                message: "What kind of account help do you need?",
-                options: [
-                    { text: "Login Issues", next: "login" },
-                    { text: "Profile Settings", next: "profile" },
-                    { text: "Back to Main Menu", next: "start" }
-                ]
-            },
-            mission: {
-                message: "Our mission is to connect people through cultural exchange and foster global understanding.",
-                options: [
-                    { text: "Learn More About Us", next: "about" },
-                    { text: "Back to Main Menu", next: "start" }
-                ]
-            },
-            features: {
-                message: "Kulturifiko offers cultural posts, interactive learning, and community engagement features.",
-                options: [
-                    { text: "How to Use Features", next: "usage" },
-                    { text: "Back to Main Menu", next: "start" }
-                ]
-            },
-            posting: {
-                message: "To create a post, click the '+ Create' button in the navigation bar and follow the prompts.",
-                options: [
-                    { text: "More Usage Tips", next: "usage" },
-                    { text: "Back to Main Menu", next: "start" }
-                ]
-            },
-            interaction: {
-                message: "You can interact by liking posts, commenting, and following other users.",
-                options: [
-                    { text: "More Usage Tips", next: "usage" },
-                    { text: "Back to Main Menu", next: "start" }
-                ]
-            },
-            login: {
-                message: "For login issues, try resetting your password or contact support at support@kulturifiko.com",
-                options: [
-                    { text: "Other Account Help", next: "account" },
-                    { text: "Back to Main Menu", next: "start" }
-                ]
-            },
-            profile: {
-                message: "You can edit your profile settings by clicking on 'Profile' in the menu dropdown.",
-                options: [
-                    { text: "Other Account Help", next: "account" },
-                    { text: "Back to Main Menu", next: "start" }
-                ]
+        // Replace the static chatData with a function to call Ollama
+        async function getMistralResponse(userMessage) {
+            try {
+                const response = await fetch('components/widgets/api/chat.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: userMessage })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.message || 'Unknown error occurred');
+                }
+                
+                return data.response || "I apologize, but I received an invalid response from the AI service.";
+            } catch (error) {
+                console.error('Error:', error);
+                return "I apologize, but I'm having trouble connecting to the AI service right now.";
             }
-        };
+        }
 
-        // Toggle chat window
-        $('#chatBubble').click(function() {
+        // Modify the click handler to remove options
+        $('#chatBubble').click(async function() {
             const container = $('#chatContainer');
             const bubble = $('#chatBubble');
             
             container.toggleClass('active');
-            bubble.toggleClass('hidden'); // Hide/show chat bubble
+            bubble.toggleClass('hidden');
             
-            // Initialize chat if it hasn't been already
             if (!container.data('initialized')) {
-                addMessage(chatData.start.message);
-                showOptions(chatData.start.options);
+                addMessage("Hello! How can I help you learn about different cultures today?");
                 container.data('initialized', true);
             }
         });
 
-        function addMessage(message, isBot = true) {
-            const messageDiv = $('<div class="message"></div>')
-                .addClass(isBot ? 'bot-message' : 'user-message')
-                .text(message);
-            $('#chatMessages').append(messageDiv);
-            $('#chatMessages').scrollTop($('#chatMessages')[0].scrollHeight);
-        }
-
-        function showOptions(options) {
-            const container = $('#optionsContainer');
-            container.empty();
-            options.forEach(option => {
-                $('<button></button>')
-                    .addClass('option-button')
-                    .text(option.text)
-                    .click(() => handleOption(option))
-                    .appendTo(container);
-            });
-        }
-
-        function handleOption(option) {
-            addMessage(option.text, false);
-            const nextState = chatData[option.next];
-            setTimeout(() => {
-                addMessage(nextState.message);
-                showOptions(nextState.options);
-            }, 500);
+        async function handleUserInput(userMessage) {
+            addMessage(userMessage, false);
+            
+            // Show typing indicator with animated dots
+            const typingDiv = $('<div class="message bot-message"><div class="typing-indicator">Thinking<span>.</span><span>.</span><span>.</span></div></div>');
+            $('#chatMessages').append(typingDiv);
+            
+            // Get response from Mistral
+            const response = await getMistralResponse(userMessage);
+            
+            // Remove typing indicator and add response
+            typingDiv.remove();
+            addMessage(response);
         }
 
         // Close chat when clicking outside
@@ -287,6 +275,38 @@
                 $('#chatBubble').removeClass('hidden'); // Show chat bubble when closing
             }
         });
+
+        // Add these new event listeners
+        $('#chatInput').keypress(function(e) {
+            if (e.which == 13) { // Enter key
+                sendMessage();
+            }
+        });
+
+        $('#sendButton').click(sendMessage);
+
+        function sendMessage() {
+            const input = $('#chatInput');
+            const message = input.val().trim();
+            
+            if (message) {
+                handleUserInput(message);
+                input.val(''); // Clear input after sending
+            }
+        }
+
+        function addMessage(message, isBot = true) {
+            const messageDiv = $('<div></div>')
+                .addClass('message')
+                .addClass(isBot ? 'bot-message' : 'user-message')
+                .text(message);
+            
+            $('#chatMessages').append(messageDiv);
+            
+            // Scroll to the bottom of the messages
+            const messagesDiv = $('#chatMessages');
+            messagesDiv.scrollTop(messagesDiv[0].scrollHeight);
+        }
     </script>
 </body>
 </html>
