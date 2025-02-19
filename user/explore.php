@@ -815,7 +815,7 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
         /* Add this to your existing CSS */
         .post-media {
             width: 100%;
-            max-height: 150px;
+            max-height: 500px;
             /* Limit media height */
             object-fit: cover;
             border-radius: 8px;
@@ -1014,325 +1014,38 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
             <?php include 'components/explore/trend.php'; ?>
             <?php include 'components/widgets/chat.php'; ?>
 
-            <!-- Add this modal HTML just before the closing </body> tag -->
-            <div id="deleteModal" class="modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2>Delete Post</h2>
-                        <span class="close-modal">&times;</span>
-                    </div>
-                    <div class="modal-body">
-                        <p>Are you sure you want to delete this post? This action cannot be undone.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="cancel-btn">Cancel</button>
-                        <button class="delete-confirm-btn">Delete</button>
-                    </div>
-                </div>
-            </div>
+            <!-- Add these before the closing </head> tag -->
+            <link rel="stylesheet" href="modal/post-modal.css">
+            <script src="modal/post-modal.js"></script>
 
-            <!-- Add this before the closing </body> tag, after the delete modal -->
-            <div id="postViewModal" class="post-modal">
-                <div class="post-modal-content">
-                    <span class="close-post-modal" style="display: none;">&times;</span>
-                    <div id="expanded-post-content"></div>
-                </div>
-            </div>
-
-            <!-- Add these styles to your existing CSS -->
-            <style>
-                .modal {
-                    display: none;
-                    position: fixed;
-                    z-index: 1000;
-                    left: 0;
-                    top: 0;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgba(0, 0, 0, 0.5);
-                    animation: fadeIn 0.3s ease;
-                }
-
-                .modal-content {
-                    background-color: #fefefe;
-                    margin: 15% auto;
-                    padding: 0;
-                    border-radius: 8px;
-                    width: 400px;
-                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                    animation: slideIn 0.3s ease;
-                }
-
-                .modal-header {
-                    padding: 15px 20px;
-                    border-bottom: 1px solid #eee;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                }
-
-                .modal-header h2 {
-                    margin: 0;
-                    font-size: 1.2rem;
-                    color: #333;
-                }
-
-                .close-modal {
-                    color: #aaa;
-                    font-size: 24px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    transition: color 0.2s ease;
-                }
-
-                .close-modal:hover {
-                    color: #333;
-                }
-
-                .modal-body {
-                    padding: 20px;
-                    color: #666;
-                }
-
-                .modal-footer {
-                    padding: 15px 20px;
-                    border-top: 1px solid #eee;
-                    display: flex;
-                    justify-content: flex-end;
-                    gap: 10px;
-                }
-
-                .cancel-btn,
-                .delete-confirm-btn {
-                    padding: 8px 16px;
-                    border-radius: 4px;
-                    border: none;
-                    cursor: pointer;
-                    font-size: 14px;
-                    transition: all 0.2s ease;
-                }
-
-                .cancel-btn {
-                    background-color: #e0e0e0;
-                    color: #333;
-                }
-
-                .cancel-btn:hover {
-                    background-color: #d0d0d0;
-                }
-
-                .delete-confirm-btn {
-                    background-color: #dc3545;
-                    color: white;
-                }
-
-                .delete-confirm-btn:hover {
-                    background-color: #c82333;
-                }
-
-                @keyframes fadeIn {
-                    from {
-                        opacity: 0;
-                    }
-
-                    to {
-                        opacity: 1;
-                    }
-                }
-
-                @keyframes slideIn {
-                    from {
-                        transform: translateY(-20px);
-                        opacity: 0;
-                    }
-
-                    to {
-                        transform: translateY(0);
-                        opacity: 1;
-                    }
-                }
-
-                .post-modal {
-                    display: none;
-                    /* Initial state is hidden */
-                    position: fixed;
-                    z-index: 1001;
-                    left: 0;
-                    top: 50px;
-                    width: 100%;
-                    height: 100%;
-                    background-color: rgba(0, 0, 0, 0.8);
-                    overflow-y: auto;
-                }
-
-                /* When active, use these styles */
-                .post-modal.active {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                }
-
-                .post-modal-content {
-                    background-color: #fff;
-                    padding: 30px;
-                    width: 90%;
-                    max-width: 800px;
-                    /* Reduced from 900px for better readability */
-                    border-radius: 12px;
-                    position: relative;
-                    animation: zoomIn 0.3s ease;
-                    max-height: 90vh;
-                    overflow-y: auto;
-                    /* Allow scrolling if content is too long */
-                    margin: 20px auto;
-                    /* Center the modal and add some vertical spacing */
-                }
-
-                /* Update post content styles inside modal */
-                #expanded-post-content {
-                    padding: 0;
-                    /* Remove default padding */
-                }
-
-                #expanded-post-content .post-header {
-                    margin-bottom: 20px;
-                    padding: 0;
-                }
-
-                #expanded-post-content .post-content {
-                    margin: 20px 0;
-                    padding: 0;
-                    position: relative;
-                    /* Reset position */
-                    margin-bottom: 20px;
-                    /* Add space between content and interactions */
-                }
-
-                #expanded-post-content .post-title {
-                    font-size: 24px;
-                    font-weight: 600;
-                    color: #333;
-                    margin-bottom: 15px;
-                    display: block;
-                }
-
-                #expanded-post-content p {
-                    font-size: 16px;
-                    line-height: 1.6;
-                    color: #4a4a4a;
-                    margin-bottom: 20px;
-                }
-
-                #expanded-post-content .post-media {
-                    max-height: 500px;
-                    width: auto;
-                    /* Change from 100% to auto */
-                    max-width: 100%;
-                    /* Ensure image doesn't overflow */
-                    object-fit: contain;
-                    margin: 20px auto;
-                    /* Center media content */
-                    display: block;
-                    /* Helps with centering */
-                }
-
-                #expanded-post-content .post-interactions {
-                    position: relative;
-                    margin-top: 20px;
-                    padding-top: 20px;
-                    border-top: 1px solid #eee;
-                    display: flex;
-                    gap: 10px;
-                }
-
-                /* Responsive adjustments */
-                @media screen and (max-width: 768px) {
-                    .post-modal-content {
-                        width: 95%;
-                        padding: 20px;
-                        margin: 10px auto;
-                    }
-
-                    #expanded-post-content .post-title {
-                        font-size: 20px;
-                    }
-
-                    #expanded-post-content p {
-                        font-size: 14px;
-                    }
-                }
-
-                @keyframes zoomIn {
-                    from {
-                        transform: scale(0.95);
-                        opacity: 0;
-                    }
-
-                    to {
-                        transform: scale(1);
-                        opacity: 1;
-                    }
-                }
-
-                /* Modal comment styles */
-                .modal-comments-container {
-                    display: flex;
-                    flex-direction: column;
-                    max-height: 400px;
-                    margin-top: 20px;
-                }
-
-                .comments-section {
-                    flex: 1;
-                    overflow-y: auto;
-                    padding: 20px;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 12px;
-                }
-
-                .comment {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: flex-start;
-                    padding: 12px;
-                    background: #f8f9fa;
-                    border-radius: 8px;
-                }
-
-                .comment-user-info {
-                    display: flex;
-                    gap: 12px;
-                    align-items: flex-start;
-                    flex: 1;
-                }
-
-                .comment-input-wrapper {
-                    display: flex;
-                    flex: 1;
-                    gap: 8px;
-                    align-items: center;
-                }
-
-                .modal-comment-input {
-                    position: sticky;
-                    bottom: 0;
-                    background: white;
-                    padding: 16px;
-                    border-top: 1px solid #eee;
-                    margin-top: auto;
-                }
-
-                .comments-section:empty::before {
-                    content: 'No comments yet';
-                    text-align: center;
-                    color: #666;
-                    padding: 20px;
-                    font-style: italic;
-                }
-            </style>
-
-            </body>
-</head>
+            </head>
 
 </html>
+
+<!-- Add this just before the closing </body> tag -->
+<div id="postViewModal" class="post-modal">
+    <div class="post-modal-content">
+        <span class="close-post-modal" style="display: none;">&times;</span>
+        <div id="expanded-post-content"></div>
+    </div>
+</div>
+
+<!-- Add this before the closing </body> tag, after the post modal -->
+<div id="commentDeleteModal" class="comment-modal">
+    <div class="comment-modal-content">
+        <div class="modal-header">
+            <h3>Delete Comment</h3>
+            <span class="close-comment-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete this comment?</p>
+            <div class="comment-preview">
+                <div class="comment-text-preview"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="cancel-delete">Cancel</button>
+            <button class="confirm-delete">Delete</button>
+        </div>
+    </div>
+</div>

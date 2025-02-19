@@ -1,7 +1,10 @@
 // DOM Ready handler
 $(document).ready(function() {
+  // Initialize post modal
+  postModal.init();
+  
+  // Load initial posts
   loadPosts();
-  modal.init();
 });
 
 // Add these variables at the top of the file
@@ -10,53 +13,6 @@ const postsPerPage = 6;
 let isLoading = false;
 let hasMorePosts = true;
 let currentPostToDelete = null;
-
-const modal = {
-    element: null,
-    init: function() {
-        this.element = document.getElementById('deleteModal');
-        if (!this.element) return;
-
-        // Close modal when clicking outside
-        this.element.addEventListener('click', (e) => {
-            if (e.target === this.element) {
-                this.close();
-            }
-        });
-
-        // Close button handler
-        const closeBtn = this.element.querySelector('.close-modal');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => this.close());
-        }
-
-        // Cancel button handler
-        const cancelBtn = this.element.querySelector('.cancel-btn');
-        if (cancelBtn) {
-            cancelBtn.addEventListener('click', () => this.close());
-        }
-
-        // Delete confirmation handler
-        const deleteBtn = this.element.querySelector('.delete-confirm-btn');
-        if (deleteBtn) {
-            deleteBtn.addEventListener('click', () => {
-                if (currentPostToDelete) {
-                    confirmDelete(currentPostToDelete);
-                    this.close();
-                }
-            });
-        }
-    },
-    open: function() {
-        this.element.style.display = 'block';
-        document.body.style.overflow = 'hidden'; // Prevent scrolling
-    },
-    close: function() {
-        this.element.style.display = 'none';
-        document.body.style.overflow = '';
-        currentPostToDelete = null;
-    }
-};
 
 // Modified loadPosts function with debugging
 function loadPosts(append = false) {
@@ -183,19 +139,28 @@ function displayPosts(posts, append = false) {
               ${renderComments(post.comments)}
           </div>`;
 
-      postDisplay.appendChild(postElement);
+      // Add click event listener to the post content
+      const postContent = postElement.querySelector('.post-content');
+      if (postContent) {
+          postContent.addEventListener('click', function(e) {
+              e.stopPropagation();
+              postModal.showExpandedPost({
+                  ...post,
+                  profile_picture: post.profile_picture || 'assets/default-profile.png',
+                  comments: post.comments || []
+              });
+          });
+      }
 
-      // Add this to your existing displayPosts function, inside the posts.forEach loop
-      postElement.addEventListener('click', function(e) {
-          // Don't open modal if clicking on buttons
-          if (e.target.closest('.delete-post') || 
-              e.target.closest('.like-btn') || 
-              e.target.closest('.comment-toggle')) {
-              return;
-          }
-          
-          showExpandedPost(post);
+      // Make sure interaction buttons don't trigger modal
+      const interactionButtons = postElement.querySelectorAll('.like-btn, .delete-post');
+      interactionButtons.forEach(button => {
+          button.addEventListener('click', (e) => {
+              e.stopPropagation();
+          });
       });
+
+      postDisplay.appendChild(postElement);
   });
 }
 
@@ -367,7 +332,7 @@ function deletePost(postId, postUserId) {
   // Only allow if user is admin or post owner
   if (currentUserId == postUserId || isAdmin) {
       currentPostToDelete = postId;
-      modal.open();
+      postModal.open();
   } else {
       alert('You are not authorized to delete this post');
   }
@@ -390,7 +355,7 @@ function confirmDelete(postId) {
                   if (postElement) {
                       postElement.remove();
                   }
-                  modal.close();
+                  postModal.close();
               } else {
                   console.error('Failed to delete post:', data.message);
                   alert(data.message || 'Failed to delete post');
@@ -451,168 +416,3 @@ $(document).ready(function() {
         loadPosts(true);
     });
 });
-
-// Update the modal handling code
-document.addEventListener('DOMContentLoaded', function() {
-    const postModal = document.getElementById('postViewModal');
-    const closePostBtn = document.querySelector('.close-post-modal');
-    const modalContent = document.querySelector('.post-modal-content');
-
-    // Close on X button click
-    if (closePostBtn) {
-        closePostBtn.onclick = function(e) {
-            e.stopPropagation(); // Prevent event from bubbling to modal
-            postModal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-    }
-
-    // Close on outside click
-    if (postModal) {
-        postModal.onclick = function(e) {
-            if (e.target === postModal) {
-                postModal.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        }
-    }
-
-    // Prevent modal content clicks from closing the modal
-    if (modalContent) {
-        modalContent.onclick = function(e) {
-            e.stopPropagation();
-        }
-    }
-});
-
-// Update the showExpandedPost function
-function showExpandedPost(post) {
-    const modal = document.getElementById('postViewModal');
-    const content = document.getElementById('expanded-post-content');
-    let mediaHTML = '';
-    if (post.file_path) {
-        const fileExtension = post.file_path.split('.').pop().toLowerCase();
-        const isVideo = ['mp4', 'webm', 'mov'].includes(fileExtension);
-        
-        if (isVideo) {
-            mediaHTML = `
-                <video class="post-media" controls>
-                    <source src="${post.file_path}" type="video/mp4">
-                    Your browser does not support the video tag.
-                </video>`;
-        } else {
-            mediaHTML = `<img class="post-media" src="${post.file_path}" alt="Post media">`;
-        }
-    }
-
-    content.innerHTML = `
-        <div class="post-content">
-            <div class="post-header">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <img src="${post.profile_picture || 'assets/default-profile.png'}" class="profile-pic" alt="Profile Picture">
-                    <span class="username">${post.username}</span>
-                </div>
-            </div>
-            <span class="post-title">${post.title}</span>
-            <p class="post-description">${post.description}</p>
-            ${mediaHTML}
-        </div>
-        <div class="modal-comments-container">
-            <div class="comments-section" id="modal-comments-${post.id}">
-                <!-- Comments will be rendered here -->
-            </div>
-            ${currentUserId ? `
-                <div class="modal-comment-input">
-                    <img src="${currentUserProfilePic || 'assets/default-profile.png'}" class="comment-profile-pic" alt="Your Profile Picture">
-                    <div class="comment-input-wrapper">
-                        <input type="text" class="modal-comment-text" placeholder="Write a comment...">
-                        <button class="modal-submit-comment">Post</button>
-                    </div>
-                </div>
-            ` : `
-                <div class="modal-comment-login">
-                    <p>Please <a href="auth/login.php">log in</a> to comment</p>
-                </div>
-            `}
-        </div>`;
-
-    // Add event listener for the comment button
-    const commentButton = content.querySelector('.modal-submit-comment');
-    if (commentButton) {
-        commentButton.addEventListener('click', () => submitModalComment(post.id));
-    }
-
-    // After setting up the modal content, fetch and display comments
-    updateModalComments(post.id);
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-// Update the submitModalComment function
-function submitModalComment(postId) {
-    const commentInput = document.querySelector('.modal-comment-text');
-    const commentText = commentInput.value.trim();
-    
-    if (!commentText) return;
-
-    $.ajax({
-        url: 'posts_management.php',
-        type: 'POST',
-        data: {
-            action: 'add_comment',
-            post_id: postId,
-            comment_text: commentText
-        },
-        success: function(response) {
-            try {
-                const data = typeof response === 'object' ? response : JSON.parse(response);
-                if (data.status === 'success') {
-                    // Clear input
-                    commentInput.value = '';
-                    // Refresh comments in both modal and main post
-                    updateModalComments(postId);
-                    updateComments(postId);
-                }
-            } catch (e) {
-                console.error('Error processing comment response:', e);
-            }
-        }
-    });
-}
-
-// Update the updateModalComments function
-function updateModalComments(postId) {
-    $.ajax({
-        url: 'posts_management.php',
-        type: 'POST',
-        data: {
-            action: 'get_comments',
-            post_id: postId
-        },
-        success: function(response) {
-            try {
-                const data = typeof response === 'object' ? response : JSON.parse(response);
-                if (data.status === 'success') {
-                    // Update comments in modal
-                    const modalCommentsSection = document.querySelector(`#modal-comments-${postId}`);
-                    if (modalCommentsSection) {
-                        modalCommentsSection.innerHTML = renderComments(data.comments);
-                    }
-                    
-                    // Also update comments in the main post view if it exists
-                    const mainCommentsSection = document.querySelector(`#comments-${postId}`);
-                    if (mainCommentsSection) {
-                        mainCommentsSection.innerHTML = renderComments(data.comments);
-                    }
-                } else {
-                    console.error('Error fetching comments:', data.message);
-                }
-            } catch (e) {
-                console.error('Error parsing comment response:', e);
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('Ajax error:', error);
-        }
-    });
-}

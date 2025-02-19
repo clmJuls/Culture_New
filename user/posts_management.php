@@ -294,6 +294,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'status' => 'success',
                 'comments' => $comments
             ]);
+        } elseif ($_POST['action'] === 'delete_comment') {
+            if (!isset($_SESSION['user_id'])) {
+                throw new Exception("User must be logged in to delete comments");
+            }
+
+            if (!isset($_POST['comment_id'])) {
+                throw new Exception("Comment ID is required");
+            }
+
+            $comment_id = (int)$_POST['comment_id'];
+            $user_id = $_SESSION['user_id'];
+            $isAdmin = isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1;
+
+            // First, get the comment details to check ownership
+            $query = "SELECT user_id FROM comments WHERE id = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("i", $comment_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $comment = $result->fetch_assoc();
+
+            if (!$comment) {
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Comment not found'
+                ]);
+                exit;
+            }
+
+            // Check if user is authorized to delete the comment
+            if ($comment['user_id'] != $user_id && !$isAdmin) {
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'You are not authorized to delete this comment'
+                ]);
+                exit;
+            }
+
+            // Delete the comment
+            $delete_query = "DELETE FROM comments WHERE id = ?";
+            $stmt = $conn->prepare($delete_query);
+            $stmt->bind_param("i", $comment_id);
+
+            if ($stmt->execute()) {
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Comment deleted successfully'
+                ]);
+            } else {
+                throw new Exception("Error deleting comment: " . $stmt->error);
+            }
         } else {
             throw new Exception("Invalid action");
         }
