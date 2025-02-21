@@ -90,17 +90,13 @@ $(document).ready(function() {
         posts.forEach(post => {
             const postElement = document.createElement('div');
             postElement.className = 'post';
+            postElement.setAttribute('data-post-id', post.id);
             
-            // Determine if the file is an image or video based on file extension
-            const isVideo = post.file_path && (
-                post.file_path.endsWith('.mp4') || 
-                post.file_path.endsWith('.webm') || 
-                post.file_path.endsWith('.mov')
-            );
-
-            // Create the media element (image or video)
             let mediaHTML = '';
             if (post.file_path) {
+                const fileExtension = post.file_path.split('.').pop().toLowerCase();
+                const isVideo = ['mp4', 'webm', 'mov'].includes(fileExtension);
+                
                 if (isVideo) {
                     mediaHTML = `
                         <video class="post-media" controls>
@@ -119,7 +115,7 @@ $(document).ready(function() {
                         <span>${post.username}</span>
                     </div>
                     ${post.user_id === currentUserId || isAdmin ? 
-                        `<button class="delete-post" onclick="deletePost(${post.id})">
+                        `<button class="delete-post">
                             <i class="fas fa-trash"></i>
                         </button>` : ''
                     }
@@ -130,23 +126,133 @@ $(document).ready(function() {
                     ${mediaHTML}
                 </div>
                 <div class="post-interactions">
-                    <button class="like-btn ${post.user_liked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
+                    <button class="like-btn ${post.user_liked ? 'liked' : ''}">
                         <i class="fas fa-heart"></i> ${post.like_count} Likes
                     </button>
-                    <!-- <button class="comment-toggle" onclick="toggleComments(${post.id})">
-                        <i class="fas fa-comment"></i> ${post.comment_count} Comments
-                    </button> -->
-                </div>
-                <div class="comments-section" id="comments-${post.id}" style="display: none;">
-                    <!-- Comments will be loaded here -->
                 </div>`;
+
+            // Add click event listeners
+            postElement.addEventListener('click', function(e) {
+                // Don't open modal if clicking on interaction buttons
+                if (e.target.closest('.delete-post') || 
+                    e.target.closest('.like-btn')) {
+                    return;
+                }
+                postModal.showExpandedPost(post);
+            });
+
+            // Add like button event listener
+            const likeBtn = postElement.querySelector('.like-btn');
+            if (likeBtn) {
+                likeBtn.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent modal from opening
+                    toggleLike(post.id);
+                });
+            }
+
+            // Add delete button event listener
+            const deleteBtn = postElement.querySelector('.delete-post');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent modal from opening
+                    deletePost(post.id, post.user_id);
+                });
+            }
 
             postDisplay.appendChild(postElement);
         });
     }
+
+    // Add these functions for post interactions
+    function toggleLike(postId) {
+        if (!currentUserId) {
+            handleUnauthorizedAction('like posts');
+            return;
+        }
+
+        $.ajax({
+            url: 'posts_management.php',
+            type: 'POST',
+            data: { 
+                action: 'toggle_like',
+                post_id: postId
+            },
+            success: function(response) {
+                try {
+                    const data = typeof response === 'object' ? response : JSON.parse(response);
+                    if (data.status === 'success') {
+                        updatePostLike(postId);
+                    }
+                } catch (e) {
+                    console.error('Error processing like response:', e);
+                }
+            }
+        });
+    }
+
+    function updatePostLike(postId) {
+        $.ajax({
+            url: 'posts_management.php',
+            type: 'POST',
+            data: { 
+                action: 'get_post_likes',
+                post_id: postId
+            },
+            success: function(response) {
+                try {
+                    const data = typeof response === 'object' ? response : JSON.parse(response);
+                    if (data.status === 'success') {
+                        const likeBtn = document.querySelector(`.post[data-post-id="${postId}"] .like-btn`);
+                        if (likeBtn) {
+                            likeBtn.classList.toggle('liked', data.user_liked);
+                            likeBtn.innerHTML = `<i class="fas fa-heart"></i> ${data.like_count} Likes`;
+                        }
+                    }
+                } catch (e) {z
+                    console.error('Error updating like status:', e);
+                }
+            }
+        });
+    }
+
+    function deletePost(postId, postUserId) {
+        if (!currentUserId) {
+            handleUnauthorizedAction('delete posts');
+            return;
+        }
+
+        if (currentUserId == postUserId || isAdmin) {
+            if (confirm('Are you sure you want to delete this post?')) {
+                $.ajax({
+                    url: 'posts_management.php',
+                    type: 'POST',
+                    data: { 
+                        action: 'delete_post',
+                        post_id: postId
+                    },
+                    success: function(response) {
+                        try {
+                            const data = typeof response === 'object' ? response : JSON.parse(response);
+                            if (data.status === 'success') {
+                                const postElement = document.querySelector(`.post[data-post-id="${postId}"]`);
+                                if (postElement) {
+                                    postElement.remove();
+                                }
+                            }
+                        } catch (e) {
+                            console.error('Error processing delete response:', e);
+                        }
+                    }
+                });
+            }
+        } else {
+            alert('You are not authorized to delete this post');
+        }
+    }
+
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('like-btn')) {
-fetchPosts();
+            fetchPosts();
         }
     });
     
@@ -219,7 +325,7 @@ fetchPosts();
                     ` : ''}
                 </div>
                 <div class="post-content">
-                    <h3>${post.title}</h3>
+                    <span class="post-title">${post.title}</span>
                     <p>${post.description}</p>
                     ${post.file_path ? `<img src="${post.file_path}" alt="${post.title}" style="width: 100%;">` : ''}
                 </div>
@@ -243,76 +349,6 @@ fetchPosts();
         return postHtml;
     }
     
-
-    // Like functionality
-    $(document).on('click', '.like-btn', function() {
-        const postId = $(this).closest('.post').data('post-id');
-        const likeBtn = $(this);
-        
-        // Prevent multiple clicks while processing
-        if (likeBtn.hasClass('processing')) return;
-        likeBtn.addClass('processing');
-        
-        // Safer number parsing with fallback
-        let currentLikeCount = 0;
-        try {
-            currentLikeCount = parseInt(likeBtn.text().match(/\d+/) || [0])[0];
-            if (isNaN(currentLikeCount)) currentLikeCount = 0;
-        } catch (e) {
-            currentLikeCount = 0;
-        }
-        
-        const isCurrentlyLiked = likeBtn.hasClass('liked');
-        
-        // Format like count with safeguard
-        const formatLikeCount = (count) => {
-            count = Math.max(0, count);
-            return `👍 ${count} ${count === 1 ? 'Like' : 'Likes'}`;
-        };
-
-        // Add animation class
-        likeBtn.addClass('like-animation');
-        setTimeout(() => {
-            likeBtn.removeClass('like-animation');
-        }, 200);
-
-        // Make AJAX call
-        $.ajax({
-            url: 'posts_management.php',
-            type: 'POST',
-            data: { 
-                action: 'toggle_like', 
-                post_id: postId,
-                final_state: !isCurrentlyLiked ? 1 : 0
-            },
-            dataType: 'json',
-            success: function(response) {
-                if (response.status === 'success') {
-                    // Update UI only after successful response
-                    if (isCurrentlyLiked) {
-                        likeBtn.removeClass('liked');
-                    } else {
-                        likeBtn.addClass('liked');
-                    }
-                    
-                    // Update like count if provided
-                    if (response.like_count !== undefined) {
-                        likeBtn.html(formatLikeCount(response.like_count));
-                    } else {
-                        // Fallback to calculated count if server doesn't provide it
-                        likeBtn.html(formatLikeCount(isCurrentlyLiked ? currentLikeCount - 1 : currentLikeCount + 1));
-                    }
-                }
-            },
-            error: function() {
-                // On error, no state change needed since we didn't update UI yet
-                console.error('Failed to update like status');
-            },
-            complete: function() {
-                likeBtn.removeClass('processing');
-            }
-        });
-    });
 
     // Comment toggle
     $(document).on('click', '.comment-toggle', function() {
@@ -343,30 +379,6 @@ fetchPosts();
                 }
             });
         }
-    });
-
-    // Delete post
-    $(document).on('click', '.delete-post', function() {
-        if (!confirm('Are you sure you want to delete this post?')) return;
-
-        const postId = $(this).closest('.post').data('post-id');
-
-        $.ajax({
-            url: 'posts_management.php',
-            type: 'POST',
-            data: { 
-                action: 'delete_post', 
-                post_id: postId 
-            },
-            dataType: 'json',
-            success: function(response) {
-                if (response.status === 'success') {
-                    fetchPosts();
-                } else {
-                    alert(response.message);
-                }
-            }
-        });
     });
 
     // Delete comment
@@ -447,6 +459,8 @@ fetchPosts();
         loadPosts();
     }
 
-    // Initial load
+    // Initialize
+    postModal.init();
     loadPosts();
+    initializeFilters();
 });
