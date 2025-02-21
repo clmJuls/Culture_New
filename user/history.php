@@ -497,8 +497,8 @@ document.getElementById('createPostForm').addEventListener('submit', function(e)
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Post created successfully!');
-            location.reload();
+            closeModal(); // Close the create post modal
+            showSuccessModal(); // Show the success modal
         } else {
             alert('Error creating post: ' + data.error);
         }
@@ -604,6 +604,24 @@ function deletePost(postId) {
             alert('An error occurred while deleting the post');
         });
     }
+}
+
+// Add these new functions
+function showSuccessModal() {
+    const modal = document.getElementById('successModal');
+    modal.style.display = 'block';
+    setTimeout(() => {
+        modal.classList.add('active');
+    }, 10);
+}
+
+function closeSuccessModal() {
+    const modal = document.getElementById('successModal');
+    modal.classList.remove('active');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        location.reload(); // Reload the page to show the new post
+    }, 300);
 }
 </script>
 
@@ -1061,6 +1079,275 @@ document.addEventListener('DOMContentLoaded', function() {
             prompt.style.display = 'flex';
             alert('Please upload an image file');
         }
+    }
+});
+</script>
+
+<!-- Add this success modal HTML before the closing body tag -->
+<div id="successModal" class="success-modal">
+    <div class="success-modal-content">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>Success!</h2>
+        <p>Your post has been successfully created.</p>
+        <button onclick="closeSuccessModal()" class="success-btn">Continue</button>
+    </div>
+</div>
+
+<style>
+/* Success Modal Styles */
+.success-modal {
+    display: none;
+    position: fixed;
+    z-index: 1100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.success-modal.active {
+    opacity: 1;
+}
+
+.success-modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 40px;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 12px;
+    text-align: center;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+}
+
+.success-modal.active .success-modal-content {
+    transform: translateY(0);
+}
+
+.success-icon {
+    color: #28a745;
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.success-modal h2 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.success-modal p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.success-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.success-btn:hover {
+    background-color: #218838;
+}
+</style>
+
+<!-- Add this deletion confirmation modal HTML -->
+<div id="deleteConfirmModal" class="delete-modal">
+    <div class="delete-modal-content">
+        <div class="delete-icon">
+            <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <h2>Confirm Deletion</h2>
+        <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+        <div class="delete-modal-actions">
+            <button onclick="cancelDelete()" class="cancel-btn">Cancel</button>
+            <button onclick="confirmDelete()" class="confirm-delete-btn">Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add this deletion success modal HTML -->
+<div id="deleteSuccessModal" class="success-modal">
+    <div class="success-modal-content">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>Success!</h2>
+        <p>The post has been successfully deleted.</p>
+        <button onclick="closeDeleteSuccessModal()" class="success-btn">Continue</button>
+    </div>
+</div>
+
+<style>
+/* Delete Confirmation Modal Styles */
+.delete-modal {
+    display: none;
+    position: fixed;
+    z-index: 1100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.delete-modal.active {
+    opacity: 1;
+}
+
+.delete-modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 40px;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 12px;
+    text-align: center;
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+}
+
+.delete-modal.active .delete-modal-content {
+    transform: translateY(0);
+}
+
+.delete-icon {
+    color: #dc3545;
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.delete-modal h2 {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.delete-modal p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.delete-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.cancel-btn {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.cancel-btn:hover {
+    background-color: #5a6268;
+}
+
+.confirm-delete-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.confirm-delete-btn:hover {
+    background-color: #c82333;
+}
+</style>
+
+<script>
+// Add these variables at the top of your script
+let postIdToDelete = null;
+
+// Update the deletePost function
+function deletePost(postId) {
+    postIdToDelete = postId;
+    const modal = document.getElementById('deleteConfirmModal');
+    modal.style.display = 'block';
+    setTimeout(() => {
+        modal.classList.add('active');
+    }, 10);
+}
+
+function cancelDelete() {
+    const modal = document.getElementById('deleteConfirmModal');
+    modal.classList.remove('active');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        postIdToDelete = null;
+    }, 300);
+}
+
+function confirmDelete() {
+    if (postIdToDelete) {
+        fetch('delete_history_post.php?id=' + postIdToDelete, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Close the confirmation modal
+                const confirmModal = document.getElementById('deleteConfirmModal');
+                confirmModal.classList.remove('active');
+                setTimeout(() => {
+                    confirmModal.style.display = 'none';
+                    // Show the success modal
+                    showDeleteSuccessModal();
+                }, 300);
+            } else {
+                alert('Error deleting post: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the post');
+        });
+    }
+}
+
+function showDeleteSuccessModal() {
+    const modal = document.getElementById('deleteSuccessModal');
+    modal.style.display = 'block';
+    setTimeout(() => {
+        modal.classList.add('active');
+    }, 10);
+}
+
+function closeDeleteSuccessModal() {
+    const modal = document.getElementById('deleteSuccessModal');
+    modal.classList.remove('active');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        location.reload(); // Reload the page to update the post list
+    }, 300);
+}
+
+// Add ESC key handler for delete confirmation modal
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cancelDelete();
     }
 });
 </script>
