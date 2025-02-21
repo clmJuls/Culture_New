@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kulturabase</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="geography/assets/css/journal-card.css">
     <style>
     /* General */
         * {
@@ -57,95 +58,309 @@
         <h2>Geography Journals</h2>
         <p>Geography explores the Earth's landscapes, environments, and the relationships between people and their surroundings. Dive into journals that highlight the influence of physical and human geography on our world.</p>
 
+        <?php if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1): ?>
+        <!-- Add New Post Button (Admin only) -->
+        <button class="create-post-btn" onclick="openModal()">Create New Post</button>
+        <?php endif; ?>
+
         <!-- Search Bar -->
         <div class="search-bar">
-            <input type="text" placeholder="Search journals...">
-            <button type="submit">Search</button>
+            <input type="text" id="searchInput" placeholder="Search journals...">
+            <button onclick="searchJournals()">Search</button>
         </div>
 
         <div class="journal-grid">
-            <!-- Journal Card 1 -->
-            <div class="journal-card">
-                <img src="assets/journal/mountain.jpg" alt="Mountain Culture">
-                <div class="journal-card-content">
-                    <h3>Mountains and Culture</h3>
-                    <p>Explore how mountainous regions shape the traditions and lifestyles of communities.</p>
-                    <a href="#" class="read-more">Read More</a>
-                </div>
-            </div>
+            <?php
+            // Fetch posts from geography_posts table with user information
+            $sql = "SELECT gp.*, u.username 
+                    FROM geography_posts gp 
+                    LEFT JOIN users u ON gp.user_id = u.id 
+                    ORDER BY gp.created_at DESC";
+            $result = $conn->query($sql);
 
-            <!-- Journal Card 2 -->
-            <div class="journal-card">
-                <img src="assets/journal/role_river.jpg" alt="River Systems">
-                <div class="journal-card-content">
-                    <h3>The Role of Rivers</h3>
-                    <p>Understand how rivers impact trade, settlements, and cultural development over time.</p>
-                    <a href="#" class="read-more">Read More</a>
-                </div>
-            </div>
-
-            <!-- Journal Card 3 -->
-            <div class="journal-card">
-                    <img src="assets/journal/urban_geo.jpg" alt="Urban Geography">
-                    <div class="journal-card-content">
-                    <h3>Urban Geography</h3>
-                    <p>Discover the influence of geography on city planning and urbanization patterns.</p>
-                    <a href="#" class="read-more">Read More</a>
-                </div>
-            </div>
-
-            <!-- Journal Card 4 -->
-            <div class="journal-card">
-                <img src="assets/journal/climate_culture.jpg" alt="Climate Impact">
-                <div class="journal-card-content">
-                    <h3>Climate and Culture</h3>
-                    <p>From deserts to rainforests, learn how climates shape civilizations and their practices.</p>
-                    <a href="#" class="read-more">Read More</a>
-                </div>
-            </div>
-
-            <!-- Journal Card 5 -->
-            <div class="journal-card">
-                <img src="assets/journal/landscape.jpg" alt="Cultural Landscapes">
-                <div class="journal-card-content">
-                    <h3>Cultural Landscapes</h3>
-                    <p>The dynamic interaction of human activities with the natural environment over time.</p>
-                    <a href="#" class="read-more">Read More</a>
-                </div>
-            </div>
-
-            <!-- Journal Card 6 -->
-            <div class="journal-card">
-                <img src="assets/journal/agri_geo.jpg" alt="Agricultural Geography">
-                <div class="journal-card-content">
-                    <h3>Agricultural Geography</h3>
-                    <p>Study how geography influences agricultural techniques and food production systems.</p>
-                    <a href="#" class="read-more">Read More</a>
-                </div>
-            </div>
-
-            <!-- Journal Card 7 -->
-            <div class="journal-card">
-                <img src="assets/journal/coastal1.jpg" alt="Coastal Studies">
-                <div class="journal-card-content">
-                    <h3>Coastal Geography</h3>
-                    <p>Explore the impact of coastal environments on trade, tourism, and culture.</p>
-                    <a href="#" class="read-more">Read More</a>
-                </div>
-            </div>
-
-            <!-- Journal Card 8 -->
-            <div class="journal-card">
-                <img src="assets/journal/desert_landscape.jpg" alt="Desert Studies">
-                <div class="journal-card-content">
-                    <h3>Desert Landscapes</h3>
-                    <p>Investigate the unique challenges and adaptations of desert environments.</p>
-                    <a href="#" class="read-more">Read More</a>
-                </div>
-            </div>
+            if ($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()) {
+                    ?>
+                    <div class="journal-card">
+                        <?php if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1): ?>
+                            <div class="admin-controls">
+                                <button onclick="deletePost(<?php echo $row['id']; ?>)" class="delete-btn">
+                                    <span class="delete-icon">×</span>
+                                    <span class="delete-text">Delete</span>
+                                </button>
+                            </div>
+                        <?php endif; ?>
+                        <img src="<?php echo htmlspecialchars($row['image_url']); ?>" alt="<?php echo htmlspecialchars($row['title']); ?>">
+                        <div class="journal-card-content">
+                            <div class="card-header">
+                                <h3><?php echo htmlspecialchars($row['title']); ?></h3>
+                                <h4 class="subtitle"><?php echo htmlspecialchars($row['description']); ?></h4>
+                            </div>
+                            <div class="card-body">
+                                <p class="content-preview">
+                                    <?php 
+                                    echo htmlspecialchars(substr($row['content'], 0, 150)) . 
+                                         (strlen($row['content']) > 150 ? '...' : ''); 
+                                    ?>
+                                </p>
+                            </div>
+                            <div class="card-footer">
+                                <span class="author">By: <?php echo $row['username'] ? htmlspecialchars($row['username']) : 'Anonymous'; ?></span>
+                                <a href="#" class="read-more" onclick="viewPost(<?php echo $row['id']; ?>)">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+                }
+            }
+            ?>
         </div>
     </div>
 </section>
+
+<!-- Create Post Modal -->
+<div id="createPostModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Create New Post</h2>
+        <form id="createPostForm" method="POST" action="process_geography_post.php" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="content">Content:</label>
+                <textarea id="content" name="content" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="image">Image:</label>
+                <div class="drop-zone">
+                    <span class="drop-zone__prompt">Drag & drop your file here or click to select</span>
+                    <input type="file" name="image" class="drop-zone__input" id="image" accept="image/*" required>
+                </div>
+            </div>
+            <button type="submit" class="submit-btn">Create Post</button>
+        </form>
+    </div>
+</div>
+
+<!-- Add this modal for viewing full posts -->
+<div id="viewPostModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeViewModal()">&times;</span>
+        <div id="postContent">
+            <!-- Content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<!-- Add this HTML for the delete confirmation modal at the bottom of your file, before </body> -->
+<div id="deleteConfirmModal" class="modal">
+    <div class="modal-content delete-confirm-content">
+        <div class="delete-confirm-header">
+            <h3>Delete Post</h3>
+            <span class="close" onclick="closeDeleteModal()">&times;</span>
+        </div>
+        <div class="delete-confirm-body">
+            <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+        </div>
+        <div class="delete-confirm-footer">
+            <button class="cancel-btn" onclick="closeDeleteModal()">Cancel</button>
+            <button class="confirm-delete-btn" onclick="confirmDelete()">Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- Update the JavaScript -->
+<script>
+function openModal() {
+    document.getElementById('createPostModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('createPostModal').style.display = 'none';
+}
+
+function viewPost(postId) {
+    fetch(`get_post.php?id=${postId}`)
+        .then(response => response.json())
+        .then(data => {
+            let adminControls = '';
+            <?php if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1): ?>
+            adminControls = `
+                <div class="admin-controls">
+                    <button onclick="deletePost(${postId})" class="delete-btn">Delete Post</button>
+                </div>
+            `;
+            <?php endif; ?>
+            
+            document.getElementById('postContent').innerHTML = `
+                ${adminControls}
+                <h2>${data.title}</h2>
+                <h4 class="subtitle">${data.description}</h4>
+                <img src="${data.image_url}" alt="${data.title}" class="full-post-image">
+                <div class="post-metadata">
+                    <span class="author">By ${data.username}</span>
+                    <span class="date">${data.created_at}</span>
+                </div>
+                <div class="post-content">
+                    ${data.content}
+                </div>
+            `;
+            document.getElementById('viewPostModal').style.display = 'block';
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function closeViewModal() {
+    document.getElementById('viewPostModal').style.display = 'none';
+}
+
+// Update window click handler to handle both modals
+window.onclick = function(event) {
+    if (event.target == document.getElementById('createPostModal')) {
+        closeModal();
+    }
+    if (event.target == document.getElementById('viewPostModal')) {
+        closeViewModal();
+    }
+    if (event.target == document.getElementById('deleteConfirmModal')) {
+        closeDeleteModal();
+    }
+}
+
+document.querySelectorAll(".drop-zone__input").forEach((inputElement) => {
+    const dropZoneElement = inputElement.closest(".drop-zone");
+
+    dropZoneElement.addEventListener("click", (e) => {
+        inputElement.click();
+    });
+
+    inputElement.addEventListener("change", (e) => {
+        if (inputElement.files.length) {
+            updateThumbnail(dropZoneElement, inputElement.files[0]);
+        }
+    });
+
+    dropZoneElement.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropZoneElement.classList.add("drop-zone--over");
+    });
+
+    ["dragleave", "dragend"].forEach((type) => {
+        dropZoneElement.addEventListener(type, (e) => {
+            dropZoneElement.classList.remove("drop-zone--over");
+        });
+    });
+
+    dropZoneElement.addEventListener("drop", (e) => {
+        e.preventDefault();
+
+        if (e.dataTransfer.files.length) {
+            inputElement.files = e.dataTransfer.files;
+            updateThumbnail(dropZoneElement, e.dataTransfer.files[0]);
+        }
+
+        dropZoneElement.classList.remove("drop-zone--over");
+    });
+});
+
+function updateThumbnail(dropZoneElement, file) {
+    let thumbnailElement = dropZoneElement.querySelector(".drop-zone__thumb");
+
+    // First time - remove the prompt
+    if (dropZoneElement.querySelector(".drop-zone__prompt")) {
+        dropZoneElement.querySelector(".drop-zone__prompt").remove();
+    }
+
+    // First time - there is no thumbnail element, so lets create it
+    if (!thumbnailElement) {
+        thumbnailElement = document.createElement("div");
+        thumbnailElement.classList.add("drop-zone__thumb");
+        dropZoneElement.appendChild(thumbnailElement);
+    }
+
+    thumbnailElement.dataset.label = file.name;
+
+    // Show thumbnail for image files
+    if (file.type.startsWith("image")) {
+        thumbnailElement.style.backgroundImage = `url(${URL.createObjectURL(file)})`;
+    }
+}
+
+function searchJournals() {
+    const searchInput = document.getElementById('searchInput');
+    const filter = searchInput.value.toLowerCase().trim();
+    const cards = document.getElementsByClassName('journal-card');
+
+    if (filter === '') {
+        for (let card of cards) {
+            card.style.display = "";
+        }
+        return;
+    }
+
+    for (let card of cards) {
+        const title = card.querySelector('h3').textContent.toLowerCase();
+        if (title.includes(filter)) {
+            card.style.display = "";
+        } else {
+            card.style.display = "none";
+        }
+    }
+}
+
+document.getElementById('searchInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        searchJournals();
+    }
+});
+
+function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    searchJournals();
+}
+
+let postIdToDelete = null;
+
+function deletePost(postId) {
+    postIdToDelete = postId;
+    document.getElementById('deleteConfirmModal').style.display = 'block';
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteConfirmModal').style.display = 'none';
+    postIdToDelete = null;
+}
+
+function confirmDelete() {
+    if (postIdToDelete === null) return;
+    
+    fetch('delete_geography_post.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `post_id=${postIdToDelete}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            showErrorModal('Failed to delete post: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showErrorModal('Failed to delete post');
+    });
+}
+</script>
 
 <style>
  /* Geography Hero Section */
@@ -272,6 +487,7 @@
     transition: transform 0.3s, box-shadow 0.3s;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .journal-card:hover {
@@ -294,33 +510,72 @@
     justify-content: space-between;
 }
 
-.journal-card h3 {
-    font-size: 1.1rem;
+.card-header {
+    margin-bottom: 15px;
+}
+
+.card-header h3 {
+    font-size: 1.2rem;
     color: #333;
-    margin: 0 0 10px;
+    margin-bottom: 8px;
     font-weight: bold;
 }
 
-.journal-card p {
+.subtitle {
     font-size: 0.9rem;
     color: #666;
-    margin: 0 0 15px;
+    font-weight: normal;
+    margin-bottom: 12px;
 }
 
-.journal-card .read-more {
-    text-decoration: none;
-    color: #ffffff;
-    background-color: #007bff;
-    padding: 8px 12px;
-    border-radius: 5px;
-    font-size: 0.875rem;
-    text-align: center;
-    display: inline-block;
-    transition: background-color 0.3s;
+.content-preview {
+    font-size: 0.9rem;
+    color: #444;
+    line-height: 1.5;
+    margin-bottom: 15px;
 }
 
-.journal-card .read-more:hover {
-    background-color: #0056b3;
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.author {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* Full post view styles */
+.full-post-image {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.post-metadata {
+    margin: 15px 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.post-content {
+    line-height: 1.8;
+    color: #333;
+    margin-top: 20px;
+}
+
+/* Update modal styles for post viewing */
+.modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.date {
+    margin-left: 15px;
 }
 
 /* Responsive Design */
@@ -355,6 +610,217 @@
 
 .cta-button:hover {
     background-color: #0052b1;
+}
+
+/* Add these styles to your existing CSS */
+.create-post-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.create-post-btn:hover {
+    background-color: #0056b3;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: black;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-group textarea {
+    height: 100px;
+}
+
+.submit-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.submit-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Updated Admin Controls and Delete Button Styles */
+.admin-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+}
+
+.delete-btn {
+    display: flex;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.delete-btn:hover {
+    background-color: rgba(220, 53, 69, 0.9);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.delete-icon {
+    font-size: 1.2rem;
+    margin-right: 6px;
+    font-weight: bold;
+}
+
+.delete-text {
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+/* Optional: Add a subtle animation when hovering over the journal card */
+.journal-card:hover .delete-btn {
+    opacity: 1;
+}
+
+.delete-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Delete Confirmation Modal Styles */
+.delete-confirm-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 0;
+    width: 400px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.delete-confirm-header {
+    background-color: #f8f9fa;
+    padding: 15px 20px;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delete-confirm-header h3 {
+    margin: 0;
+    color: #343a40;
+    font-size: 1.2rem;
+}
+
+.delete-confirm-body {
+    padding: 20px;
+    color: #495057;
+    font-size: 1rem;
+}
+
+.delete-confirm-footer {
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    border-radius: 0 0 8px 8px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.cancel-btn {
+    padding: 8px 16px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.cancel-btn:hover {
+    background-color: #5a6268;
+}
+
+.confirm-delete-btn {
+    padding: 8px 16px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.confirm-delete-btn:hover {
+    background-color: #c82333;
+}
+
+/* Optional: Add animation to the modal */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.delete-confirm-content {
+    animation: modalFadeIn 0.3s ease-out;
 }
 </style>
 
