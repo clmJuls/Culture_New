@@ -82,6 +82,14 @@
                 while($row = $result->fetch_assoc()) {
                     ?>
                     <div class="journal-card">
+                        <?php if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1): ?>
+                            <div class="admin-controls">
+                                <button onclick="deletePost(<?php echo $row['id']; ?>)" class="delete-btn">
+                                    <span class="delete-icon">×</span>
+                                    <span class="delete-text">Delete</span>
+                                </button>
+                            </div>
+                        <?php endif; ?>
                         <img src="<?php echo htmlspecialchars($row['image_url']); ?>" alt="<?php echo htmlspecialchars($row['title']); ?>">
                         <div class="journal-card-content">
                             <div class="card-header">
@@ -97,7 +105,7 @@
                                 </p>
                             </div>
                             <div class="card-footer">
-                                <span class="author">By :  <?php echo $row['username'] ? htmlspecialchars($row['username']) : 'Anonymous'; ?></span>
+                                <span class="author">By: <?php echo $row['username'] ? htmlspecialchars($row['username']) : 'Anonymous'; ?></span>
                                 <a href="#" class="read-more" onclick="viewPost(<?php echo $row['id']; ?>)">Read More</a>
                             </div>
                         </div>
@@ -150,6 +158,23 @@
     </div>
 </div>
 
+<!-- Add this HTML for the delete confirmation modal at the bottom of your file, before </body> -->
+<div id="deleteConfirmModal" class="modal">
+    <div class="modal-content delete-confirm-content">
+        <div class="delete-confirm-header">
+            <h3>Delete Post</h3>
+            <span class="close" onclick="closeDeleteModal()">&times;</span>
+        </div>
+        <div class="delete-confirm-body">
+            <p>Are you sure you want to delete this post? This action cannot be undone.</p>
+        </div>
+        <div class="delete-confirm-footer">
+            <button class="cancel-btn" onclick="closeDeleteModal()">Cancel</button>
+            <button class="confirm-delete-btn" onclick="confirmDelete()">Delete</button>
+        </div>
+    </div>
+</div>
+
 <!-- Update the JavaScript -->
 <script>
 function openModal() {
@@ -161,11 +186,20 @@ function closeModal() {
 }
 
 function viewPost(postId) {
-    // Fetch post details using AJAX
     fetch(`get_post.php?id=${postId}`)
         .then(response => response.json())
         .then(data => {
+            let adminControls = '';
+            <?php if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1): ?>
+            adminControls = `
+                <div class="admin-controls">
+                    <button onclick="deletePost(${postId})" class="delete-btn">Delete Post</button>
+                </div>
+            `;
+            <?php endif; ?>
+            
             document.getElementById('postContent').innerHTML = `
+                ${adminControls}
                 <h2>${data.title}</h2>
                 <h4 class="subtitle">${data.description}</h4>
                 <img src="${data.image_url}" alt="${data.title}" class="full-post-image">
@@ -174,9 +208,7 @@ function viewPost(postId) {
                     <span class="date">${data.created_at}</span>
                 </div>
                 <div class="post-content">
-                    ${data.content.split('\n').map(paragraph => 
-                        paragraph ? `<p>${paragraph}</p>` : ''
-                    ).join('')}
+                    ${data.content}
                 </div>
             `;
             document.getElementById('viewPostModal').style.display = 'block';
@@ -195,6 +227,9 @@ window.onclick = function(event) {
     }
     if (event.target == document.getElementById('viewPostModal')) {
         closeViewModal();
+    }
+    if (event.target == document.getElementById('deleteConfirmModal')) {
+        closeDeleteModal();
     }
 }
 
@@ -288,6 +323,42 @@ document.getElementById('searchInput').addEventListener('keypress', function(e) 
 function clearSearch() {
     document.getElementById('searchInput').value = '';
     searchJournals();
+}
+
+let postIdToDelete = null;
+
+function deletePost(postId) {
+    postIdToDelete = postId;
+    document.getElementById('deleteConfirmModal').style.display = 'block';
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteConfirmModal').style.display = 'none';
+    postIdToDelete = null;
+}
+
+function confirmDelete() {
+    if (postIdToDelete === null) return;
+    
+    fetch('delete_geography_post.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `post_id=${postIdToDelete}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            showErrorModal('Failed to delete post: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showErrorModal('Failed to delete post');
+    });
 }
 </script>
 
@@ -416,6 +487,7 @@ function clearSearch() {
     transition: transform 0.3s, box-shadow 0.3s;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .journal-card:hover {
@@ -610,6 +682,145 @@ function clearSearch() {
 
 .submit-btn:hover {
     background-color: #0056b3;
+}
+
+/* Updated Admin Controls and Delete Button Styles */
+.admin-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+}
+
+.delete-btn {
+    display: flex;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.delete-btn:hover {
+    background-color: rgba(220, 53, 69, 0.9);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.delete-icon {
+    font-size: 1.2rem;
+    margin-right: 6px;
+    font-weight: bold;
+}
+
+.delete-text {
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+/* Optional: Add a subtle animation when hovering over the journal card */
+.journal-card:hover .delete-btn {
+    opacity: 1;
+}
+
+.delete-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Delete Confirmation Modal Styles */
+.delete-confirm-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 0;
+    width: 400px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.delete-confirm-header {
+    background-color: #f8f9fa;
+    padding: 15px 20px;
+    border-bottom: 1px solid #dee2e6;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delete-confirm-header h3 {
+    margin: 0;
+    color: #343a40;
+    font-size: 1.2rem;
+}
+
+.delete-confirm-body {
+    padding: 20px;
+    color: #495057;
+    font-size: 1rem;
+}
+
+.delete-confirm-footer {
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    border-radius: 0 0 8px 8px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.cancel-btn {
+    padding: 8px 16px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.cancel-btn:hover {
+    background-color: #5a6268;
+}
+
+.confirm-delete-btn {
+    padding: 8px 16px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.confirm-delete-btn:hover {
+    background-color: #c82333;
+}
+
+/* Optional: Add animation to the modal */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.delete-confirm-content {
+    animation: modalFadeIn 0.3s ease-out;
 }
 </style>
 
