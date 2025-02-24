@@ -903,7 +903,7 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
                     <h3>Resources</h3>
                     <div class="menu-item">
                         <span>🔗</span>
-                        <a href="#">About Kulturifiko</a>
+                        <a href="about.php">About Kulturifiko</a>
                     </div>
                 </div>
             </div>

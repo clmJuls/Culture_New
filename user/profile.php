@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Fetch user information from the database
-$query = "SELECT full_name, profile_picture, username, about, location, birthday, website, skills FROM users WHERE id = '$user_id'";
+$query = "SELECT full_name, profile_picture, username, about, location, birthday, website, skills, isPremium FROM users WHERE id = '$user_id'";
 $result = $conn->query($query);
 
 if ($result->num_rows > 0) {
@@ -26,6 +26,7 @@ if ($result->num_rows > 0) {
     $website = htmlspecialchars($user['website']);
     $skills = htmlspecialchars($user['skills']);
     $profile_picture = htmlspecialchars($user['profile_picture']);
+    $is_premium = $user['isPremium'];
 } else {
     echo "<script>
             alert('User not found.');
@@ -33,10 +34,14 @@ if ($result->num_rows > 0) {
           </script>";
     exit();
 }
+
 $name_parts = explode(' ', $full_name);
 $first_initial = strtoupper(substr($name_parts[0], 0, 1)); // First letter of first name
 $last_name = isset($name_parts[1]) ? strtoupper(substr($name_parts[1], 0, 1)) : ''; // First letter of last name (if exists)
 $avatar_text = $first_initial . $last_name;
+
+// Add a class based on premium status
+$premium_class = $is_premium ? 'premium-user' : '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -45,6 +50,9 @@ $avatar_text = $first_initial . $last_name;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kulturabase</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <?php if ($is_premium): ?>
+    <link rel="stylesheet" href="../assets/css/premium-styles.css">
+    <?php endif; ?>
     <body>
     <style>
     /* General */
@@ -79,7 +87,7 @@ $avatar_text = $first_initial . $last_name;
     </div> -->
 
     <!-- Profile Header -->
-    <div class="profile-header" style="margin-top: 100px;">
+    <div class="profile-header <?php echo $premium_class; ?>" style="margin-top: 100px;">
         <div class="profile-picture">
             <div class="profile-img">
                 <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" id="profile-img" class="profile-img-preview">
@@ -673,6 +681,62 @@ $avatar_text = $first_initial . $last_name;
   width: 100px;
   height: 100px;
   border-radius: 50%;
+}
+
+/* Premium User Styling with Flowery Design */
+.premium-user {
+    border: 2px solid gold;
+    background-color: #f0f8ff;
+    position: relative;
+    overflow: visible;
+}
+
+.premium-user::before,
+.premium-user::after {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: 
+        radial-gradient(circle at 30% 30%, gold 2px, transparent 4px) 0 0,
+        radial-gradient(circle at 70% 30%, gold 2px, transparent 4px) 0 0,
+        radial-gradient(circle at 30% 70%, gold 2px, transparent 4px) 0 0,
+        radial-gradient(circle at 70% 70%, gold 2px, transparent 4px) 0 0;
+    background-size: 30px 30px;
+    z-index: 1;
+}
+
+.premium-user::before {
+    top: -20px;
+    left: -20px;
+    transform: rotate(-45deg);
+}
+
+.premium-user::after {
+    bottom: -20px;
+    right: -20px;
+    transform: rotate(135deg);
+}
+
+.premium-user .user-info::before {
+    content: '⭐ Premium Member ⭐';
+    display: block;
+    color: gold;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    margin-bottom: 10px;
+}
+
+/* Add subtle animation */
+@keyframes floralSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.premium-user::before,
+.premium-user::after {
+    animation: floralSpin 20s linear infinite;
 }
   </style>
 

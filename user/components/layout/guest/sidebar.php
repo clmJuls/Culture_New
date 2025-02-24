@@ -30,8 +30,7 @@
     <div class="menu-section">
         <h3>Resources</h3>
         <div class="menu-item">
-            <span>🔗</span>
-            <a href="#">About Kulturifiko</a>
+            <a href="about.php" <?php echo basename($_SERVER['PHP_SELF']) == 'about.php' ? 'class="active"' : ''; ?>>About Kulturifiko</a>
         </div>
     </div>
 </div>
