@@ -171,6 +171,112 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
             padding: 20px;
             font-style: italic;
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 0;
+            border-radius: 8px;
+            width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.3s ease;
+        }
+
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .close-modal {
+            color: #aaa;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .warning-text {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #e5e5e5;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .cancel-btn, .confirm-delete-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+
+        .cancel-btn {
+            background-color: #e5e5e5;
+            color: #333;
+        }
+
+        .cancel-btn:hover {
+            background-color: #d5d5d5;
+        }
+
+        .confirm-delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .confirm-delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
     </style>
 
     <!-- Navigation Bar -->
@@ -1046,6 +1152,24 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
         <div class="modal-footer">
             <button class="cancel-delete">Cancel</button>
             <button class="confirm-delete">Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add this before the closing </body> tag -->
+<div id="deleteConfirmModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Delete Post</h3>
+            <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete this post?</p>
+            <p class="warning-text">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="cancel-btn">Cancel</button>
+            <button class="confirm-delete-btn">Delete</button>
         </div>
     </div>
 </div>

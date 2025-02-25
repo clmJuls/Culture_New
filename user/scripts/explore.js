@@ -21,7 +21,6 @@ function loadPosts(append = false) {
   isLoading = true;
   updateViewMoreButton('Loading...');
   
-  console.log('Fetching posts for page:', currentPage); // Debug log
 
   $.ajax({
       url: 'posts_management.php',
@@ -32,10 +31,8 @@ function loadPosts(append = false) {
           per_page: postsPerPage
       },
       success: function(response) {
-          console.log('Raw response:', response); // Debug log
           try {
               const data = typeof response === 'object' ? response : JSON.parse(response);
-              console.log('Parsed data:', data); // Debug log
               
               if (data.posts && data.posts.length > 0) {
                   displayPosts(data.posts, append);
@@ -53,8 +50,6 @@ function loadPosts(append = false) {
       },
       error: function(xhr, status, error) {
           console.error('Ajax error:', error);
-          console.log('Status:', status);
-          console.log('Response:', xhr.responseText);
           isLoading = false;
           updateViewMoreButton('Try Again');
       }
@@ -85,7 +80,6 @@ function handleLogout() {
 
 // Post display and interaction functions
 function displayPosts(posts, append = false) {
-  console.log('Displaying posts:', posts); // Debug log
   const postDisplay = document.getElementById('post-display');
   
   if (!append) {
@@ -96,7 +90,14 @@ function displayPosts(posts, append = false) {
       const postElement = document.createElement('div');
       postElement.className = 'post';
       postElement.setAttribute('data-post-id', post.id);
+      postElement.setAttribute('data-user-id', post.user_id);
       
+      // Create the delete button HTML only if user is authorized
+      const deleteButtonHtml = (post.user_id == currentUserId || isAdmin) ? 
+          `<button class="delete-post" data-post-id="${post.id}" data-user-id="${post.user_id}">
+              <i class="fas fa-trash"></i>
+          </button>` : '';
+
       let mediaHTML = '';
       if (post.file_path) {
           const fileExtension = post.file_path.split('.').pop().toLowerCase();
@@ -119,11 +120,7 @@ function displayPosts(posts, append = false) {
                   <img src="${post.profile_picture || 'assets/default-profile.png'}" class="profile-pic" alt="Profile Picture">
                   <span>${post.username}</span>
               </div>
-              ${(post.user_id == currentUserId || isAdmin) ? 
-                  `<button class="delete-post" onclick="deletePost(${post.id}, ${post.user_id})">
-                      <i class="fas fa-trash"></i>
-                  </button>` : ''
-              }
+              ${deleteButtonHtml}
           </div>
           <div class="post-content">
               <span class="post-title">${post.title}</span>
@@ -162,10 +159,18 @@ function displayPosts(posts, append = false) {
 
       postDisplay.appendChild(postElement);
   });
+
+  // Add click handlers for delete buttons
+  $('.delete-post').off('click').on('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const postId = $(this).data('post-id');
+      const postUserId = $(this).data('user-id');
+      deletePost(postId, postUserId);
+  });
 }
 
 function renderComments(comments) {
-    console.log('Rendering comments:', comments); // Debug log
     
     if (!comments || !comments.length) {
         return '<p class="no-comments">No comments yet</p>';
@@ -323,53 +328,77 @@ function toggleComments(postId) {
 }
 
 function deletePost(postId, postUserId) {
-  // Check if user is authorized to delete
-  if (!currentUserId) {
-      handleUnauthorizedAction('delete posts');
-      return;
-  }
+    if (!currentUserId) {
+        handleUnauthorizedAction('delete posts');
+        return;
+    }
 
-  // Only allow if user is admin or post owner
-  if (currentUserId == postUserId || isAdmin) {
-      currentPostToDelete = postId;
-      postModal.open();
-  } else {
-      alert('You are not authorized to delete this post');
-  }
-}
+    if (currentUserId == postUserId || isAdmin) {
+        // Show delete confirmation modal
+        const modal = document.getElementById('deleteConfirmModal');
+        modal.style.display = 'block';
 
-function confirmDelete(postId) {
-  $.ajax({
-      url: 'posts_management.php',
-      type: 'POST',
-      data: { 
-          action: 'delete_post',
-          post_id: postId
-      },
-      success: function(response) {
-          try {
-              const data = typeof response === 'object' ? response : JSON.parse(response);
-              if (data.status === 'success') {
-                  // Remove the post element from the DOM
-                  const postElement = document.querySelector(`.post[data-post-id="${postId}"]`);
-                  if (postElement) {
-                      postElement.remove();
-                  }
-                  postModal.close();
-              } else {
-                  console.error('Failed to delete post:', data.message);
-                  alert(data.message || 'Failed to delete post');
-              }
-          } catch (e) {
-              console.error('Error processing delete response:', e);
-              alert('An error occurred while deleting the post');
-          }
-      },
-      error: function(xhr, status, error) {
-          console.error('Error deleting post:', error);
-          alert('An error occurred while deleting the post');
-      }
-  });
+        // Handle close button
+        const closeBtn = modal.querySelector('.close-modal');
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        // Handle cancel button
+        const cancelBtn = modal.querySelector('.cancel-btn');
+        cancelBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        // Handle confirm delete button
+        const confirmBtn = modal.querySelector('.confirm-delete-btn');
+        confirmBtn.onclick = function() {
+            $.ajax({
+                url: 'posts_management.php',
+                type: 'POST',
+                data: { 
+                    action: 'delete_post',
+                    post_id: postId
+                },
+                success: function(response) {
+                    try {
+                        const data = typeof response === 'object' ? response : JSON.parse(response);
+                        if (data.status === 'success') {
+                            // Hide modal first
+                            modal.style.display = 'none';
+                            
+                            // Remove the post with animation
+                            $(`.post[data-post-id="${postId}"]`).fadeOut(300, function() {
+                                $(this).remove();
+                            });
+                        } else {
+                            alert('Error deleting post: ' + (data.message || 'Unknown error'));
+                        }
+                    } catch (e) {
+                        console.error('Error processing delete response:', e);
+                        alert('Error deleting post');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Delete request failed:', {
+                        status: status,
+                        error: error,
+                        response: xhr.responseText
+                    });
+                    alert('Error deleting post. Please try again.');
+                }
+            });
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    } else {
+        alert('You are not authorized to delete this post');
+    }
 }
 
 function deleteComment(commentId, postId) {
