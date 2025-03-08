@@ -54,6 +54,13 @@ if ($result) {
         .card-image-container {
             position: relative;
             width: 100%;
+            height: 200px;
+        }
+
+        .card-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .delete-btn {
@@ -112,7 +119,7 @@ if ($result) {
             <!-- Search Bar -->
             <div class="search-container">
                 <input type="text" id="searchInput" placeholder="Search journals...">
-                <button onclick="searchPosts()" class="search-button">Search</button>
+                <button id="searchButton" class="search-button">Search</button>
             </div>
 
             <div class="journal-grid">
@@ -230,6 +237,14 @@ if ($result) {
         background-color: #0052b1;
     }
 
+    .no-results {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+        font-size: 1.1em;
+        grid-column: 1 / -1;
+    }
+
     /* Journals Section */
     .journals {
         background-color: #f4f4f4;
@@ -260,9 +275,10 @@ if ($result) {
 
     .journal-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 30px;
         margin-top: 20px;
+        padding: 20px;
     }
 
     .journal-card {
@@ -273,6 +289,8 @@ if ($result) {
         transition: transform 0.3s, box-shadow 0.3s;
         display: flex;
         flex-direction: column;
+        height: 400px;
+        width: 100%;
     }
 
     .journal-card:hover {
@@ -280,32 +298,36 @@ if ($result) {
         box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
     }
 
-    .journal-card img {
-        width: 100%;
-        height: 150px;
-        object-fit: cover;
-        border-bottom: 1px solid #ddd;
-    }
-
     .journal-card-content {
-        padding: 15px;
+        padding: 20px;
         flex: 1;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
     }
 
-    .journal-card h3 {
+    .journal-card-content h3 {
         font-size: 1.1rem;
         color: #333;
         margin: 0 0 10px;
         font-weight: bold;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .journal-card p {
+    .journal-card-content p {
         font-size: 0.9rem;
         color: #666;
         margin: 0 0 15px;
+        flex-grow: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .journal-card .read-more {
@@ -316,8 +338,9 @@ if ($result) {
         border-radius: 5px;
         font-size: 0.875rem;
         text-align: center;
-        display: inline-block;
+        display: block;
         transition: background-color 0.3s;
+        margin-top: auto;
     }
 
     .journal-card .read-more:hover {
@@ -325,15 +348,42 @@ if ($result) {
     }
 
     /* Responsive Design */
+    @media (max-width: 1200px) {
+        .journal-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        }
+    }
+
     @media (max-width: 768px) {
         .journal-grid {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 15px;
+        }
+        
+        .journal-card {
+            height: 380px;
+        }
+        
+        .card-image-container {
+            height: 180px;
+        }
+
+        .search-container {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .search-container input,
+        .search-button {
+            width: 100%;
         }
     }
 
     @media (max-width: 480px) {
         .journal-grid {
             grid-template-columns: 1fr;
+            padding: 10px;
         }
     }
 
@@ -369,22 +419,32 @@ if ($result) {
     <?php include 'components/widgets/chat.php'; ?>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Pass PHP variables to JavaScript
+        const isAdminUser = <?php echo isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1 ? 'true' : 'false'; ?>;
+    </script>
     <script src="scripts/culture-post.js"></script>
 
-    <!-- Add this before the closing </body> tag -->
+    <!-- Post View Modal -->
     <div id="postModal" class="modal">
         <div class="modal-content post-modal">
             <span class="close">&times;</span>
-            <div id="modalContent">
-                <img id="modalImage" src="" alt="Post Image">
+            <div class="modal-body">
+                <div class="modal-image">
+                    <img id="modalImage" src="" alt="Post Image">
+                </div>
                 <div class="post-details">
                     <h2 id="modalTitle"></h2>
-                    <p id="modalDescription"></p>
                     <div class="post-meta">
-                        <span id="modalCategory"></span>
-                        <span id="modalDate"></span>
+                        <span class="category" id="modalCategory"></span>
+                        <span class="date" id="modalDate"></span>
                     </div>
-                    <p id="modalContent"></p>
+                    <div class="description">
+                        <p id="modalDescription"></p>
+                    </div>
+                    <div class="content">
+                        <p id="modalContent"></p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -412,64 +472,93 @@ if ($result) {
         max-width: 800px;
         border-radius: 8px;
         position: relative;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-body {
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+
+    .modal-image {
+        width: 100%;
+        height: 300px;
+        position: relative;
         overflow: hidden;
-    }
-
-    .close {
-        position: absolute;
-        right: 20px;
-        top: 20px;
-        font-size: 28px;
-        font-weight: bold;
-        color: #fff;
-        cursor: pointer;
-        z-index: 1001;
-        background-color: rgba(0, 0, 0, 0.5);
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .close:hover {
-        background-color: rgba(0, 0, 0, 0.8);
     }
 
     #modalImage {
         width: 100%;
-        max-height: 400px;
+        height: 100%;
         object-fit: cover;
     }
 
     .post-details {
-        padding: 20px;
+        padding: 30px;
     }
 
-    .post-details h2 {
+    #modalTitle {
+        font-size: 24px;
+        font-weight: 600;
         color: #333;
         margin-bottom: 15px;
     }
 
     .post-meta {
         display: flex;
+        align-items: center;
         gap: 15px;
         margin-bottom: 20px;
+    }
+
+    #modalCategory {
+        background-color: #f0f0f0;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 14px;
         color: #666;
-        font-size: 0.9em;
+    }
+
+    #modalDate {
+        font-size: 14px;
+        color: #888;
     }
 
     #modalDescription {
-        color: #666;
-        margin-bottom: 20px;
+        font-size: 16px;
         line-height: 1.6;
+        color: #666;
+        margin-bottom: 25px;
     }
 
     #modalContent {
-        color: #333;
+        font-size: 15px;
         line-height: 1.8;
-        margin-top: 20px;
+        color: #333;
+        white-space: pre-wrap;
+    }
+
+    .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        width: 30px;
+        height: 30px;
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #333;
+        cursor: pointer;
+        z-index: 1001;
+        transition: all 0.3s ease;
+    }
+
+    .close:hover {
+        background-color: #fff;
+        transform: rotate(90deg);
     }
 
     /* Responsive Design */
@@ -479,6 +568,205 @@ if ($result) {
             width: 100%;
             height: 100%;
             border-radius: 0;
+        }
+
+        .modal-body {
+            max-height: 100vh;
+        }
+
+        .modal-image {
+            height: 200px;
+        }
+
+        .post-details {
+            padding: 20px;
+        }
+    }
+    </style>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmModal" class="modal">
+        <div class="modal-content delete-modal">
+            <div class="delete-modal-header">
+                <h3>Confirm Deletion</h3>
+                <span class="close delete-close">&times;</span>
+            </div>
+            <div class="delete-modal-body">
+                <p>Are you sure you want to delete this post?</p>
+                <p class="warning-text">This action cannot be undone.</p>
+            </div>
+            <div class="delete-modal-footer">
+                <button id="cancelDelete" class="btn-cancel">Cancel</button>
+                <button id="confirmDelete" class="btn-delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    /* Delete Modal Styles */
+    .delete-modal {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 0;
+        width: 90%;
+        max-width: 400px;
+        border-radius: 8px;
+        position: relative;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .delete-modal-header {
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .delete-modal-header h3 {
+        margin: 0;
+        color: #333;
+        font-size: 1.2rem;
+    }
+
+    .delete-close {
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+        transition: color 0.3s ease;
+    }
+
+    .delete-close:hover {
+        color: #333;
+    }
+
+    .delete-modal-body {
+        padding: 20px;
+        text-align: center;
+    }
+
+    .warning-text {
+        color: #dc3545;
+        font-size: 0.9rem;
+        margin-top: 10px;
+    }
+
+    .delete-modal-footer {
+        padding: 20px;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .btn-cancel, .btn-delete {
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .btn-cancel {
+        background-color: #f8f9fa;
+        color: #333;
+        border: 1px solid #ddd;
+    }
+
+    .btn-cancel:hover {
+        background-color: #e9ecef;
+    }
+
+    .btn-delete {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background-color: #c82333;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 576px) {
+        .delete-modal {
+            margin: 30% auto;
+            width: 95%;
+        }
+    }
+    </style>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content success-modal">
+            <div class="success-modal-body">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3>Success!</h3>
+                <p id="successMessage">Post deleted successfully!</p>
+                <button class="btn-ok" onclick="closeSuccessModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    /* Success Modal Styles */
+    .success-modal {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 30px;
+        width: 90%;
+        max-width: 400px;
+        border-radius: 8px;
+        position: relative;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .success-modal-body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .success-icon {
+        color: #28a745;
+        font-size: 48px;
+    }
+
+    .success-modal-body h3 {
+        color: #333;
+        margin: 0;
+        font-size: 24px;
+    }
+
+    .success-modal-body p {
+        color: #666;
+        margin: 0;
+    }
+
+    .btn-ok {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+        margin-top: 10px;
+    }
+
+    .btn-ok:hover {
+        background-color: #218838;
+    }
+
+    @media (max-width: 576px) {
+        .success-modal {
+            margin: 30% auto;
+            padding: 20px;
         }
     }
     </style>

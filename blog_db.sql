@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 22, 2025 at 12:58 PM
+-- Generation Time: Mar 08, 2025 at 12:28 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -35,6 +35,14 @@ CREATE TABLE `comments` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `comments`
+--
+
+INSERT INTO `comments` (`id`, `post_id`, `user_id`, `comment_text`, `created_at`) VALUES
+(36, 50, 3, 'test', '2025-03-08 11:16:05'),
+(37, 45, 3, 'test', '2025-03-08 11:20:20');
+
 -- --------------------------------------------------------
 
 --
@@ -52,6 +60,13 @@ CREATE TABLE `culture_posts` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `culture_posts`
+--
+
+INSERT INTO `culture_posts` (`id`, `title`, `description`, `content`, `image_url`, `category`, `user_id`, `created_at`, `updated_at`) VALUES
+(14, 'Test me', 'test', 'test', 'uploads/culture/67cc21cb8d555_481234611_122140772222562748_6460917983758228935_n.jpg', 'traditions', 3, '2025-03-08 10:54:03', '2025-03-08 10:54:03');
 
 -- --------------------------------------------------------
 
@@ -91,6 +106,14 @@ CREATE TABLE `geography_posts` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `geography_posts`
+--
+
+INSERT INTO `geography_posts` (`id`, `title`, `description`, `content`, `image_url`, `user_id`, `created_at`, `updated_at`) VALUES
+(12, 'ttest', 'test', 'test', 'uploads/geography/67c95aca4c408.png', 3, '2025-03-06 08:20:26', '2025-03-06 08:20:26'),
+(14, 'test', 'test', 'test', 'uploads/geography/67cc1e7052ac9.jpg', 3, '2025-03-08 10:39:44', '2025-03-08 10:39:44');
+
 -- --------------------------------------------------------
 
 --
@@ -109,6 +132,13 @@ CREATE TABLE `history_posts` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `history_posts`
+--
+
+INSERT INTO `history_posts` (`id`, `title`, `description`, `content`, `category`, `image_url`, `user_id`, `created_at`, `updated_at`) VALUES
+(10, 'test', 'test', 'test', 'ancient', 'uploads/history/67cc248d55d92.jpg', 3, '2025-03-08 11:05:49', '2025-03-08 11:05:49');
+
 -- --------------------------------------------------------
 
 --
@@ -122,6 +152,18 @@ CREATE TABLE `likes` (
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `likes`
+--
+
+INSERT INTO `likes` (`id`, `post_id`, `user_id`, `is_active`, `created_at`) VALUES
+(45, 51, 3, 1, '2025-03-08 11:20:45'),
+(46, 52, 3, 1, '2025-03-08 11:20:52'),
+(48, 52, 4, 1, '2025-03-08 11:21:11'),
+(49, 50, 4, 1, '2025-03-08 11:22:40'),
+(51, 45, 4, 1, '2025-03-08 11:22:54'),
+(52, 51, 4, 1, '2025-03-08 11:23:18');
 
 -- --------------------------------------------------------
 
@@ -139,6 +181,20 @@ CREATE TABLE `posts` (
   `learning_styles` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `posts`
+--
+
+INSERT INTO `posts` (`id`, `user_id`, `title`, `description`, `file_path`, `culture_elements`, `learning_styles`, `created_at`) VALUES
+(45, 3, 'test', 'test', 'uploads/67cc2573c4159_481234611_122140772222562748_6460917983758228935_n.jpg', '', 'Auditory & Oral', '2025-03-08 11:09:39'),
+(46, 3, 'test', 'test', 'uploads/67cc25d284eb1_481234611_122140772222562748_6460917983758228935_n.jpg', '', 'Auditory & Oral,Kinesthetic', '2025-03-08 11:11:14'),
+(47, 3, 'test', 'test', 'uploads/67cc25e0baba8_481234611_122140772222562748_6460917983758228935_n.jpg', 'History', 'Auditory & Oral', '2025-03-08 11:11:28'),
+(48, 3, 'test', 'test', 'uploads/67cc25edf2569_481234611_122140772222562748_6460917983758228935_n.jpg', '', 'Auditory & Oral', '2025-03-08 11:11:41'),
+(49, 3, 'test', 'test', 'uploads/67cc25f947760_481234611_122140772222562748_6460917983758228935_n.jpg', 'Geography', 'Auditory & Oral', '2025-03-08 11:11:53'),
+(50, 3, 'test', 'test', 'uploads/67cc26020263c_481234611_122140772222562748_6460917983758228935_n.jpg', '', 'Visual', '2025-03-08 11:12:02'),
+(51, 3, 'test', 'test', 'uploads/67cc260b01f50_481234611_122140772222562748_6460917983758228935_n.jpg', '', 'Read & Write', '2025-03-08 11:12:11'),
+(52, 3, 'test', 'test', 'uploads/67cc279fe4ec4_blank-profile-picture-973460_960_720.webp', '', 'Visual', '2025-03-08 11:18:55');
 
 -- --------------------------------------------------------
 
@@ -239,13 +295,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `culture_posts`
 --
 ALTER TABLE `culture_posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `demographics_posts`
@@ -257,25 +313,25 @@ ALTER TABLE `demographics_posts`
 -- AUTO_INCREMENT for table `geography_posts`
 --
 ALTER TABLE `geography_posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `history_posts`
 --
 ALTER TABLE `history_posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -317,6 +373,21 @@ ALTER TABLE `history_posts`
 ALTER TABLE `likes`
   ADD CONSTRAINT `likes_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `likes_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+-- Add unique constraint to prevent duplicate likes from the same user on the same post
+ALTER TABLE `likes` 
+ADD UNIQUE KEY `unique_user_post_like` (`user_id`, `post_id`);
+
+-- Add indexes to improve query performance and prevent duplicates
+ALTER TABLE `posts`
+ADD INDEX `created_at_index` (`created_at`),
+ADD INDEX `user_posts_index` (`user_id`, `created_at`);
+
+-- Add foreign key constraint for posts.user_id if not already present
+ALTER TABLE `posts`
+ADD CONSTRAINT `posts_ibfk_1` 
+FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
