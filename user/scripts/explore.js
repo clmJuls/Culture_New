@@ -13,22 +13,21 @@ const postsPerPage = 6;
 let isLoading = false;
 let hasMorePosts = true;
 let currentPostToDelete = null;
+let isSnapScrolling = false; // Add this new variable for snap scrolling
 
-// Modified loadPosts function with debugging
+// Modified loadPosts function to load all posts initially
 function loadPosts(append = false) {
   if (isLoading || (!append && !hasMorePosts)) return;
   
   isLoading = true;
-  updateViewMoreButton('Loading...');
   
-
   $.ajax({
       url: 'posts_management.php',
       type: 'POST',
       data: { 
           action: 'fetch_posts',
           page: currentPage,
-          per_page: postsPerPage
+          per_page: append ? postsPerPage : 0 // Send 0 to fetch all posts initially
       },
       success: function(response) {
           try {
@@ -37,21 +36,18 @@ function loadPosts(append = false) {
               if (data.posts && data.posts.length > 0) {
                   displayPosts(data.posts, append);
                   currentPage++;
-                  hasMorePosts = data.posts.length === postsPerPage;
+                  hasMorePosts = append ? data.posts.length === postsPerPage : true;
               } else {
                   hasMorePosts = false;
               }
-              updateViewMoreButton();
           } catch (e) {
               console.error('Error parsing response:', e);
-              updateViewMoreButton('Try Again');
           }
           isLoading = false;
       },
       error: function(xhr, status, error) {
           console.error('Ajax error:', error);
           isLoading = false;
-          updateViewMoreButton('Try Again');
       }
   });
 }
@@ -92,6 +88,9 @@ function displayPosts(posts, append = false) {
       postElement.setAttribute('data-post-id', post.id);
       postElement.setAttribute('data-user-id', post.user_id);
       
+      // Add snap scroll attribute
+      postElement.style.scrollSnapAlign = 'start';
+      
       // Create the delete button HTML only if user is authorized
       const deleteButtonHtml = (post.user_id == currentUserId || isAdmin) ? 
           `<button class="delete-post" data-post-id="${post.id}" data-user-id="${post.user_id}">
@@ -124,8 +123,10 @@ function displayPosts(posts, append = false) {
           </div>
           <div class="post-content">
               <span class="post-title">${post.title}</span>
-              <p>${post.description}</p>
-              ${mediaHTML}
+              <p class="post-description">${post.description}</p>
+              <div class="media-container">
+                  ${mediaHTML}
+              </div>
           </div>
           <div class="post-interactions">
               <button class="like-btn ${post.user_liked ? 'liked' : ''}" onclick="toggleLike(${post.id})">
@@ -167,6 +168,63 @@ function displayPosts(posts, append = false) {
       const postId = $(this).data('post-id');
       const postUserId = $(this).data('user-id');
       deletePost(postId, postUserId);
+  });
+  
+  // Add CSS to standardize post card heights
+  normalizePostCardHeights();
+}
+
+// Add this new function to standardize post card heights
+function normalizePostCardHeights() {
+  // Set fixed heights for media containers
+  const mediaContainers = document.querySelectorAll('.media-container');
+  mediaContainers.forEach(container => {
+    container.style.height = '180px';
+    container.style.overflow = 'hidden';
+    container.style.display = 'flex';
+    container.style.alignItems = 'center';
+    container.style.justifyContent = 'center';
+  });
+  
+  // Make post media fit within container
+  const postMedia = document.querySelectorAll('.post-media');
+  postMedia.forEach(media => {
+    if (media.tagName === 'IMG') {
+      media.style.maxHeight = '100%';
+      media.style.maxWidth = '100%';
+      media.style.objectFit = 'contain';
+    } else if (media.tagName === 'VIDEO') {
+      media.style.maxHeight = '100%';
+      media.style.maxWidth = '100%';
+    }
+  });
+  
+  // Style post titles with larger font size
+  const titles = document.querySelectorAll('.post-title');
+  titles.forEach(title => {
+    title.style.fontSize = '16px';
+    title.style.fontWeight = 'bold';
+    title.style.display = 'block';
+    title.style.marginBottom = '6px';
+  });
+  
+  // Limit description height
+  const descriptions = document.querySelectorAll('.post-description');
+  descriptions.forEach(desc => {
+    desc.style.maxHeight = '50px';
+    desc.style.overflow = 'hidden';
+    desc.style.textOverflow = 'ellipsis';
+    desc.style.display = '-webkit-box';
+    desc.style.webkitLineClamp = '2';
+    desc.style.webkitBoxOrient = 'vertical';
+  });
+  
+  // Make all post cards the same height
+  const posts = document.querySelectorAll('.post');
+  posts.forEach(post => {
+    post.style.height = '380px';
+    post.style.display = 'flex';
+    post.style.flexDirection = 'column';
   });
 }
 
@@ -428,20 +486,73 @@ function deleteComment(commentId, postId) {
 
 // Add these new functions
 function updateViewMoreButton(text = 'View More') {
-    const button = document.getElementById('view-more-btn');
-    if (!button) return;
-
-    button.textContent = text;
-    button.classList.toggle('loading', text === 'Loading...');
-    button.style.display = hasMorePosts ? 'inline-block' : 'none';
+    // This function can be removed, but we'll keep it empty for now
+    // in case it's referenced elsewhere in code we can't see
 }
 
 // Add event listeners
 $(document).ready(function() {
     loadPosts();
+    
+    // Initialize snap scroll
+    initSnapScroll();
 
-    // View More button click handler
-    $('#view-more-btn').on('click', function() {
-        loadPosts(true);
+    // Implement infinite scroll with snap scrolling
+    $(window).scroll(function() {
+        if(!isSnapScrolling && $(window).scrollTop() + $(window).height() > $(document).height() - 200) {
+            if(!isLoading && hasMorePosts) {
+                loadPosts(true);
+            }
+        }
     });
 });
+
+// Add this new function for snap scrolling
+function initSnapScroll() {
+    // Get the post display container
+    const postDisplay = document.getElementById('post-display');
+    
+    // Apply CSS for snap scrolling container
+    if (postDisplay) {
+        postDisplay.style.scrollSnapType = 'y mandatory';
+        postDisplay.style.overflowY = 'scroll';
+        postDisplay.style.height = 'calc(100vh - 150px)'; // Adjust height as needed
+    }
+    
+    // Add scroll event listener for snap scrolling
+    window.addEventListener('scroll', handleSnapScroll, { passive: true });
+}
+
+function handleSnapScroll() {
+    if (isSnapScrolling) return;
+    
+    const posts = document.querySelectorAll('.post');
+    if (!posts.length) return;
+    
+    // Calculate row height (assuming posts are in a grid)
+    const postHeight = posts[0].offsetHeight;
+    const rowHeight = postHeight + 20; // Add margin/padding
+    
+    // Get current scroll position
+    const scrollPosition = window.scrollY;
+    
+    // Calculate which row we should snap to
+    const targetRow = Math.round(scrollPosition / rowHeight);
+    const targetScrollPosition = targetRow * rowHeight;
+    
+    // Only snap if we're not too far from a snap point
+    if (Math.abs(scrollPosition - targetScrollPosition) > 20) {
+        isSnapScrolling = true;
+        
+        // Smooth scroll to the target position
+        window.scrollTo({
+            top: targetScrollPosition,
+            behavior: 'smooth'
+        });
+        
+        // Reset the flag after animation completes
+        setTimeout(() => {
+            isSnapScrolling = false;
+        }, 500);
+    }
+}

@@ -331,9 +331,6 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
     <div class="explore-container">
         <div id="post-display"></div>
-        <div class="view-more-container">
-            <button id="view-more-btn" class="view-more-btn">View More</button>
-        </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>

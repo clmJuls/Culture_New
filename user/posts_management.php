@@ -14,10 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($_POST['action'] === 'fetch_posts') {
             $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
             $per_page = isset($_POST['per_page']) ? (int)$_POST['per_page'] : 6;
-            $offset = ($page - 1) * $per_page;
-            
             $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
             
+            // Base query without LIMIT clause
             $query = "SELECT p.*, u.username, u.profile_picture, 
                      COUNT(DISTINCT l.id) as like_count,
                      IF(? > 0, EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_id = ?), 0) as user_liked
@@ -25,15 +24,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      LEFT JOIN users u ON p.user_id = u.id
                      LEFT JOIN likes l ON p.id = l.post_id
                      GROUP BY p.id, u.username, u.profile_picture
-                     ORDER BY p.created_at DESC
-                     LIMIT ? OFFSET ?";
+                     ORDER BY p.created_at DESC";
             
-            $stmt = $conn->prepare($query);
+            // Add LIMIT clause only if per_page is not 0
+            if ($per_page > 0) {
+                $offset = ($page - 1) * $per_page;
+                $query .= " LIMIT ? OFFSET ?";
+                $stmt = $conn->prepare($query);
+                $stmt->bind_param("iiii", $currentUserId, $currentUserId, $per_page, $offset);
+            } else {
+                // No pagination - fetch all posts
+                $stmt = $conn->prepare($query);
+                $stmt->bind_param("ii", $currentUserId, $currentUserId);
+            }
+            
             if ($stmt === false) {
                 throw new Exception("Prepare failed: " . $conn->error);
             }
-            
-            $stmt->bind_param("iiii", $currentUserId, $currentUserId, $per_page, $offset);
             
             if (!$stmt->execute()) {
                 throw new Exception("Execute failed: " . $stmt->error);
