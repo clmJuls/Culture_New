@@ -67,10 +67,18 @@
         .chat-header {
             background: #365486;
             color: white;
-            padding: 20px; /* Increased padding */
+            padding: 20px;
             text-align: center;
             font-weight: bold;
-            font-size: 1.2em; /* Increased font size */
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-header i {
+            margin-right: 10px;
+            font-size: 1.3em;
         }
 
         .chat-messages {
@@ -194,7 +202,8 @@
         </div>
         <div class="chat-container" id="chatContainer">
             <div class="chat-header">
-                Kulturifiko Assistant
+                <i class="fas fa-globe-americas"></i>
+                Kulturifiko - Your Cultural Guide
             </div>
             <div class="chat-messages" id="chatMessages">
                 <!-- Messages will appear here -->
@@ -248,7 +257,7 @@
             bubble.toggleClass('hidden');
             
             if (!container.data('initialized')) {
-                addMessage("Hello! How can I help you learn about different cultures today?");
+                addMessage("Welcome to Kulturifiko! I'm your guide to exploring the rich tapestry of world cultures. Feel free to ask me about any cultural traditions, customs, celebrations, or heritage you're curious about. What would you like to learn today?");
                 container.data('initialized', true);
             }
         });
