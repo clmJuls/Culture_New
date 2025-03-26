@@ -3,6 +3,9 @@ $(document).ready(function() {
   // Initialize post modal
   postModal.init();
   
+  // Initialize learning style filters
+  initializeLearningStyleFilters();
+  
   // Load initial posts
   loadPosts();
 });
@@ -14,12 +17,14 @@ let isLoading = false;
 let hasMorePosts = true;
 let currentPostToDelete = null;
 let isSnapScrolling = false; // Add this new variable for snap scrolling
+let selectedLearningStyles = new Set();
 
 // Modified loadPosts function to load all posts initially
 function loadPosts(append = false) {
   if (isLoading || (!append && !hasMorePosts)) return;
   
   isLoading = true;
+  updateViewMoreButton('Loading...');
   
   $.ajax({
       url: 'posts_management.php',
@@ -27,7 +32,8 @@ function loadPosts(append = false) {
       data: { 
           action: 'fetch_posts',
           page: currentPage,
-          per_page: append ? postsPerPage : 0 // Send 0 to fetch all posts initially
+          per_page: postsPerPage,
+          learning_styles: Array.from(selectedLearningStyles) // Convert Set to Array
       },
       success: function(response) {
           try {
@@ -36,18 +42,21 @@ function loadPosts(append = false) {
               if (data.posts && data.posts.length > 0) {
                   displayPosts(data.posts, append);
                   currentPage++;
-                  hasMorePosts = append ? data.posts.length === postsPerPage : true;
+                  hasMorePosts = data.posts.length === postsPerPage;
               } else {
                   hasMorePosts = false;
               }
+              updateViewMoreButton();
           } catch (e) {
               console.error('Error parsing response:', e);
+              updateViewMoreButton('Try Again');
           }
           isLoading = false;
       },
       error: function(xhr, status, error) {
           console.error('Ajax error:', error);
           isLoading = false;
+          updateViewMoreButton('Try Again');
       }
   });
 }
@@ -490,8 +499,27 @@ function updateViewMoreButton(text = 'View More') {
     // in case it's referenced elsewhere in code we can't see
 }
 
+// Add learning style filter handlers
+function initializeLearningStyleFilters() {
+    const checkboxes = document.querySelectorAll('.menu-item input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                selectedLearningStyles.add(this.value);
+            } else {
+                selectedLearningStyles.delete(this.value);
+            }
+            // Reset pagination and reload posts with new filters
+            currentPage = 1;
+            hasMorePosts = true;
+            loadPosts();
+        });
+    });
+}
+
 // Add event listeners
 $(document).ready(function() {
+    initializeLearningStyleFilters();
     loadPosts();
     
     // Initialize snap scroll

@@ -16,26 +16,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $per_page = isset($_POST['per_page']) ? (int)$_POST['per_page'] : 6;
             $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
             
+            // Debug the received learning styles
+            error_log("Received learning styles: " . print_r($_POST['learning_styles'], true));
+            
+            // Get learning styles filter
+            $learning_styles = isset($_POST['learning_styles']) && is_array($_POST['learning_styles']) 
+                ? array_map('strval', $_POST['learning_styles']) 
+                : [];
+            
             // Base query without LIMIT clause
-            $query = "SELECT p.*, u.username, u.profile_picture, 
+            $query = "SELECT DISTINCT p.*, u.username, u.profile_picture, 
                      COUNT(DISTINCT l.id) as like_count,
                      IF(? > 0, EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_id = ?), 0) as user_liked
                      FROM posts p
                      LEFT JOIN users u ON p.user_id = u.id
-                     LEFT JOIN likes l ON p.id = l.post_id
-                     GROUP BY p.id, u.username, u.profile_picture
-                     ORDER BY p.created_at DESC";
+                     LEFT JOIN likes l ON p.id = l.post_id";
+            
+            // Add WHERE clause if learning styles are selected
+            if (!empty($learning_styles)) {
+                $query .= " WHERE (";
+                $conditions = array();
+                foreach ($learning_styles as $style) {
+                    $conditions[] = "p.learning_styles LIKE ?";
+                }
+                $query .= implode(" OR ", $conditions) . ")";
+            }
+            
+            $query .= " GROUP BY p.id, u.username, u.profile_picture
+                       ORDER BY p.created_at DESC";
             
             // Add LIMIT clause only if per_page is not 0
             if ($per_page > 0) {
                 $offset = ($page - 1) * $per_page;
                 $query .= " LIMIT ? OFFSET ?";
-                $stmt = $conn->prepare($query);
-                $stmt->bind_param("iiii", $currentUserId, $currentUserId, $per_page, $offset);
+                
+                if (!empty($learning_styles)) {
+                    // Prepare parameter types for currentUserId (2) + learning styles + per_page + offset
+                    $types = "ii" . str_repeat('s', count($learning_styles)) . "ii";
+                    $params = array_merge(
+                        [$currentUserId, $currentUserId],
+                        array_map(function($style) { return "%$style%"; }, $learning_styles),
+                        [$per_page, $offset]
+                    );
+                    $stmt = $conn->prepare($query);
+                    $stmt->bind_param($types, ...$params);
+                } else {
+                    $stmt = $conn->prepare($query);
+                    $stmt->bind_param("iiii", $currentUserId, $currentUserId, $per_page, $offset);
+                }
             } else {
                 // No pagination - fetch all posts
-                $stmt = $conn->prepare($query);
-                $stmt->bind_param("ii", $currentUserId, $currentUserId);
+                if (!empty($learning_styles)) {
+                    $types = "ii" . str_repeat('s', count($learning_styles));
+                    $params = array_merge(
+                        [$currentUserId, $currentUserId],
+                        array_map(function($style) { return "%$style%"; }, $learning_styles)
+                    );
+                    $stmt = $conn->prepare($query);
+                    $stmt->bind_param($types, ...$params);
+                } else {
+                    $stmt = $conn->prepare($query);
+                    $stmt->bind_param("ii", $currentUserId, $currentUserId);
+                }
             }
             
             if ($stmt === false) {

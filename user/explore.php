@@ -988,140 +988,141 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
                 <h3>Learning Styles</h3>
                 <div class="menu-item">
                     <ul>
-                        <li><input type="checkbox">Visual</li>
-                        <li><input type="checkbox">Auditory & Oral</li>
-                        <li><input type="checkbox">Read & Write</li>
-                        <li><input type="checkbox">Kinesthetic</li>
+                        <li><input type="checkbox" value="visual">Visual</li>
+                        <li><input type="checkbox" value="auditory">Auditory & Oral</li>
+                        <li><input type="checkbox" value="read_write">Read & Write</li>
+                        <li><input type="checkbox" value="kinesthetic">Kinesthetic</li>
                     </ul>
-                </div>
-
-                <div class="menu-section">
-                    <h3>Location</h3>
-                    <div class="menu-item">
-                        <a href="choose-loc.php"><span>+</span> Choose a location</a>
-                    </div>
-                </div>
-
-                <div class="menu-section">
-                    <h3>Resources</h3>
-                    <div class="menu-item">
-                        <span>🔗</span>
-                        <a href="about.php">About Kulturifiko</a>
-                    </div>
                 </div>
             </div>
 
-            <style>
-                /* Sidebar */
-                .sidebar {
-                    position: fixed;
-                    top: 60px;
-                    left: 0;
-                    width: 240px;
-                    height: 100vh;
-                    background-color: #365486;
-                    padding-top: 30px;
-                    z-index: 999;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    overflow-y: auto;
-                    flex-grow: 1;
-                    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
-                    border-radius: 0 5px 5px 0;
-                }
+            <div class="menu-section">
+                <h3>Location</h3>
+                <div class="menu-item">
+                    <a href="choose-loc.php"><span>+</span> Choose a location</a>
+                </div>
+            </div>
 
-                /* Logo Section */
-                .logo-section {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    margin-top: 15px;
-                    margin-bottom: 15px;
-                }
+            <div class="menu-section">
+                <h3>Resources</h3>
+                <div class="menu-item">
+                    <span>🔗</span>
+                    <a href="about.php">About Kulturifiko</a>
+                </div>
+            </div>
+        </div>
 
-                .logo-section img {
-                    max-width: 100px;
-                    border-radius: 5px;
-                }
+        <style>
+            /* Sidebar */
+            .sidebar {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                width: 240px;
+                height: 100vh;
+                background-color: #365486;
+                padding-top: 30px;
+                z-index: 999;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                overflow-y: auto;
+                flex-grow: 1;
+                box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+                border-radius: 0 5px 5px 0;
+            }
 
-                /* Section Menus */
-                .menu-section {
-                    margin-bottom: 10px;
-                }
+            /* Logo Section */
+            .logo-section {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-top: 15px;
+                margin-bottom: 15px;
+            }
 
-                .menu-section h3 {
-                    font-size: 18px;
-                    margin-bottom: 8px;
-                    color: #DCF2F1
-                }
+            .logo-section img {
+                max-width: 100px;
+                border-radius: 5px;
+            }
 
-                /* Menu Items */
-                .menu-item {
-                    display: inline-block;
-                    align-items: center;
-                    justify-content: flex-start;
-                    margin: 3px 0;
-                    cursor: pointer;
-                    transition: background 0.2s ease;
-                    padding: 5px 5px;
-                    border-radius: 4px;
-                    color: #ffffff;
-                }
+            /* Section Menus */
+            .menu-section {
+                margin-bottom: 10px;
+            }
 
-                .menu-item a {
-                    color: #ffffff;
-                    text-decoration: none;
-                    font-size: .8rem;
-                    font-weight: 500;
-                    padding: 5px 10px;
-                    border-radius: 30px;
-                }
+            .menu-section h3 {
+                font-size: 18px;
+                margin-bottom: 8px;
+                color: #DCF2F1
+            }
 
-                .menu-item a:hover {
-                    background-color: #7FC7D9;
-                    color: #0F1035;
-                }
+            /* Menu Items */
+            .menu-item {
+                display: inline-block;
+                align-items: center;
+                justify-content: flex-start;
+                margin: 3px 0;
+                cursor: pointer;
+                transition: background 0.2s ease;
+                padding: 5px 5px;
+                border-radius: 4px;
+                color: #ffffff;
+            }
 
-                .menu-item a.active {
-                    background-color: #1e3c72;
-                    color: #fff;
-                }
+            .menu-item a {
+                color: #ffffff;
+                text-decoration: none;
+                font-size: .8rem;
+                font-weight: 500;
+                padding: 5px 10px;
+                border-radius: 30px;
+            }
 
-                .menu-item ul {
-                    list-style: none;
-                    padding: 0;
-                }
+            .menu-item a:hover {
+                background-color: #7FC7D9;
+                color: #0F1035;
+            }
 
-                .menu-item li {
-                    margin-bottom: 10px;
-                    font-size: .8rem;
-                }
+            .menu-item a.active {
+                background-color: #1e3c72;
+                color: #fff;
+            }
 
-                input[type="checkbox"] {
-                    margin-right: 5px;
-                }
+            .menu-item ul {
+                list-style: none;
+                padding: 0;
+            }
 
-                #chosen-location-container {
-                    margin-top: 20px;
-                    display: block;
-                }
+            .menu-item li {
+                margin-bottom: 10px;
+                font-size: .8rem;
+            }
 
-                #chosen-location-container label {
-                    font-size: 12px;
-                    color: #ffffff;
-                }
-            </style>
+            input[type="checkbox"] {
+                margin-right: 5px;
+            }
 
-            <!-- Trending Posts -->
-            <?php include 'components/explore/trend.php'; ?>
-            <?php include 'components/widgets/chat.php'; ?>
+            #chosen-location-container {
+                margin-top: 20px;
+                display: block;
+            }
 
-            <!-- Add these before the closing </head> tag -->
-            <link rel="stylesheet" href="modal/post-modal.css">
-            <script src="modal/post-modal.js"></script>
+            #chosen-location-container label {
+                font-size: 12px;
+                color: #ffffff;
+            }
+        </style>
 
-            </head>
+        <!-- Trending Posts -->
+        <?php include 'components/explore/trend.php'; ?>
+        <?php include 'components/widgets/chat.php'; ?>
+
+        <!-- Add these before the closing </head> tag -->
+        <link rel="stylesheet" href="modal/post-modal.css">
+        <script src="modal/post-modal.js"></script>
+
+        </head>
 
 </html>
 
