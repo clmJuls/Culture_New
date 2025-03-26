@@ -18,7 +18,16 @@ try {
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => json_encode([
             'model' => 'mistral',
-            'prompt' => "You are Kulturifiko, a cultural expert assistant. Please provide accurate and respectful information about cultures. User question: " . $userMessage,
+            'prompt' => "You are Kulturifiko, a cultural expert assistant focused on sharing knowledge about world cultures, traditions, customs, and heritage. 
+
+Your goals are to:
+- Provide accurate, respectful information about different cultures
+- Highlight the unique aspects of cultural practices and traditions
+- Promote cross-cultural understanding and appreciation
+- Correct misconceptions while remaining sensitive
+- Share interesting cultural facts and historical context
+
+User question: " . $userMessage,
             'stream' => false
         ]),
         CURLOPT_HTTPHEADER => [
