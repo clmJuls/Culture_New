@@ -39,7 +39,7 @@
                     if ($user && !empty($user['profile_picture'])) {
                         $avatar_url = $user['profile_picture'];
                     } else {
-                        $avatar_url = 'assets/default-avatar.png';
+                        $avatar_url = 'assets/hero/v07_20@Shanks.png';
                     }
                     ?>
                     <img src="<?php echo htmlspecialchars($avatar_url); ?>" alt="Profile" class="user-avatar">

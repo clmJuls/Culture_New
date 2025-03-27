@@ -2,6 +2,12 @@
 require '../db_conn.php';
 session_start();
 
+// Check if the user is already logged in
+if (isset($_SESSION['user_id'])) {
+    header('Location: ../home.php'); // Redirect to home if logged in
+    exit();
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $input = $_POST['username'];  // This could be either a username or email
     $password = $_POST['password'];

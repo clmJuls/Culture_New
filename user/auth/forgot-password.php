@@ -1,3 +1,13 @@
+<?php
+require '../db_conn.php';
+session_start();
+
+// Check if the user is already logged in
+if (isset($_SESSION['user_id'])) {
+    header('Location: ../home.php'); // Redirect to home if logged in
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

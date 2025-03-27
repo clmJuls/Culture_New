@@ -183,9 +183,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     accept="image/*,video/mp4,video/webm,video/mov"
                     style="display: none;">
             </div>
-            <div class="file-preview" id="file-preview"></div>
+            <!-- <div class="file-preview" id="file-preview"></div> -->
             <!-- Culture Elements (Hidden for Non-Admin Users) -->
-            <?php if ($_SESSION['isAdmin'] == 1) { ?>
+            <!-- <?php if ($_SESSION['isAdmin'] == 1) { ?>
                 <div style="background-color: #fff; padding: 15px; border-radius: 8px; border: 2px solid #ddd; margin: 15px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
                     <h3 style="color: #365486; font-size: 18px; font-weight: 500; margin-bottom: 8px;">Select Culture Elements</h3>
                     <div style="display: grid; gap: 8px;">
@@ -210,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php } ?>
 
         <!-- Learning Styles -->
-        <div style="background-color: #fff; padding: 15px; border-radius: 8px; border: 2px solid #ddd; margin: 15px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
+        <!-- <div style="background-color: #fff; padding: 15px; border-radius: 8px; border: 2px solid #ddd; margin: 15px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
             <h3 style="color: #365486; font-size: 18px; font-weight: 500; margin-bottom: 8px;">Select Learning Styles</h3>
             <div style="display: grid; gap: 8px;">
                 <label style="display: flex; align-items: center; margin: 0;">
@@ -230,7 +230,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <span style="font-size: 15px; color: #444;">Kinesthetic</span>
                 </label>
             </div>
-        </div>
+        </div> -->
 
             <!-- Submit Button -->
             <button type="submit" style="padding: 10px; background-color: #007bff; color: white; font-size: 16px; border: none; border-radius: 4px; cursor: pointer;">Post</button>
