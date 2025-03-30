@@ -26,9 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         move_uploaded_file($_FILES['file']['tmp_name'], $uploaded_file);
     }
 
-    // Insert post into database
-    $stmt = $conn->prepare("INSERT INTO posts (user_id, title, description, file_path, culture_elements, learning_styles) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param('isssss', $user_id, $title, $description, $uploaded_file, $culture_elements, $learning_styles); // Add learning_styles
+    // Set status to 'approved' if user is admin, otherwise 'pending'
+    $status = (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1) ? 'approved' : 'pending';
+
+    // Insert post into database with status
+    $stmt = $conn->prepare("INSERT INTO posts (user_id, title, description, file_path, culture_elements, learning_styles, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param('issssss', $user_id, $title, $description, $uploaded_file, $culture_elements, $learning_styles, $status);
 
     if ($stmt->execute()) {
         // Replace the alert with a success response

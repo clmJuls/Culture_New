@@ -19,7 +19,7 @@ let currentPostToDelete = null;
 let isSnapScrolling = false; // Add this new variable for snap scrolling
 let selectedLearningStyles = new Set();
 
-// Modified loadPosts function to load all posts initially
+// Modified loadPosts function to handle empty results naturally
 function loadPosts(append = false) {
   if (isLoading || (!append && !hasMorePosts)) return;
   
@@ -33,7 +33,7 @@ function loadPosts(append = false) {
           action: 'fetch_posts',
           page: currentPage,
           per_page: postsPerPage,
-          learning_styles: Array.from(selectedLearningStyles) // Convert Set to Array
+          learning_styles: Array.from(selectedLearningStyles)
       },
       success: function(response) {
           try {
@@ -45,6 +45,12 @@ function loadPosts(append = false) {
                   hasMorePosts = data.posts.length === postsPerPage;
               } else {
                   hasMorePosts = false;
+                  if (!append) {
+                      const postDisplay = document.getElementById('post-display');
+                      if (postDisplay) {
+                          postDisplay.innerHTML = ''; // Simply clear the display if no posts found
+                      }
+                  }
               }
               updateViewMoreButton();
           } catch (e) {
@@ -501,7 +507,10 @@ function updateViewMoreButton(text = 'View More') {
 
 // Add learning style filter handlers
 function initializeLearningStyleFilters() {
-    const checkboxes = document.querySelectorAll('.menu-item input[type="checkbox"]');
+    const filterContainer = document.getElementById('learning-styles-filter');
+    if (!filterContainer) return;
+
+    const checkboxes = filterContainer.querySelectorAll('input[type="checkbox"]');
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             if (this.checked) {
@@ -512,7 +521,7 @@ function initializeLearningStyleFilters() {
             // Reset pagination and reload posts with new filters
             currentPage = 1;
             hasMorePosts = true;
-            loadPosts();
+            loadPosts(false); // false to clear existing posts
         });
     });
 }

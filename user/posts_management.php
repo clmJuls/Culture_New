@@ -30,11 +30,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      IF(? > 0, EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_id = ?), 0) as user_liked
                      FROM posts p
                      LEFT JOIN users u ON p.user_id = u.id
-                     LEFT JOIN likes l ON p.id = l.post_id";
+                     LEFT JOIN likes l ON p.id = l.post_id
+                     WHERE p.status = 'approved'";
             
             // Add WHERE clause if learning styles are selected
             if (!empty($learning_styles)) {
-                $query .= " WHERE (";
+                $query .= " AND (";
                 $conditions = array();
                 foreach ($learning_styles as $style) {
                     $conditions[] = "p.learning_styles LIKE ?";
@@ -394,6 +395,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 throw new Exception("Error deleting comment: " . $stmt->error);
             }
+        } elseif ($_POST['action'] === 'update_status') {
+            // Verify admin privileges
+            if (!isset($_SESSION['user_id']) || !isset($_SESSION['isAdmin']) || !$_SESSION['isAdmin']) {
+                throw new Exception("Unauthorized access");
+            }
+            
+            // Validate inputs
+            if (!isset($_POST['post_id']) || !isset($_POST['status'])) {
+                throw new Exception("Missing required parameters");
+            }
+            
+            $post_id = (int)$_POST['post_id'];
+            $status = $_POST['status'];
+            
+            // Validate status value
+            if (!in_array($status, ['pending', 'approved', 'rejected'])) {
+                throw new Exception("Invalid status value");
+            }
+            
+            // Update the post status
+            $query = "UPDATE posts SET status = ? WHERE id = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("si", $status, $post_id);
+            
+            if ($stmt->execute()) {
+                echo json_encode(['status' => 'success']);
+            } else {
+                throw new Exception("Database error: " . $conn->error);
+            }
+            
+            $stmt->close();
         } else {
             throw new Exception("Invalid action");
         }
@@ -402,7 +434,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_log("Error in posts_management.php: " . $e->getMessage());
         echo json_encode([
             'status' => 'error',
-            'message' => 'An error occurred while processing your request'
+            'message' => $e->getMessage()
         ]);
     }
 } else {
