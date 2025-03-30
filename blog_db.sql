@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 08, 2025 at 12:28 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Generation Time: Mar 27, 2025 at 10:19 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -40,8 +40,8 @@ CREATE TABLE `comments` (
 --
 
 INSERT INTO `comments` (`id`, `post_id`, `user_id`, `comment_text`, `created_at`) VALUES
-(36, 50, 3, 'test', '2025-03-08 11:16:05'),
-(37, 45, 3, 'test', '2025-03-08 11:20:20');
+(36, 44, 6, 'asd', '2025-03-17 07:37:06'),
+(37, 47, 6, 'test', '2025-03-17 07:40:34');
 
 -- --------------------------------------------------------
 
@@ -111,8 +111,7 @@ CREATE TABLE `geography_posts` (
 --
 
 INSERT INTO `geography_posts` (`id`, `title`, `description`, `content`, `image_url`, `user_id`, `created_at`, `updated_at`) VALUES
-(12, 'ttest', 'test', 'test', 'uploads/geography/67c95aca4c408.png', 3, '2025-03-06 08:20:26', '2025-03-06 08:20:26'),
-(14, 'test', 'test', 'test', 'uploads/geography/67cc1e7052ac9.jpg', 3, '2025-03-08 10:39:44', '2025-03-08 10:39:44');
+(12, 'test', 'test', 'test', 'uploads/geography/67d7c09c9a324.png', 6, '2025-03-17 06:26:37', '2025-03-17 06:26:37');
 
 -- --------------------------------------------------------
 
@@ -137,7 +136,7 @@ CREATE TABLE `history_posts` (
 --
 
 INSERT INTO `history_posts` (`id`, `title`, `description`, `content`, `category`, `image_url`, `user_id`, `created_at`, `updated_at`) VALUES
-(10, 'test', 'test', 'test', 'ancient', 'uploads/history/67cc248d55d92.jpg', 3, '2025-03-08 11:05:49', '2025-03-08 11:05:49');
+(10, 'asdasd', 'asdasd', 'asdasd', 'movements', 'uploads/history/67d7c0b72b8fc.png', 6, '2025-03-17 06:27:03', '2025-03-17 06:27:03');
 
 -- --------------------------------------------------------
 
@@ -158,12 +157,8 @@ CREATE TABLE `likes` (
 --
 
 INSERT INTO `likes` (`id`, `post_id`, `user_id`, `is_active`, `created_at`) VALUES
-(45, 51, 3, 1, '2025-03-08 11:20:45'),
-(46, 52, 3, 1, '2025-03-08 11:20:52'),
-(48, 52, 4, 1, '2025-03-08 11:21:11'),
-(49, 50, 4, 1, '2025-03-08 11:22:40'),
-(51, 45, 4, 1, '2025-03-08 11:22:54'),
-(52, 51, 4, 1, '2025-03-08 11:23:18');
+(43, 44, 6, 1, '2025-03-17 07:37:10'),
+(44, 47, 6, 1, '2025-03-17 07:40:35');
 
 -- --------------------------------------------------------
 
@@ -187,15 +182,16 @@ CREATE TABLE `posts` (
 --
 
 INSERT INTO `posts` (`id`, `user_id`, `title`, `description`, `file_path`, `culture_elements`, `learning_styles`, `created_at`) VALUES
-(45, 3, 'test', 'test', 'uploads/67cc2573c4159_481234611_122140772222562748_6460917983758228935_n.jpg', '', 'Auditory & Oral', '2025-03-08 11:09:39'),
-(46, 3, 'test', 'test', 'uploads/67cc25d284eb1_481234611_122140772222562748_6460917983758228935_n.jpg', '', 'Auditory & Oral,Kinesthetic', '2025-03-08 11:11:14'),
-(47, 3, 'test', 'test', 'uploads/67cc25e0baba8_481234611_122140772222562748_6460917983758228935_n.jpg', 'History', 'Auditory & Oral', '2025-03-08 11:11:28'),
-(48, 3, 'test', 'test', 'uploads/67cc25edf2569_481234611_122140772222562748_6460917983758228935_n.jpg', '', 'Auditory & Oral', '2025-03-08 11:11:41'),
-(49, 3, 'test', 'test', 'uploads/67cc25f947760_481234611_122140772222562748_6460917983758228935_n.jpg', 'Geography', 'Auditory & Oral', '2025-03-08 11:11:53'),
-(50, 3, 'test', 'test', 'uploads/67cc26020263c_481234611_122140772222562748_6460917983758228935_n.jpg', '', 'Visual', '2025-03-08 11:12:02'),
-(51, 3, 'test', 'test', 'uploads/67cc260b01f50_481234611_122140772222562748_6460917983758228935_n.jpg', '', 'Read & Write', '2025-03-08 11:12:11'),
-(52, 3, 'test', 'test', 'uploads/67cc279fe4ec4_blank-profile-picture-973460_960_720.webp', '', 'Visual', '2025-03-08 11:18:55');
-
+(40, 6, 'asdasd', 'asdasd', 'uploads/67d7c0fad5887_RobloxScreenShot20250311_145611294.png', '', '', '2025-03-17 06:28:10'),
+(41, 6, 'asdasd', 'asdasdas', 'uploads/67d7c10271e25_RobloxScreenShot20250312_231930823.png', '', '', '2025-03-17 06:28:18'),
+(42, 6, 'asdasdasdasd', 'asdasdasd', 'uploads/67d7c108b47c7_RobloxScreenShot20250312_231930823.png', '', '', '2025-03-17 06:28:24'),
+(43, 6, 'asdasdasd', 'asdasd', 'uploads/67d7c10f0bf37_RobloxScreenShot20250312_231930823.png', '', '', '2025-03-17 06:28:31'),
+(44, 6, 'asdasdasd', 'asdasdasd', 'uploads/67d7c115a85ac_RobloxScreenShot20250312_231930823.png', '', '', '2025-03-17 06:28:37'),
+(45, 6, 'asdasda', 'sdasdasd', 'uploads/67d7c11ba3f6c_RobloxScreenShot20250311_145611294.png', '', '', '2025-03-17 06:28:43'),
+(46, 6, 'asdasd', 'asdasdasda', 'uploads/67d7cfd922a71_RobloxScreenShot20250312_231930823.png', '', '', '2025-03-17 07:31:37'),
+(47, 6, 'asdasd', 'asdasd', 'uploads/67d7cfde9fcad_RobloxScreenShot20250312_231930823.png', '', '', '2025-03-17 07:31:42'),
+(48, 6, 'asdasdas', 'dasdasd', 'uploads/67d7cfe4ad586_RobloxScreenShot20250311_145611294.png', '', '', '2025-03-17 07:31:48'),
+(49, 6, 'asdasd', 'asdasd', 'uploads/67d7cfea32a9e_RobloxScreenShot20250311_145611294.png', '', '', '2025-03-17 07:31:54');
 -- --------------------------------------------------------
 
 --
@@ -213,7 +209,7 @@ CREATE TABLE `users` (
   `birthday` date DEFAULT NULL,
   `website` varchar(255) DEFAULT NULL,
   `skills` text DEFAULT NULL,
-  `profile_picture` varchar(255) DEFAULT 'user/assets/hero/v07_20@Shanks.png',
+  `profile_picture` varchar(255) DEFAULT NULL,
   `isAdmin` tinyint(1) NOT NULL DEFAULT 0,
   `isPremium` tinyint(4) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -227,7 +223,9 @@ INSERT INTO `users` (`id`, `email`, `username`, `password`, `full_name`, `about`
 (2, 'jamesdy02@gmail.com', 'james', '$2y$10$AjiUxyVF3OiJx4bkZ6mBv.eBQOjZoaOxlltzLKBF1RbckLZeNSfO.', '', NULL, '', NULL, '', NULL, 'uploads/Screenshot 2025-02-12 205955.png', 0, 0),
 (3, 'clmjuls25@gmail.com', 'clmjuls', '$2y$10$aKByFvJ0pBhQ52be94Cn8OtThOltI7NSNIMw.oEnXlrTrYT4xaXf2', '', NULL, '', NULL, '', NULL, 'uploads/41a357c3028363d1b6962ab77e0bbdc5.jpg', 1, 0),
 (4, 'mjbcoloma@gmail.com', 'juls', '$2y$10$wB41R.BOb6IJw42BXt983uOZFixQvcxAVhbK9MINr5QhsMU4nxm5C', '', NULL, '', NULL, '', NULL, 'uploads/WIN_20221222_18_40_16_Pro.jpg', 0, 0),
-(5, 'clmjuls@gmail.com', 'testtest', '$2y$10$/98I0lHWEqgKQvyCZjmRE.qEk2H.9IwwECT/zqgeyAiOMzcxWZ792', '', NULL, NULL, NULL, NULL, NULL, 'user/assets/hero/v07_20@Shanks.png', 0, 0);
+(5, 'clmjuls@gmail.com', 'testtest', '$2y$10$/98I0lHWEqgKQvyCZjmRE.qEk2H.9IwwECT/zqgeyAiOMzcxWZ792', '', NULL, NULL, NULL, NULL, NULL, NULL, 0, 0),
+(6, 'jamesdy03@gmail.com', 'James3', '$2y$10$JoSm77EkRSBDbTJmgXoEweypPuJ0A33pkmPwcFDIddLDzc1cRbEGm', '', NULL, NULL, NULL, NULL, NULL, NULL, 1, 1),
+(7, 'asdasd@asdasd.com', 'James4', '$2y$10$zE/7klEQb9muzTI2IyndTupwe1AnKBo6qIl244tZqyL7iszi4X8w2', '', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0);
 
 --
 -- Indexes for dumped tables
@@ -313,8 +311,7 @@ ALTER TABLE `demographics_posts`
 -- AUTO_INCREMENT for table `geography_posts`
 --
 ALTER TABLE `geography_posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
-
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 --
 -- AUTO_INCREMENT for table `history_posts`
 --
@@ -325,19 +322,19 @@ ALTER TABLE `history_posts`
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Constraints for dumped tables
