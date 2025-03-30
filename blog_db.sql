@@ -61,6 +61,13 @@ CREATE TABLE `culture_posts` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `culture_posts`
+--
+
+INSERT INTO `culture_posts` (`id`, `title`, `description`, `content`, `image_url`, `category`, `user_id`, `created_at`, `updated_at`) VALUES
+(14, 'Test me', 'test', 'test', 'uploads/culture/67cc21cb8d555_481234611_122140772222562748_6460917983758228935_n.jpg', 'traditions', 3, '2025-03-08 10:54:03', '2025-03-08 10:54:03');
+
 -- --------------------------------------------------------
 
 --
@@ -185,7 +192,6 @@ INSERT INTO `posts` (`id`, `user_id`, `title`, `description`, `file_path`, `cult
 (47, 6, 'asdasd', 'asdasd', 'uploads/67d7cfde9fcad_RobloxScreenShot20250312_231930823.png', '', '', '2025-03-17 07:31:42'),
 (48, 6, 'asdasdas', 'dasdasd', 'uploads/67d7cfe4ad586_RobloxScreenShot20250311_145611294.png', '', '', '2025-03-17 07:31:48'),
 (49, 6, 'asdasd', 'asdasd', 'uploads/67d7cfea32a9e_RobloxScreenShot20250311_145611294.png', '', '', '2025-03-17 07:31:54');
-
 -- --------------------------------------------------------
 
 --
@@ -293,7 +299,7 @@ ALTER TABLE `comments`
 -- AUTO_INCREMENT for table `culture_posts`
 --
 ALTER TABLE `culture_posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `demographics_posts`
@@ -306,7 +312,6 @@ ALTER TABLE `demographics_posts`
 --
 ALTER TABLE `geography_posts`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
-
 --
 -- AUTO_INCREMENT for table `history_posts`
 --
@@ -365,6 +370,21 @@ ALTER TABLE `history_posts`
 ALTER TABLE `likes`
   ADD CONSTRAINT `likes_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `likes_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+-- Add unique constraint to prevent duplicate likes from the same user on the same post
+ALTER TABLE `likes` 
+ADD UNIQUE KEY `unique_user_post_like` (`user_id`, `post_id`);
+
+-- Add indexes to improve query performance and prevent duplicates
+ALTER TABLE `posts`
+ADD INDEX `created_at_index` (`created_at`),
+ADD INDEX `user_posts_index` (`user_id`, `created_at`);
+
+-- Add foreign key constraint for posts.user_id if not already present
+ALTER TABLE `posts`
+ADD CONSTRAINT `posts_ibfk_1` 
+FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
