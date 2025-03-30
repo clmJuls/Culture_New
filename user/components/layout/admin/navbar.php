@@ -8,6 +8,9 @@
             <a href="create-post.php" <?php echo basename($_SERVER['PHP_SELF']) == 'create-post.php' ? 'class="active"' : ''; ?>>+ Create</a>
             <a href="explore.php" <?php echo basename($_SERVER['PHP_SELF']) == 'explore.php' ? 'class="active"' : ''; ?>>Explore</a>
             <a href="generate_report.php" <?php echo basename($_SERVER['PHP_SELF']) == 'generate_report.php' ? 'class="active"' : ''; ?>>Generate Report</a>
+            <a href="post-requests.php" <?php echo basename($_SERVER['PHP_SELF']) == 'post-requests.php' ? 'class="active"' : ''; ?>>
+                <i class="fas fa-tasks"></i> Post Requests
+            </a>
             <div class="notification-dropdown">
                 <div class="notification-icon" onclick="toggleNotificationDropdown()">
                     <i class="fas fa-bell"></i>
