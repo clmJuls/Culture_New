@@ -183,7 +183,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     accept="image/*,video/mp4,video/webm,video/mov"
                     style="display: none;">
             </div>
-            <!-- <div class="file-preview" id="file-preview"></div> -->
+            <div class="file-preview" id="file-preview"></div>
+
             <!-- Culture Elements (Hidden for Non-Admin Users) -->
             <!-- <?php if ($_SESSION['isAdmin'] == 1) { ?>
                 <div style="background-color: #fff; padding: 15px; border-radius: 8px; border: 2px solid #ddd; margin: 15px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
@@ -210,27 +211,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php } ?>
 
         <!-- Learning Styles -->
-        <!-- <div style="background-color: #fff; padding: 15px; border-radius: 8px; border: 2px solid #ddd; margin: 15px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
-            <h3 style="color: #365486; font-size: 18px; font-weight: 500; margin-bottom: 8px;">Select Learning Styles</h3>
-            <div style="display: grid; gap: 8px;">
-                <label style="display: flex; align-items: center; margin: 0;">
-                    <input type="checkbox" name="learning_styles[]" value="Visual" style="margin-right: 8px;">
-                    <span style="font-size: 15px; color: #444;">Visual</span>
-                </label>
-                <label style="display: flex; align-items: center; margin: 0;">
-                    <input type="checkbox" name="learning_styles[]" value="Auditory & Oral" style="margin-right: 8px;">
-                    <span style="font-size: 15px; color: #444;">Auditory & Oral</span>
-                </label>
-                <label style="display: flex; align-items: center; margin: 0;">
-                    <input type="checkbox" name="learning_styles[]" value="Read & Write" style="margin-right: 8px;">
-                    <span style="font-size: 15px; color: #444;">Read & Write</span>
-                </label>
-                <label style="display: flex; align-items: center; margin: 0;">
-                    <input type="checkbox" name="learning_styles[]" value="Kinesthetic" style="margin-right: 8px;">
-                    <span style="font-size: 15px; color: #444;">Kinesthetic</span>
-                </label>
+        <div style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            <h3 style="color: #1a73e8; font-size: 16px; margin-bottom: 15px;">Select Learning Styles</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" name="learning_styles[]" value="Visual">
+                        <span style="color: #202124; font-size: 14px;">Visual</span>
+                    </label>
+                    <i class="fas fa-info-circle info-icon" 
+                       data-info="Visual learners prefer information presented through images, diagrams, charts, and other visual aids. They learn best when concepts are illustrated visually."
+                       style="color: #1a73e8; cursor: help;"
+                       onmouseover="showInfo(event)" 
+                       onmouseout="hideInfo()">
+                    </i>
+                </div>
+
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" name="learning_styles[]" value="Auditory & Oral">
+                        <span style="color: #202124; font-size: 14px;">Auditory & Oral</span>
+                    </label>
+                    <i class="fas fa-info-circle info-icon"
+                       data-info="Auditory and oral learners process information best through listening and speaking. They benefit from discussions, lectures, and verbal explanations."
+                       style="color: #1a73e8; cursor: help;"
+                       onmouseover="showInfo(event)"
+                       onmouseout="hideInfo()">
+                    </i>
+                </div>
+
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" name="learning_styles[]" value="Read & Write">
+                        <span style="color: #202124; font-size: 14px;">Read & Write</span>
+                    </label>
+                    <i class="fas fa-info-circle info-icon"
+                       data-info="Read and write learners prefer written information. They learn best through reading texts and writing notes, making lists, and working with written materials."
+                       style="color: #1a73e8; cursor: help;"
+                       onmouseover="showInfo(event)"
+                       onmouseout="hideInfo()">
+                    </i>
+                </div>
+
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" name="learning_styles[]" value="Kinesthetic">
+                        <span style="color: #202124; font-size: 14px;">Kinesthetic</span>
+                    </label>
+                    <i class="fas fa-info-circle info-icon"
+                       data-info="Kinesthetic learners learn through physical activities and hands-on experiences. They prefer learning by doing, experimenting, and engaging in practical applications."
+                       style="color: #1a73e8; cursor: help;"
+                       onmouseover="showInfo(event)"
+                       onmouseout="hideInfo()">
+                    </i>
+                </div>
             </div>
-        </div> -->
+        </div>
 
             <!-- Submit Button -->
             <button type="submit" style="padding: 10px; background-color: #007bff; color: white; font-size: 16px; border: none; border-radius: 4px; cursor: pointer;">Post</button>
@@ -258,8 +295,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             e.preventDefault();
             e.stopPropagation();
         }
-
-        // Add/remove dragover class
         ['dragenter', 'dragover'].forEach(eventName => {
             dragDropZone.addEventListener(eventName, () => {
                 dragDropZone.classList.add('dragover');
@@ -773,7 +808,67 @@ h1 {
         function cancelLogout() {
             document.getElementById('logoutModal').style.display = 'none';
         }
+
+        function showInfo(event) {
+            const popup = document.getElementById('infoPopup');
+            const info = event.target.getAttribute('data-info');
+            
+            popup.querySelector('.popup-content').textContent = info;
+            popup.style.display = 'block';
+            
+            // Position the popup
+            const iconRect = event.target.getBoundingClientRect();
+            popup.style.top = `${iconRect.top + window.scrollY - 5}px`;
+            popup.style.left = `${iconRect.left + window.scrollX - 290}px`; // Position to the left
+        }
+
+        function hideInfo() {
+            document.getElementById('infoPopup').style.display = 'none';
+        }
     </script>
+
+    <!-- Info Popup -->
+    <div id="infoPopup" class="info-popup" style="display: none;">
+        <div class="popup-content"></div>
+    </div>
+
+    <style>
+        .info-popup {
+            position: absolute;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            padding: 12px 16px;
+            max-width: 280px;
+            z-index: 1000;
+            font-size: 13px;
+            color: #5f6368;
+            line-height: 1.5;
+            border: 1px solid #dadce0;
+        }
+
+        .info-icon {
+            font-size: 16px;
+            transition: opacity 0.2s;
+        }
+
+        .info-icon:hover {
+            opacity: 0.8;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #5f6368;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        input[type="checkbox"]:checked {
+            background-color: #1a73e8;
+            border-color: #1a73e8;
+        }
+    </style>
 
 </body>
 </head>
