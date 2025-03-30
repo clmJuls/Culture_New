@@ -113,10 +113,12 @@ $isAdmin = $_SESSION['isAdmin'];
     <?php
     // Check if the user is an admin or not and adjust the query accordingly
     if ($isAdmin) {
-        // Admin: Fetch all posts, comments, and likes
+        // Admin: Fetch all posts, comments, likes, and post requests
         $query = "SELECT 
+                    p.id AS post_id,
                     p.title AS post_title,
                     p.created_at AS post_created_at,
+                    p.status AS post_status,
                     u.username AS post_creator,
                     u.profile_picture AS user_avatar,
                     c.comment_text,
@@ -125,18 +127,38 @@ $isAdmin = $_SESSION['isAdmin'];
                     cu.username AS comment_user,
                     l.created_at AS like_created_at,
                     l.user_id AS like_user_id,
-                    lu.username AS like_user
+                    lu.username AS like_user,
+                    'post_interaction' AS notification_type
                 FROM posts p
                 JOIN users u ON p.user_id = u.id
                 LEFT JOIN comments c ON p.id = c.post_id
                 LEFT JOIN users cu ON c.user_id = cu.id
                 LEFT JOIN likes l ON p.id = l.post_id
                 LEFT JOIN users lu ON l.user_id = lu.id
-                ORDER BY GREATEST(
-                    IFNULL(p.created_at, 0),
-                    IFNULL(c.created_at, 0),
-                    IFNULL(l.created_at, 0)
-                ) DESC
+                WHERE p.status != 'approved'
+                
+                UNION ALL
+                
+                SELECT 
+                    p2.id AS post_id,
+                    p2.title AS post_title,
+                    p2.created_at AS post_created_at,
+                    p2.status AS post_status,
+                    u2.username AS post_creator,
+                    u2.profile_picture AS user_avatar,
+                    NULL as comment_text,
+                    NULL as comment_created_at,
+                    NULL as comment_user_id,
+                    NULL as comment_user,
+                    NULL as like_created_at,
+                    NULL as like_user_id,
+                    NULL as like_user,
+                    'post_request' AS notification_type
+                FROM posts p2
+                JOIN users u2 ON p2.user_id = u2.id
+                WHERE p2.status = 'pending'
+                
+                ORDER BY post_created_at DESC
                 LIMIT 20";
         $stmt = $conn->prepare($query);
     } else {
@@ -184,32 +206,42 @@ $isAdmin = $_SESSION['isAdmin'];
             if (!empty($row['user_avatar'])) {
                 echo '<img src="' . htmlspecialchars($row['user_avatar']) . '" alt="User avatar" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">';
             } else {
-                echo htmlspecialchars($row['avatar_letter']);
+                echo substr($row['post_creator'], 0, 1);
             }
             echo '</div>
                     <div class="notification-content">';
 
-            // Post notification
-            echo '<div class="notification-title">
-                    ' . htmlspecialchars($row['post_creator']) . ' created a new post
-                  </div>
-                  <div>' . htmlspecialchars($row['post_title']) . '</div>
-                  <div class="notification-time">' . $postTimeAgo . '</div>';
-
-            // Comment notification
-            if (!empty($row['comment_text'])) {
-                echo '<div class="notification-comment">
-                        <strong>' . htmlspecialchars($row['comment_user']) . '</strong> commented: "' . htmlspecialchars($row['comment_text']) . '"
+            // Post request notification for admins
+            if ($isAdmin && $row['notification_type'] === 'post_request') {
+                echo '<div class="notification-title">
+                        New Post Request
                       </div>
-                      <div class="notification-time">' . $commentTimeAgo . '</div>';
-            }
-
-            // Like notification
-            if (!empty($row['like_user'])) {
-                echo '<div class="notification-like">
-                        <strong>' . htmlspecialchars($row['like_user']) . '</strong> liked this post
+                      <div>' . htmlspecialchars($row['post_creator']) . ' submitted a new post: "' . htmlspecialchars($row['post_title']) . '"</div>
+                      <div class="notification-time">' . getTimeAgo(strtotime($row['post_created_at'])) . '</div>
+                      <a href="post-requests.php" class="notification-action">Review Request</a>';
+            } else {
+                // Post notification
+                echo '<div class="notification-title">
+                        ' . htmlspecialchars($row['post_creator']) . ' created a new post
                       </div>
-                      <div class="notification-time">' . $likeTimeAgo . '</div>';
+                      <div>' . htmlspecialchars($row['post_title']) . '</div>
+                      <div class="notification-time">' . $postTimeAgo . '</div>';
+
+                // Comment notification
+                if (!empty($row['comment_text'])) {
+                    echo '<div class="notification-comment">
+                            <strong>' . htmlspecialchars($row['comment_user']) . '</strong> commented: "' . htmlspecialchars($row['comment_text']) . '"
+                          </div>
+                          <div class="notification-time">' . $commentTimeAgo . '</div>';
+                }
+
+                // Like notification
+                if (!empty($row['like_user'])) {
+                    echo '<div class="notification-like">
+                            <strong>' . htmlspecialchars($row['like_user']) . '</strong> liked this post
+                          </div>
+                          <div class="notification-time">' . $likeTimeAgo . '</div>';
+                }
             }
 
             echo '</div></div>';
@@ -225,7 +257,7 @@ $isAdmin = $_SESSION['isAdmin'];
         $time_difference = time() - $timestamp;
 
         if ($time_difference < 60) {
-            return "Just now";
+            return date("h:i A", $timestamp); 
         } elseif ($time_difference < 3600) {
             $minutes = round($time_difference / 60);
             return $minutes . " minute" . ($minutes != 1 ? "s" : "") . " ago";
@@ -496,6 +528,21 @@ $isAdmin = $_SESSION['isAdmin'];
     .tag:hover {
       background-color: #007bff;
       color: #fff;
+    }
+
+    .notification-action {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 4px 12px;
+        background-color: #365486;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 0.9em;
+    }
+    
+    .notification-action:hover {
+        background-color: #2a4268;
     }
   </style>
 
