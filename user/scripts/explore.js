@@ -33,7 +33,8 @@ function loadPosts(append = false) {
           action: 'fetch_posts',
           page: currentPage,
           per_page: postsPerPage,
-          learning_styles: Array.from(selectedLearningStyles)
+          learning_styles: Array.from(selectedLearningStyles),
+          include_premium_status: true  // Add this to request premium status
       },
       success: function(response) {
           try {
@@ -97,11 +98,32 @@ function displayPosts(posts, append = false) {
       postDisplay.innerHTML = '';
   }
 
+  // Define an array of premium gradients
+  const premiumGradients = [
+      'linear-gradient(135deg, #1e3c72, #2a5298)',  // Blue
+      'linear-gradient(135deg, #ff416c, #ff4b2b)',  // Red-Orange
+      'linear-gradient(135deg, #8e2de2, #4a00e0)',  // Purple
+      'linear-gradient(135deg, #11998e, #38ef7d)',  // Green
+      'linear-gradient(135deg, #f953c6, #b91d73)',  // Pink
+      'linear-gradient(135deg, #f12711, #f5af19)',  // Orange
+      'linear-gradient(135deg, #667eea, #764ba2)',  // Indigo
+      'linear-gradient(135deg, #00b09b, #96c93d)'   // Teal
+  ];
+
   posts.forEach(post => {
       const postElement = document.createElement('div');
       postElement.className = 'post';
       postElement.setAttribute('data-post-id', post.id);
       postElement.setAttribute('data-user-id', post.user_id);
+      
+      // Add premium class if user is premium
+      if (post.is_premium) {
+          postElement.classList.add('premium-post');
+          
+          // Apply a random gradient
+          const randomGradient = premiumGradients[Math.floor(Math.random() * premiumGradients.length)];
+          postElement.style.setProperty('--premium-gradient', randomGradient);
+      }
       
       // Add snap scroll attribute
       postElement.style.scrollSnapAlign = 'start';
@@ -111,6 +133,10 @@ function displayPosts(posts, append = false) {
           `<button class="delete-post" data-post-id="${post.id}" data-user-id="${post.user_id}">
               <i class="fas fa-trash"></i>
           </button>` : '';
+
+      // Add premium badge if user is premium
+      const premiumBadgeHtml = post.is_premium ? 
+          `<span class="premium-badge"><i class="fas fa-crown"></i> Premium</span>` : '';
 
       let mediaHTML = '';
       if (post.file_path) {
@@ -133,6 +159,7 @@ function displayPosts(posts, append = false) {
               <div style="display: flex; align-items: center;">
                   <img src="${post.profile_picture || 'assets/default-profile.png'}" class="profile-pic" alt="Profile Picture">
                   <span>${post.username}</span>
+                  ${premiumBadgeHtml}
               </div>
               ${deleteButtonHtml}
           </div>
@@ -240,6 +267,27 @@ function normalizePostCardHeights() {
     post.style.height = '380px';
     post.style.display = 'flex';
     post.style.flexDirection = 'column';
+  });
+  
+  // Add premium styling
+  const premiumPosts = document.querySelectorAll('.premium-post');
+  premiumPosts.forEach(post => {
+    // Add a gold border and subtle gradient background
+    post.style.border = '2px solid #ffd700';
+    post.style.background = 'linear-gradient(to bottom, #fffdf0, #ffffff)';
+    post.style.boxShadow = '0 4px 8px rgba(255, 215, 0, 0.2)';
+  });
+  
+  // Style premium badges
+  const premiumBadges = document.querySelectorAll('.premium-badge');
+  premiumBadges.forEach(badge => {
+    badge.style.backgroundColor = '#ffd700';
+    badge.style.color = '#333';
+    badge.style.padding = '2px 6px';
+    badge.style.borderRadius = '10px';
+    badge.style.fontSize = '12px';
+    badge.style.marginLeft = '8px';
+    badge.style.fontWeight = 'bold';
   });
 }
 

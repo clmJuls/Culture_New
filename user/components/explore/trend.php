@@ -16,6 +16,16 @@ function getTrendingPosts($conn, $limit = 5) {
     $stmt->execute();
     return $stmt->get_result();
 }
+
+// Check if user is logged in
+$show_premium_section = true;
+if (isset($_SESSION['user_id'])) {
+    // Check if user is premium or admin
+    if ((isset($_SESSION['isPremium']) && $_SESSION['isPremium'] == 1) || 
+        (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1)) {
+        $show_premium_section = false;
+    }
+}
 ?>
 
 <div class="right-sidebar">
@@ -42,20 +52,22 @@ function getTrendingPosts($conn, $limit = 5) {
         </div>
     </div>
     
-    <div class="premium-section">
-        <h3>Upgrade to Premium</h3>
-        <div class="premium-content">
-            <p>Get access to exclusive features:</p>
-            <ul>
-                <li><i class="fas fa-check"></i> Additional Design</li>
-                <li><i class="fas fa-check"></i> Advanced analytics</li>
-                <li><i class="fas fa-check"></i> Premium content</li>
-            </ul>
-            <button class="upgrade-button" onclick="window.location.href='premium.php'">
-                Upgrade Now
-            </button>
+    <?php if ($show_premium_section): ?>
+        <div class="premium-section">
+            <h3>Upgrade to Premium</h3>
+            <div class="premium-content">
+                <p>Get access to exclusive features:</p>
+                <ul>
+                    <li><i class="fas fa-check"></i> Additional Design</li>
+                    <li><i class="fas fa-check"></i> Advanced analytics</li>
+                    <li><i class="fas fa-check"></i> Premium content</li>
+                </ul>
+                <button class="upgrade-button" onclick="window.location.href='premium.php'">
+                    Upgrade Now
+                </button>
+            </div>
         </div>
-    </div>
+    <?php endif; ?>
 </div>
 
 <style>

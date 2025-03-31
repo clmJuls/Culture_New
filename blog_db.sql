@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 27, 2025 at 10:19 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Generation Time: Mar 31, 2025 at 09:57 AM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -157,8 +157,9 @@ CREATE TABLE `likes` (
 --
 
 INSERT INTO `likes` (`id`, `post_id`, `user_id`, `is_active`, `created_at`) VALUES
-(43, 44, 6, 1, '2025-03-17 07:37:10'),
-(44, 47, 6, 1, '2025-03-17 07:40:35');
+(45, 52, 3, 1, '2025-03-30 15:05:38'),
+(46, 53, 3, 1, '2025-03-30 15:05:38'),
+(47, 55, 3, 1, '2025-03-30 15:05:39');
 
 -- --------------------------------------------------------
 
@@ -174,6 +175,7 @@ CREATE TABLE `posts` (
   `file_path` varchar(255) DEFAULT NULL,
   `culture_elements` varchar(255) DEFAULT NULL,
   `learning_styles` varchar(255) DEFAULT NULL,
+  `status` enum('pending','approved','rejected') DEFAULT 'pending',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -181,17 +183,12 @@ CREATE TABLE `posts` (
 -- Dumping data for table `posts`
 --
 
-INSERT INTO `posts` (`id`, `user_id`, `title`, `description`, `file_path`, `culture_elements`, `learning_styles`, `created_at`) VALUES
-(40, 6, 'asdasd', 'asdasd', 'uploads/67d7c0fad5887_RobloxScreenShot20250311_145611294.png', '', '', '2025-03-17 06:28:10'),
-(41, 6, 'asdasd', 'asdasdas', 'uploads/67d7c10271e25_RobloxScreenShot20250312_231930823.png', '', '', '2025-03-17 06:28:18'),
-(42, 6, 'asdasdasdasd', 'asdasdasd', 'uploads/67d7c108b47c7_RobloxScreenShot20250312_231930823.png', '', '', '2025-03-17 06:28:24'),
-(43, 6, 'asdasdasd', 'asdasd', 'uploads/67d7c10f0bf37_RobloxScreenShot20250312_231930823.png', '', '', '2025-03-17 06:28:31'),
-(44, 6, 'asdasdasd', 'asdasdasd', 'uploads/67d7c115a85ac_RobloxScreenShot20250312_231930823.png', '', '', '2025-03-17 06:28:37'),
-(45, 6, 'asdasda', 'sdasdasd', 'uploads/67d7c11ba3f6c_RobloxScreenShot20250311_145611294.png', '', '', '2025-03-17 06:28:43'),
-(46, 6, 'asdasd', 'asdasdasda', 'uploads/67d7cfd922a71_RobloxScreenShot20250312_231930823.png', '', '', '2025-03-17 07:31:37'),
-(47, 6, 'asdasd', 'asdasd', 'uploads/67d7cfde9fcad_RobloxScreenShot20250312_231930823.png', '', '', '2025-03-17 07:31:42'),
-(48, 6, 'asdasdas', 'dasdasd', 'uploads/67d7cfe4ad586_RobloxScreenShot20250311_145611294.png', '', '', '2025-03-17 07:31:48'),
-(49, 6, 'asdasd', 'asdasd', 'uploads/67d7cfea32a9e_RobloxScreenShot20250311_145611294.png', '', '', '2025-03-17 07:31:54');
+INSERT INTO `posts` (`id`, `user_id`, `title`, `description`, `file_path`, `culture_elements`, `learning_styles`, `status`, `created_at`) VALUES
+(52, 3, 'admin', 'test', 'uploads/67e95037abf5f_481234611_122140772222562748_6460917983758228935_n.jpg', '', 'Visual', 'approved', '2025-03-30 14:07:51'),
+(53, 4, 'user', 'test', 'uploads/67e95079e03fc_481234611_122140772222562748_6460917983758228935_n.jpg', '', 'Visual', 'approved', '2025-03-30 14:08:57'),
+(54, 4, 'all type', 'test', 'uploads/67e950adaa508_481234611_122140772222562748_6460917983758228935_n.jpg', '', 'Visual,Auditory & Oral,Read & Write,Kinesthetic', 'pending', '2025-03-30 14:09:49'),
+(55, 3, 'test', 'test', 'uploads/67e95c21bbb21_481234611_122140772222562748_6460917983758228935_n.jpg', '', 'Kinesthetic', 'approved', '2025-03-30 14:58:41');
+
 -- --------------------------------------------------------
 
 --
@@ -270,6 +267,7 @@ ALTER TABLE `history_posts`
 --
 ALTER TABLE `likes`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_user_post_like` (`user_id`,`post_id`),
   ADD KEY `post_id` (`post_id`),
   ADD KEY `user_id` (`user_id`);
 
@@ -277,7 +275,9 @@ ALTER TABLE `likes`
 -- Indexes for table `posts`
 --
 ALTER TABLE `posts`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `created_at_index` (`created_at`),
+  ADD KEY `user_posts_index` (`user_id`,`created_at`);
 
 --
 -- Indexes for table `users`
@@ -312,6 +312,7 @@ ALTER TABLE `demographics_posts`
 --
 ALTER TABLE `geography_posts`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
 --
 -- AUTO_INCREMENT for table `history_posts`
 --
@@ -322,13 +323,13 @@ ALTER TABLE `history_posts`
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -371,20 +372,11 @@ ALTER TABLE `likes`
   ADD CONSTRAINT `likes_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `likes_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
--- Add unique constraint to prevent duplicate likes from the same user on the same post
-ALTER TABLE `likes` 
-ADD UNIQUE KEY `unique_user_post_like` (`user_id`, `post_id`);
-
--- Add indexes to improve query performance and prevent duplicates
+--
+-- Constraints for table `posts`
+--
 ALTER TABLE `posts`
-ADD INDEX `created_at_index` (`created_at`),
-ADD INDEX `user_posts_index` (`user_id`, `created_at`);
-
--- Add foreign key constraint for posts.user_id if not already present
-ALTER TABLE `posts`
-ADD CONSTRAINT `posts_ibfk_1` 
-FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
+  ADD CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

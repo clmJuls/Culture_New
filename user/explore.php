@@ -277,6 +277,655 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
             from { transform: translateY(-20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
+
+        /* Post container */
+        .post {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin: 0 0 5px 0;
+            padding: 5px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            min-height: 350px;
+            /* Set a minimum height for consistency */
+            position: relative;
+            /* For absolute positioning of interactions */
+        }
+
+        .post:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+        .post-header span {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .delete-post {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+            width: 24px;
+            height: 24px;
+        }
+
+        .delete-post img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .delete-post:hover {
+            opacity: 1;
+        }
+
+        .post-content {
+            flex: 1;
+            overflow: hidden;
+            margin-bottom: 60px;
+            /* Space for the interaction buttons */
+        }
+
+        .post-title {
+            font-size: 18px;
+            color: #000;
+        }
+
+        .post-content h3 {
+            margin: 10px 0;
+            font-size: 18px;
+            color: #000;
+        }
+
+        .post-content p {
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #000;
+        }
+
+        .post-content img {
+            width: 100%;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .post-interactions {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background-color: #fff;
+            border-top: 1px solid #eee;
+            border-radius: 0 0 12px 12px;
+        }
+
+        .like-btn,
+        .comment-toggle {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            flex: 1;
+            margin: 0 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .like-btn.liked {
+            background: #28a745;
+        }
+
+        .comments-section {
+            position: absolute;
+            bottom: 60px;
+            /* Height of interaction buttons */
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1;
+        }
+
+        .comment {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f7f7f7;
+            border-radius: 8px;
+        }
+
+        .comment-profile-pic {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+        .comment-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .comment-content strong {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .comment-content p {
+            margin: 5px 0;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .delete-comment {
+            background: transparent;
+            border: none;
+            font-size: 12px;
+            color: #dc3545;
+            cursor: pointer;
+            align-self: flex-start;
+        }
+
+        .comment-input {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 10px 0;
+            border-top: 1px solid #eee;
+        }
+
+        .comment-text {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        .submit-comment {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        /* Add the new styles here */
+        .like-btn-disabled,
+        .comment-toggle-disabled {
+            background: #ccc;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            opacity: 0.7;
+            flex: 1;
+            margin: 0 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .like-btn-disabled:hover,
+        .comment-toggle-disabled:hover {
+            opacity: 1;
+        }
+
+        .explore-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            margin-left: 260px;
+            margin-right: 400px;
+            padding: 20px;
+            width: calc(100% - 680px);
+        }
+
+        #post-display {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 0;
+            width: 100%;
+        }
+
+        .post-container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .profile-pic {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .post-header div {
+            font-size: 14px;
+        }
+
+        .post-header strong {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .post-body {
+            margin-top: 10px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .post-body img {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            margin-top: 15px;
+            border-radius: 5px;
+        }
+
+        .post-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .post-footer button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #555;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .post-footer button:hover {
+            color: #007bff;
+        }
+
+        .post-footer .like-btn,
+        .post-footer .comment-btn,
+        .post-footer .share-btn {
+            padding: 5px 10px;
+        }
+
+        /* Tag Style for Elements */
+        .tags-container {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag {
+            background-color: #e7f1ff;
+            color: #007bff;
+            border-radius: 20px;
+            padding: 5px 15px;
+            font-size: 14px;
+            border: 1px solid #007bff;
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        /* Add responsive media queries */
+        @media screen and (max-width: 1200px) {
+            #post-display {
+                grid-template-columns: repeat(2, 1fr);
+
+            }
+
+            .post {
+                min-height: 350px;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            #post-display {
+                grid-template-columns: repeat(1, 1fr);
+            }
+
+            .post {
+                min-height: 300px;
+            }
+
+            .post-interactions {
+                padding: 10px 15px;
+            }
+
+            .like-btn,
+            .comment-toggle {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+        }
+
+        /* Learning Styles Section */
+        .learning-styles {
+            margin: 15px 0;
+            padding: 0;
+        }
+
+        .learning-styles h4 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .learning-styles ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .learning-styles li {
+            display: inline-block;
+            background-color: #f0f0f0;
+            padding: 6px 12px;
+            border-radius: 15px;
+            margin: 0 8px 8px 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        /* Like Button Styling */
+        .like-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            transition: background-color 0.2s ease;
+        }
+
+        .like-button:hover {
+            background-color: #218838;
+        }
+
+        .like-button i {
+            font-size: 16px;
+        }
+
+        .like-count {
+            font-weight: 500;
+        }
+
+        /* Post Elements Styling */
+        .post {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 0 0 20px 0;
+            padding: 20px;
+            width: 100%;
+            display: inline-block;
+            break-inside: avoid;
+            word-wrap: break-word;
+        }
+
+        /* Culture Elements & Learning Styles Sections */
+        .culture-elements,
+        .learning-styles {
+            margin: 15px 0;
+        }
+
+        .culture-elements h4,
+        .learning-styles h4 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .elements-list,
+        .styles-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .elements-list li,
+        .styles-list li {
+            display: inline-block;
+            background-color: #f0f0f0;
+            padding: 6px 12px;
+            border-radius: 15px;
+            margin: 0 8px 8px 0;
+            font-size: 14px;
+            color: #555;
+            transition: all 0.2s ease;
+        }
+
+        .elements-list li:hover,
+        .styles-list li:hover {
+            background-color: #e0e0e0;
+            transform: translateY(-1px);
+        }
+
+        /* Like Button Styling */
+        .like-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 15px;
+            transition: background-color 0.2s ease;
+        }
+
+        .like-button:hover {
+            background-color: #0056b3;
+        }
+
+        .like-button i {
+            font-size: 16px;
+        }
+
+        .like-count {
+            font-weight: 500;
+        }
+
+        /* Image container */
+        .post-image {
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .post-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Category label */
+        .category-label {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+
+        /* Hover effects */
+        .post {
+            cursor: pointer;
+        }
+
+        .post:hover .post-image img {
+            transform: scale(1.02);
+            transition: transform 0.3s ease;
+        }
+
+        /* Like Button Animation */
+        .like-btn {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .like-animation {
+            transform: scale(1.2);
+        }
+
+        .liked {
+            background-color: #28a745;
+            transform: scale(1);
+        }
+
+        .like-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Smooth transition for all button states */
+        .like-btn,
+        .comment-toggle {
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* Add this to your existing CSS */
+        .post-media {
+            width: 100%;
+            max-height: 500px;
+            /* Limit media height */
+            object-fit: cover;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        video.post-media {
+            background-color: #000;
+        }
+
+        /* Optional: Add a custom video player style */
+        video.post-media::-webkit-media-controls {
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 0 0 8px 8px;
+        }
+
+        /* Ensure proper video container sizing */
+        .post-content {
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .view-more-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .view-more-btn {
+            background: #365486;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .view-more-btn:hover {
+            background: #7FC7D9;
+            transform: translateY(-2px);
+        }
+
+        .view-more-btn.loading {
+            opacity: 0.7;
+            cursor: wait;
+        }
+
+        /* Premium Post Styling */
+        .premium-post {
+            border: 2px solid #ffd700 !important;
+            background: linear-gradient(to bottom, #fffdf0, #ffffff) !important;
+            box-shadow: 0 4px 8px rgba(255, 215, 0, 0.2) !important;
+        }
+
+        .premium-badge {
+            background-color: #ffd700;
+            color: #333;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 8px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .premium-badge i {
+            font-size: 10px;
+        }
     </style>
 
     <!-- Navigation Bar -->

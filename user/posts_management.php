@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 : [];
             
             // Base query without LIMIT clause
-            $query = "SELECT DISTINCT p.*, u.username, u.profile_picture, 
+            $query = "SELECT DISTINCT p.*, u.username, u.profile_picture, u.isPremium as is_premium,
                      COUNT(DISTINCT l.id) as like_count,
                      IF(? > 0, EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_id = ?), 0) as user_liked
                      FROM posts p

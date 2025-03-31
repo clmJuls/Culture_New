@@ -25,7 +25,7 @@ if ($result->num_rows > 0) {
     $birthday = htmlspecialchars($user['birthday']);
     $website = htmlspecialchars($user['website']);
     $skills = htmlspecialchars($user['skills']);
-    $profile_picture = htmlspecialchars($user['profile_picture']);
+    $profile_picture = $user['profile_picture'] ? htmlspecialchars($user['profile_picture']) : 'assets/hero/v07_20@Shanks.png';
     $is_premium = $user['isPremium'];
 } else {
     echo "<script>
