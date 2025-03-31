@@ -926,6 +926,55 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
         .premium-badge i {
             font-size: 10px;
         }
+
+        .document-container {
+            width: 100%;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .document-download {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #365486;
+            padding: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .document-download:hover {
+            transform: scale(1.05);
+        }
+
+        .document-download i {
+            font-size: 64px;
+            margin-bottom: 10px;
+        }
+
+        .document-name {
+            font-size: 14px;
+            color: #4a4a4a;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        /* Add hover effect */
+        .document-container:hover {
+            background-color: #f0f2f5;
+        }
+
+        .document-download:hover i {
+            color: #1a73e8;
+        }
     </style>
 
     <!-- Navigation Bar -->

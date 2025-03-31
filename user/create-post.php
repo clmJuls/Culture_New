@@ -183,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p>or</p>
                 <p>Click to select a file</p>
                 <input type="file" name="file" id="file-input"
-                    accept="image/*,video/mp4,video/webm,video/mov"
+                    accept="image/*,video/mp4,video/webm,video/mov,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain"
                     style="display: none;">
             </div>
             <div class="file-preview" id="file-preview"></div>
@@ -326,44 +326,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         function handleFiles(files) {
-            if (files.length > 0) {
-                const file = files[0];
-                fileInput.files = files;
-                showPreview(file);
-                // Hide drag-drop zone after file is added
-                dragDropZone.style.display = 'none';
+            const file = files[0]; // Get the first file
+            if (!file) return;
+
+            // Get all learning style checkboxes
+            const visualCheckbox = document.querySelector('input[name="learning_styles[]"][value="Visual"]');
+            const auditoryCheckbox = document.querySelector('input[name="learning_styles[]"][value="Auditory & Oral"]');
+            const readWriteCheckbox = document.querySelector('input[name="learning_styles[]"][value="Read & Write"]');
+            const kinestheticCheckbox = document.querySelector('input[name="learning_styles[]"][value="Kinesthetic"]');
+
+            // Uncheck all checkboxes first
+            [visualCheckbox, auditoryCheckbox, readWriteCheckbox, kinestheticCheckbox].forEach(checkbox => {
+                if (checkbox) checkbox.checked = false;
+            });
+
+            // Check appropriate boxes based on file type
+            if (file.type.startsWith('image/')) {
+                // Images - Visual
+                if (visualCheckbox) visualCheckbox.checked = true;
+            } else if (file.type.startsWith('video/')) {
+                // Videos - Visual and Auditory & Oral
+                if (visualCheckbox) visualCheckbox.checked = true;
+                if (auditoryCheckbox) auditoryCheckbox.checked = true;
+            } else if (file.type === 'audio/mp3' || file.type === 'audio/mpeg') {
+                // Audio files - Auditory & Oral only
+                if (auditoryCheckbox) auditoryCheckbox.checked = true;
+            } else if (
+                file.type === 'application/pdf' ||
+                file.type === 'application/msword' ||
+                file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+                file.type === 'application/vnd.ms-excel' ||
+                file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+                file.type === 'text/plain'
+            ) {
+                // Documents - Read & Write
+                if (readWriteCheckbox) readWriteCheckbox.checked = true;
             }
+
+            // Show preview
+            showPreview(file);
         }
 
         function showPreview(file) {
             filePreview.innerHTML = '';
+            dragDropZone.style.display = 'none';
 
             if (file.type.startsWith('image/')) {
                 const img = document.createElement('img');
                 img.file = file;
-                img.style.maxWidth = '100%';
-                img.style.maxHeight = '200px';
-                img.style.borderRadius = '8px';
                 filePreview.appendChild(img);
 
                 const reader = new FileReader();
-                reader.onload = (e) => {
-                    img.src = e.target.result;
-                };
+                reader.onload = (e) => { img.src = e.target.result; };
                 reader.readAsDataURL(file);
             } else if (file.type.startsWith('video/')) {
                 const video = document.createElement('video');
                 video.controls = true;
-                video.style.maxWidth = '100%';
-                video.style.maxHeight = '200px';
-                video.style.borderRadius = '8px';
                 filePreview.appendChild(video);
 
                 const reader = new FileReader();
-                reader.onload = (e) => {
-                    video.src = e.target.result;
-                };
+                reader.onload = (e) => { video.src = e.target.result; };
                 reader.readAsDataURL(file);
+            } else {
+                // Handle documents
+                const docIcon = document.createElement('i');
+                docIcon.className = getDocumentIconClass(file.type);
+                docIcon.style.fontSize = '48px';
+                docIcon.style.color = '#365486';
+                docIcon.style.margin = '20px 0';
+                filePreview.appendChild(docIcon);
             }
 
             // Add file name and remove button
@@ -379,12 +410,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             filePreview.appendChild(removeButton);
         }
 
-        function removeFile(e) {
-            e.preventDefault();
-            fileInput.value = '';
+        function removeFile() {
             filePreview.innerHTML = '';
-            // Show drag-drop zone after file is removed
             dragDropZone.style.display = 'flex';
+            fileInput.value = ''; // Clear the file input
+            
+            // Uncheck all learning style checkboxes
+            const checkboxes = document.querySelectorAll('input[name="learning_styles[]"]');
+            checkboxes.forEach(checkbox => checkbox.checked = false);
         }
 
         function previewFile() {
@@ -403,6 +436,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     filePreview.appendChild(previewElement);
                 };
                 reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+
+        // Helper function to get the appropriate Font Awesome icon class
+        function getDocumentIconClass(fileType) {
+            switch (fileType) {
+                case 'application/pdf':
+                    return 'fas fa-file-pdf';
+                case 'application/msword':
+                case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                    return 'fas fa-file-word';
+                case 'application/vnd.ms-excel':
+                case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                    return 'fas fa-file-excel';
+                case 'text/plain':
+                    return 'fas fa-file-alt';
+                default:
+                    return 'fas fa-file';
             }
         }
     </script>

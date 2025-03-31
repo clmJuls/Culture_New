@@ -142,6 +142,7 @@ function displayPosts(posts, append = false) {
       if (post.file_path) {
           const fileExtension = post.file_path.split('.').pop().toLowerCase();
           const isVideo = ['mp4', 'webm', 'mov'].includes(fileExtension);
+          const isDocument = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt'].includes(fileExtension);
           
           if (isVideo) {
               mediaHTML = `
@@ -149,6 +150,24 @@ function displayPosts(posts, append = false) {
                       <source src="${post.file_path}" type="video/mp4">
                       Your browser does not support the video tag.
                   </video>`;
+          } else if (isDocument) {
+              // Get appropriate icon class based on file type
+              let iconClass = 'fa-file-alt'; // default document icon
+              if (fileExtension === 'pdf') {
+                  iconClass = 'fa-file-pdf';
+              } else if (['doc', 'docx'].includes(fileExtension)) {
+                  iconClass = 'fa-file-word';
+              } else if (['xls', 'xlsx'].includes(fileExtension)) {
+                  iconClass = 'fa-file-excel';
+              }
+
+              mediaHTML = `
+                  <div class="document-container">
+                      <a href="${post.file_path}" download class="document-download">
+                          <i class="fas ${iconClass}"></i>
+                          <span class="document-name">${post.file_path.split('/').pop()}</span>
+                      </a>
+                  </div>`;
           } else {
               mediaHTML = `<img class="post-media" src="${post.file_path}" alt="Post media">`;
           }
