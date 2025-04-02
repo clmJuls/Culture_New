@@ -49,7 +49,7 @@ body {
 <div id="main-content">
     <header id="header">
         <div class="logo">
-            <!-- Add the Kulturifiko logo here -->
+            <!-- Add the Kulturifiko logo her1e -->
              <br>
              <br>
             <img src="https://scontent.xx.fbcdn.net/v/t1.15752-9/462567709_1724925585031052_4490126238712417040_n.png?_nc_cat=109&ccb=1-7&_nc_sid=0024fc&_nc_ohc=S9UP-k68ScQQ7kNvgFZCz8p&_nc_oc=AdhqsycKNWmfMJxi48g5Fy381arVHvFKzkd8WqJXUGXUQ2t9Orbh2q4-BGPMNRsbEbh54Op-n9ymVEFEvccPGyv1&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.xx&oh=03_Q7cD1gF9Fo63JcswcyKmjwBkVdKsQTDi1B7q6lvUIG4qW7KcFQ&oe=67CF02AA" alt="Kulturifiko Logo" width="300" height="250">
