@@ -12,44 +12,74 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
+// Get user's premium status from database
+$stmt = $conn->prepare("SELECT isPremium FROM users WHERE id = ?");
+$stmt->bind_param('i', $_SESSION['user_id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+$isPremium = $user['isPremium'];
+$stmt->close();
+
+// Define file size limits based on premium status
+$maxFileSize = $isPremium ? (10 * 1024 * 1024) : (2 * 1024 * 1024); // 10MB or 2MB in bytes
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $errors = array(); // Array to store validation errors
+
     $title = htmlspecialchars($_POST['title']);
     $description = htmlspecialchars($_POST['description']);
     $culture_elements = isset($_POST['culture_elements']) ? implode(',', $_POST['culture_elements']) : '';
-    $learning_styles = isset($_POST['learning_styles']) ? implode(',', $_POST['learning_styles']) : ''; // Capture learning styles
+    $learning_styles = isset($_POST['learning_styles']) ? implode(',', $_POST['learning_styles']) : '';
     $uploaded_file = '';
 
-    // Handle file upload
+    // Handle file upload with validation
     if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = 'uploads/';
-        $uploaded_file = $upload_dir . uniqid() . '_' . basename($_FILES['file']['name']);
-        move_uploaded_file($_FILES['file']['tmp_name'], $uploaded_file);
+        $file_size = $_FILES['file']['size'];
+        $max_size = $isPremium ? (10 * 1024 * 1024) : (2 * 1024 * 1024);
+        $size_limit_text = $isPremium ? "10MB" : "2MB";
+
+        if ($file_size > $max_size) {
+            $errors[] = "File size exceeds {$size_limit_text} limit" . ($isPremium ? ' for Premium users' : '');
+        } else {
+            $upload_dir = 'uploads/';
+            $uploaded_file = $upload_dir . uniqid() . '_' . basename($_FILES['file']['name']);
+            move_uploaded_file($_FILES['file']['tmp_name'], $uploaded_file);
+        }
     }
 
-    // Set status to 'approved' if user is admin, otherwise 'pending'
-    $status = (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1) ? 'approved' : 'pending';
+    // Only proceed with database insertion if there are no errors
+    if (empty($errors)) {
+        $status = (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1) ? 'approved' : 'pending';
 
-    // Insert post into database with status
-    $stmt = $conn->prepare("INSERT INTO posts (user_id, title, description, file_path, culture_elements, learning_styles, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param('issssss', $user_id, $title, $description, $uploaded_file, $culture_elements, $learning_styles, $status);
+        $stmt = $conn->prepare("INSERT INTO posts (user_id, title, description, file_path, culture_elements, learning_styles, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param('issssss', $user_id, $title, $description, $uploaded_file, $culture_elements, $learning_styles, $status);
 
-    if ($stmt->execute()) {
-        // Replace the alert with a success response
+        if ($stmt->execute()) {
+            echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showSuccessModal();
+                    });
+                  </script>";
+        } else {
+            $errors[] = "An error occurred while creating the post.";
+        }
+        $stmt->close();
+    }
+
+    // If there are errors, display them
+    if (!empty($errors)) {
         echo "<script>
                 document.addEventListener('DOMContentLoaded', function() {
-                    showSuccessModal();
+                    const errorMessages = " . json_encode($errors) . ";
+                    showErrors(errorMessages);
                 });
               </script>";
-    } else {
-        echo "<script>
-                alert('An error occurred while creating the post.');
-              </script>";
     }
-
-    $stmt->close();
 }
 
 ?>
+
 
 
 <!DOCTYPE html>
@@ -158,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Navigation Bar -->
 
-    <?php 
+    <?php
     if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1) {
         include 'components/layout/admin/navbar.php';
     } else {
@@ -186,91 +216,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     accept="image/*,video/mp4,video/webm,video/mov,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain"
                     style="display: none;">
             </div>
+            <div class="file-size-info" style="color: #666;">
+                <?php if ($isPremium): ?>
+                    <i class="fas fa-crown" style="color: #FFD700;"></i>
+                    <span>Premium user: Upload files up to 10MB</span>
+                <?php else: ?>
+                    <i class="fas fa-info-circle"></i>
+                    <span>Free user: Upload files up to 2MB</span>
+                <?php endif; ?>
+            </div>
             <div class="file-preview" id="file-preview"></div>
 
-            <!-- Culture Elements (Hidden for Non-Admin Users) -->
-            <!-- <?php if ($_SESSION['isAdmin'] == 1) { ?>
-                <div style="background-color: #fff; padding: 15px; border-radius: 8px; border: 2px solid #ddd; margin: 15px 0; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);">
-                    <h3 style="color: #365486; font-size: 18px; font-weight: 500; margin-bottom: 8px;">Select Culture Elements</h3>
-                    <div style="display: grid; gap: 8px;">
-                        <label style="display: flex; align-items: center; margin: 0;">
-                            <input type="checkbox" name="culture_elements[]" value="Geography" style="margin-right: 8px;">
-                            <span style="font-size: 15px; color: #444;">Geography</span>
+            <!-- Learning Styles -->
+            <div style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <h3 style="color: #1a73e8; font-size: 16px; margin-bottom: 15px;">Select Learning Styles</h3>
+
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" name="learning_styles[]" value="Visual">
+                            <span style="color: #202124; font-size: 14px;">Visual</span>
                         </label>
-                        <label style="display: flex; align-items: center; margin: 0;">
-                            <input type="checkbox" name="culture_elements[]" value="History" style="margin-right: 8px;">
-                            <span style="font-size: 15px; color: #444;">History</span>
+                        <i class="fas fa-info-circle info-icon"
+                            data-info="Visual learners prefer information presented through images, diagrams, charts, and other visual aids. They learn best when concepts are illustrated visually."
+                            style="color: #1a73e8; cursor: help;"
+                            onmouseover="showInfo(event)"
+                            onmouseout="hideInfo()">
+                        </i>
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" name="learning_styles[]" value="Auditory & Oral">
+                            <span style="color: #202124; font-size: 14px;">Auditory & Oral</span>
                         </label>
-                        <label style="display: flex; align-items: center; margin: 0;">
-                            <input type="checkbox" name="culture_elements[]" value="Demographics" style="margin-right: 8px;">
-                            <span style="font-size: 15px; color: #444;">Demographics</span>
+                        <i class="fas fa-info-circle info-icon"
+                            data-info="Auditory and oral learners process information best through listening and speaking. They benefit from discussions, lectures, and verbal explanations."
+                            style="color: #1a73e8; cursor: help;"
+                            onmouseover="showInfo(event)"
+                            onmouseout="hideInfo()">
+                        </i>
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" name="learning_styles[]" value="Read & Write">
+                            <span style="color: #202124; font-size: 14px;">Read & Write</span>
                         </label>
-                        <label style="display: flex; align-items: center; margin: 0;">
-                            <input type="checkbox" name="culture_elements[]" value="Culture" style="margin-right: 8px;">
-                            <span style="font-size: 15px; color: #444;">Culture</span>
+                        <i class="fas fa-info-circle info-icon"
+                            data-info="Read and write learners prefer written information. They learn best through reading texts and writing notes, making lists, and working with written materials."
+                            style="color: #1a73e8; cursor: help;"
+                            onmouseover="showInfo(event)"
+                            onmouseout="hideInfo()">
+                        </i>
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" name="learning_styles[]" value="Kinesthetic">
+                            <span style="color: #202124; font-size: 14px;">Kinesthetic</span>
                         </label>
+                        <i class="fas fa-info-circle info-icon"
+                            data-info="Kinesthetic learners learn through physical activities and hands-on experiences. They prefer learning by doing, experimenting, and engaging in practical applications."
+                            style="color: #1a73e8; cursor: help;"
+                            onmouseover="showInfo(event)"
+                            onmouseout="hideInfo()">
+                        </i>
                     </div>
                 </div>
-            <?php } ?>
-
-        <!-- Learning Styles -->
-        <div style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-            <h3 style="color: #1a73e8; font-size: 16px; margin-bottom: 15px;">Select Learning Styles</h3>
-            
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <label style="display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" name="learning_styles[]" value="Visual">
-                        <span style="color: #202124; font-size: 14px;">Visual</span>
-                    </label>
-                    <i class="fas fa-info-circle info-icon" 
-                       data-info="Visual learners prefer information presented through images, diagrams, charts, and other visual aids. They learn best when concepts are illustrated visually."
-                       style="color: #1a73e8; cursor: help;"
-                       onmouseover="showInfo(event)" 
-                       onmouseout="hideInfo()">
-                    </i>
-                </div>
-
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <label style="display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" name="learning_styles[]" value="Auditory & Oral">
-                        <span style="color: #202124; font-size: 14px;">Auditory & Oral</span>
-                    </label>
-                    <i class="fas fa-info-circle info-icon"
-                       data-info="Auditory and oral learners process information best through listening and speaking. They benefit from discussions, lectures, and verbal explanations."
-                       style="color: #1a73e8; cursor: help;"
-                       onmouseover="showInfo(event)"
-                       onmouseout="hideInfo()">
-                    </i>
-                </div>
-
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <label style="display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" name="learning_styles[]" value="Read & Write">
-                        <span style="color: #202124; font-size: 14px;">Read & Write</span>
-                    </label>
-                    <i class="fas fa-info-circle info-icon"
-                       data-info="Read and write learners prefer written information. They learn best through reading texts and writing notes, making lists, and working with written materials."
-                       style="color: #1a73e8; cursor: help;"
-                       onmouseover="showInfo(event)"
-                       onmouseout="hideInfo()">
-                    </i>
-                </div>
-
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <label style="display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" name="learning_styles[]" value="Kinesthetic">
-                        <span style="color: #202124; font-size: 14px;">Kinesthetic</span>
-                    </label>
-                    <i class="fas fa-info-circle info-icon"
-                       data-info="Kinesthetic learners learn through physical activities and hands-on experiences. They prefer learning by doing, experimenting, and engaging in practical applications."
-                       style="color: #1a73e8; cursor: help;"
-                       onmouseover="showInfo(event)"
-                       onmouseout="hideInfo()">
-                    </i>
-                </div>
             </div>
-        </div>
 
             <!-- Submit Button -->
             <button type="submit" style="padding: 10px; background-color: #007bff; color: white; font-size: 16px; border: none; border-radius: 4px; cursor: pointer;">Post</button>
@@ -285,11 +299,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const fileInput = document.getElementById('file-input');
         const filePreview = document.getElementById('file-preview');
         const form = document.getElementById('post-form');
-
-        // Handle click on drag-drop zone
         dragDropZone.addEventListener('click', () => fileInput.click());
 
-        // Handle drag events
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
             dragDropZone.addEventListener(eventName, preventDefaults, false);
         });
@@ -310,7 +321,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }, false);
         });
 
-        // Handle dropped files
         dragDropZone.addEventListener('drop', handleDrop, false);
         fileInput.addEventListener('change', handleFileSelect, false);
 
@@ -326,30 +336,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         function handleFiles(files) {
-            const file = files[0]; // Get the first file
+            const file = files[0];
             if (!file) return;
 
-            // Get all learning style checkboxes
+            // Remove size validation here to allow any file upload initially
+            showPreview(file);
+
+            // Update learning style checkboxes based on file type
             const visualCheckbox = document.querySelector('input[name="learning_styles[]"][value="Visual"]');
             const auditoryCheckbox = document.querySelector('input[name="learning_styles[]"][value="Auditory & Oral"]');
             const readWriteCheckbox = document.querySelector('input[name="learning_styles[]"][value="Read & Write"]');
             const kinestheticCheckbox = document.querySelector('input[name="learning_styles[]"][value="Kinesthetic"]');
-
-            // Uncheck all checkboxes first
             [visualCheckbox, auditoryCheckbox, readWriteCheckbox, kinestheticCheckbox].forEach(checkbox => {
                 if (checkbox) checkbox.checked = false;
             });
-
-            // Check appropriate boxes based on file type
             if (file.type.startsWith('image/')) {
-                // Images - Visual
                 if (visualCheckbox) visualCheckbox.checked = true;
             } else if (file.type.startsWith('video/')) {
-                // Videos - Visual and Auditory & Oral
                 if (visualCheckbox) visualCheckbox.checked = true;
                 if (auditoryCheckbox) auditoryCheckbox.checked = true;
             } else if (file.type === 'audio/mp3' || file.type === 'audio/mpeg') {
-                // Audio files - Auditory & Oral only
                 if (auditoryCheckbox) auditoryCheckbox.checked = true;
             } else if (
                 file.type === 'application/pdf' ||
@@ -359,12 +365,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
                 file.type === 'text/plain'
             ) {
-                // Documents - Read & Write
                 if (readWriteCheckbox) readWriteCheckbox.checked = true;
             }
-
-            // Show preview
-            showPreview(file);
         }
 
         function showPreview(file) {
@@ -377,7 +379,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 filePreview.appendChild(img);
 
                 const reader = new FileReader();
-                reader.onload = (e) => { img.src = e.target.result; };
+                reader.onload = (e) => {
+                    img.src = e.target.result;
+                };
                 reader.readAsDataURL(file);
             } else if (file.type.startsWith('video/')) {
                 const video = document.createElement('video');
@@ -385,7 +389,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 filePreview.appendChild(video);
 
                 const reader = new FileReader();
-                reader.onload = (e) => { video.src = e.target.result; };
+                reader.onload = (e) => {
+                    video.src = e.target.result;
+                };
                 reader.readAsDataURL(file);
             } else {
                 // Handle documents
@@ -397,7 +403,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 filePreview.appendChild(docIcon);
             }
 
-            // Add file name and remove button
             const fileInfo = document.createElement('div');
             fileInfo.className = 'file-name';
             fileInfo.textContent = file.name;
@@ -413,9 +418,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         function removeFile() {
             filePreview.innerHTML = '';
             dragDropZone.style.display = 'flex';
-            fileInput.value = ''; // Clear the file input
-            
-            // Uncheck all learning style checkboxes
+            fileInput.value = '';
             const checkboxes = document.querySelectorAll('input[name="learning_styles[]"]');
             checkboxes.forEach(checkbox => checkbox.checked = false);
         }
@@ -454,6 +457,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     return 'fas fa-file-alt';
                 default:
                     return 'fas fa-file';
+            }
+        }
+
+        function showErrors(errors) {
+            const errorDiv = document.getElementById('error-messages');
+            errorDiv.innerHTML = errors.map(error => `<div>${error}</div>`).join('');
+            errorDiv.style.display = 'block';
+
+            // Scroll to error messages
+            errorDiv.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+
+        // Pass PHP variables to JavaScript
+        const userIsPremium = <?php echo json_encode($isPremium); ?>;
+        const maxFileSize = <?php echo json_encode($maxFileSize); ?>;
+
+        // Update your form validation script
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const errors = [];
+            const fileInput = document.getElementById('file-input');
+
+            // Validate file size if a file is selected
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const sizeLimit = userIsPremium ? (10 * 1024 * 1024) : (2 * 1024 * 1024);
+                const sizeLimitText = userIsPremium ? "10MB" : "2MB";
+
+                if (file.size > sizeLimit) {
+                    errors.push(`File size exceeds ${sizeLimitText} limit${userIsPremium ? ' for Premium users' : ''}`);
+                }
+            }
+
+            // If there are validation errors, show them in the modal
+            if (errors.length > 0) {
+                showValidationModal(errors);
+            } else {
+                // If no errors, submit the form
+                this.submit();
+            }
+        });
+
+        function showValidationModal(errors) {
+            const modal = document.getElementById('validationModal');
+            const messagesDiv = document.getElementById('validation-messages');
+            messagesDiv.innerHTML = errors.map(error => `<div>${error}</div>`).join('');
+            modal.style.display = 'block';
+        }
+
+        function closeValidationModal() {
+            document.getElementById('validationModal').style.display = 'none';
+        }
+
+        // Close modal when clicking the X
+        document.querySelectorAll('.modal .close').forEach(closeBtn => {
+            closeBtn.onclick = function() {
+                this.closest('.modal').style.display = 'none';
+            }
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
             }
         }
     </script>
@@ -583,13 +654,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
 
-/* Title styling */
-h1 {
-    color: #365486;
-    font-size: 28px;
-    font-weight: 600;
-    text-align: center;
-}
+        /* Title styling */
+        h1 {
+            color: #365486;
+            font-size: 28px;
+            font-weight: 600;
+            text-align: center;
+        }
+
         .drag-drop-zone.dragover {
             background-color: #f0f7ff;
             border-color: #007bff;
@@ -787,13 +859,25 @@ h1 {
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         @keyframes slideIn {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         /* Loading spinner styles */
@@ -810,8 +894,13 @@ h1 {
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
 
@@ -866,10 +955,10 @@ h1 {
         function showInfo(event) {
             const popup = document.getElementById('infoPopup');
             const info = event.target.getAttribute('data-info');
-            
+
             popup.querySelector('.popup-content').textContent = info;
             popup.style.display = 'block';
-            
+
             // Position the popup
             const iconRect = event.target.getBoundingClientRect();
             popup.style.top = `${iconRect.top + window.scrollY - 5}px`;
@@ -891,7 +980,7 @@ h1 {
             position: absolute;
             background-color: white;
             border-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
             padding: 12px 16px;
             max-width: 280px;
             z-index: 1000;
@@ -921,6 +1010,81 @@ h1 {
         input[type="checkbox"]:checked {
             background-color: #1a73e8;
             border-color: #1a73e8;
+        }
+    </style>
+
+    <!-- Add this right after your form opening tag -->
+    <div id="error-messages" style="color: #dc3545; margin-bottom: 15px; display: none;"></div>
+
+    <!-- Add this new validation modal HTML after your success modal -->
+    <div id="validationModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #dc3545;">
+                <h2>Error</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <i class="fas fa-exclamation-circle" style="color: #dc3545; font-size: 48px; margin-bottom: 15px;"></i>
+                <div id="validation-messages" style="color: #dc3545;"></div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeValidationModal()" class="modal-btn" style="background-color: #6c757d; color: white;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Add these styles to your existing modal styles */
+        #validation-messages div {
+            margin: 5px 0;
+            font-size: 1.1rem;
+            color: #dc3545;
+        }
+
+        .modal-header.validation {
+            background-color: #dc3545;
+        }
+
+        .fa-exclamation-circle {
+            color: #dc3545;
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+    </style>
+
+
+
+    <style>
+        .file-size-info {
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .file-size-info i {
+            font-size: 16px;
+        }
+
+        /* Premium user indicator */
+        .premium-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background-color: #fff3dc;
+            color: #b38600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .premium-badge i {
+            color: #FFD700;
         }
     </style>
 
