@@ -4,7 +4,7 @@ session_start();
 
 // Security check
 if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
+    header('Content-Type: application/json');
     echo json_encode(['error' => 'Unauthorized access']);
     exit();
 }
@@ -18,6 +18,7 @@ $action = isset($_GET['action']) ? $_GET['action'] :
 switch ($action) {
     // Fetch user's posts
     case 'fetch':
+        header('Content-Type: application/json');
         fetchUserPosts($conn, $user_id);
         break;
 
@@ -37,43 +38,60 @@ switch ($action) {
         break;
 
     default:
-        http_response_code(400);
+        header('Content-Type: application/json');
         echo json_encode(['error' => 'Invalid action']);
         exit();
 }
 
 function fetchUserPosts($conn, $user_id) {
-    $query = "
-        SELECT p.*, 
-               u.username, 
-               u.full_name, 
-               u.profile_picture, 
-               (SELECT COUNT(*) FROM likes WHERE post_id = p.id) as like_count,
-               (SELECT COUNT(*) FROM comments WHERE post_id = p.id) as comment_count
-        FROM posts p
-        JOIN users u ON p.user_id = u.id
-        WHERE p.user_id = ?
-        ORDER BY p.created_at DESC
-    ";
+    try {
+        $query = "
+            SELECT p.*, 
+                   u.username, 
+                   u.full_name, 
+                   u.profile_picture, 
+                   COUNT(DISTINCT l.id) as like_count,
+                   COUNT(DISTINCT c.id) as comment_count,
+                   p.file_path
+            FROM posts p
+            LEFT JOIN users u ON p.user_id = u.id
+            LEFT JOIN likes l ON p.id = l.post_id
+            LEFT JOIN comments c ON p.id = c.post_id
+            WHERE p.user_id = ?
+            GROUP BY p.id, p.file_path, u.full_name, u.username, u.profile_picture
+            ORDER BY p.created_at DESC
+        ";
 
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+        $stmt = $conn->prepare($query);
+        if (!$stmt) {
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
 
-    $posts = [];
-    while ($row = $result->fetch_assoc()) {
-        // Format created_at to be more readable
-        $row['formatted_date'] = date('d M Y, h:i A', strtotime($row['created_at']));
+        $stmt->bind_param("i", $user_id);
+        if (!$stmt->execute()) {
+            throw new Exception("Execute failed: " . $stmt->error);
+        }
+
+        $result = $stmt->get_result();
+        $posts = [];
         
-        // Sanitize output
-        $row['title'] = htmlspecialchars($row['title']);
-        $row['description'] = htmlspecialchars($row['description']);
-        
-        $posts[] = $row;
+        while ($row = $result->fetch_assoc()) {
+            // Format created_at to be more readable
+            $row['formatted_date'] = date('d M Y, h:i A', strtotime($row['created_at']));
+            
+            // Sanitize output
+            $row['title'] = htmlspecialchars($row['title']);
+            $row['description'] = htmlspecialchars($row['description']);
+            
+            $posts[] = $row;
+        }
+
+        echo json_encode($posts);
+        $stmt->close();
+
+    } catch (Exception $e) {
+        echo json_encode(['error' => $e->getMessage()]);
     }
-
-    echo json_encode($posts);
     exit();
 }
 

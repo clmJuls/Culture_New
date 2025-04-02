@@ -62,6 +62,28 @@
     $stmt->execute();
     $result = $stmt->get_result();
 
+    // Add this helper function at the top of your PHP section
+    function isImageFile($path) {
+        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        return in_array($extension, $imageExtensions);
+    }
+
+    // Add these helper functions at the top of your PHP section
+    function getFileType($path) {
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        
+        $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $videoExtensions = ['mp4', 'webm', 'ogg'];
+        $documentExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'];
+        
+        if (in_array($extension, $imageExtensions)) return 'image';
+        if (in_array($extension, $videoExtensions)) return 'video';
+        if (in_array($extension, $documentExtensions)) return 'document';
+        
+        return 'unknown';
+    }
+
     ?>
 
     <div class="post-requests-container">
@@ -156,9 +178,50 @@
                             <h4><?php echo htmlspecialchars($post['title']); ?></h4>
                             <p><?php echo htmlspecialchars($post['description']); ?></p>
                             <?php if ($post['file_path']): ?>
-                            <div class="post-media">
-                                <img src="<?php echo htmlspecialchars($post['file_path']); ?>" alt="Post Image">
-                            </div>
+                                <div class="post-media">
+                                    <?php
+                                    $fileType = getFileType($post['file_path']);
+                                    switch($fileType) {
+                                        case 'image':
+                                            ?>
+                                            <img src="<?php echo htmlspecialchars($post['file_path']); ?>" alt="Post Image">
+                                            <?php
+                                            break;
+                                        case 'video':
+                                            ?>
+                                            <video controls width="100%">
+                                                <source src="<?php echo htmlspecialchars($post['file_path']); ?>" type="video/<?php echo pathinfo($post['file_path'], PATHINFO_EXTENSION); ?>">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                            <?php
+                                            break;
+                                        case 'document':
+                                            $fileName = basename($post['file_path']);
+                                            $extension = strtoupper(pathinfo($post['file_path'], PATHINFO_EXTENSION));
+                                            ?>
+                                            <div class="document-preview">
+                                                <i class="fas fa-file-<?php echo $extension === 'PDF' ? 'pdf' : 'document'; ?>"></i>
+                                                <span class="document-name"><?php echo htmlspecialchars($fileName); ?></span>
+                                                <a href="<?php echo htmlspecialchars($post['file_path']); ?>" class="download-btn" download>
+                                                    <i class="fas fa-download"></i> Download
+                                                </a>
+                                            </div>
+                                            <?php
+                                            break;
+                                        default:
+                                            ?>
+                                            <div class="document-preview">
+                                                <i class="fas fa-file"></i>
+                                                <span class="document-name"><?php echo htmlspecialchars(basename($post['file_path'])); ?></span>
+                                                <a href="<?php echo htmlspecialchars($post['file_path']); ?>" class="download-btn" download>
+                                                    <i class="fas fa-download"></i> Download
+                                                </a>
+                                            </div>
+                                            <?php
+                                            break;
+                                    }
+                                    ?>
+                                </div>
                             <?php endif; ?>
                             <div class="post-tags">
                                 <?php echo $learning_style_tags; ?>
@@ -525,13 +588,69 @@
 
         .post-media {
             margin: 15px 0;
+            border-radius: 5px;
+            overflow: hidden;
         }
 
         .post-media img {
             width: 100%;
-            height: 200px; /* Adjust this value based on your needs */
+            height: 200px;
             object-fit: cover;
             border-radius: 5px;
+        }
+
+        .post-media video {
+            width: 100%;
+            max-height: 200px;
+            border-radius: 5px;
+            background: #000;
+        }
+
+        .document-preview {
+            padding: 15px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .document-preview i {
+            font-size: 24px;
+            color: #365486;
+        }
+
+        .document-preview .document-name {
+            flex-grow: 1;
+            font-size: 14px;
+            color: #495057;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .download-btn {
+            padding: 6px 12px;
+            background: #365486;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .download-btn:hover {
+            background: #2a4268;
+            transform: translateY(-1px);
+        }
+
+        .download-btn i {
+            font-size: 14px;
+            color: white;
         }
 
         .post-tags {
@@ -799,6 +918,18 @@
     @keyframes slideIn {
         from { transform: translateY(-20px); opacity: 0; }
         to { transform: translateY(0); opacity: 1; }
+    }
+    </style>
+
+    <style>
+    .file-notice {
+        padding: 10px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        color: #6c757d;
+        text-align: center;
+        font-size: 14px;
     }
     </style>
 

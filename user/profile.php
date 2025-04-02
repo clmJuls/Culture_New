@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Fetch user information from the database
-$query = "SELECT full_name, profile_picture, username, about, location, birthday, website, skills, isPremium FROM users WHERE id = '$user_id'";
+$query = "SELECT full_name, profile_picture, username, about, location, birthday, website, skills, isPremium, profile_background FROM users WHERE id = '$user_id'";
 $result = $conn->query($query);
 
 if ($result->num_rows > 0) {
@@ -27,6 +27,7 @@ if ($result->num_rows > 0) {
     $skills = htmlspecialchars($user['skills']);
     $profile_picture = $user['profile_picture'] ? htmlspecialchars($user['profile_picture']) : 'assets/hero/v07_20@Shanks.png';
     $is_premium = $user['isPremium'];
+    $profile_background = $user['profile_background'] ? htmlspecialchars($user['profile_background']) : '';
 } else {
     echo "<script>
             alert('User not found.');
@@ -51,8 +52,9 @@ $premium_class = $is_premium ? 'premium-user' : '';
     <title>Kulturabase</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <?php if ($is_premium): ?>
-    <link rel="stylesheet" href="../assets/css/premium-styles.css">
+    <link rel="stylesheet" href="assets/css/premium-styles.css">
     <?php endif; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <body>
     <style>
     /* General */
@@ -87,21 +89,30 @@ $premium_class = $is_premium ? 'premium-user' : '';
     </div> -->
 
     <!-- Profile Header -->
-    <div class="profile-header <?php echo $premium_class; ?>" style="margin-top: 100px;">
-        <div class="profile-picture">
-            <div class="profile-img">
-                <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" id="profile-img" class="profile-img-preview">
+    <div class="profile-header <?php echo $premium_class; ?>" 
+         style="margin-top: 100px; <?php echo ($is_premium && $profile_background) ? "background-image: url('" . $profile_background . "'); background-size: cover; background-position: center;" : ''; ?>">
+        <div class="profile-overlay"></div>
+        <?php if ($is_premium): ?>
+        <button class="change-background-btn" id="changeBackgroundBtn" title="Change Background">
+            <i class="fas fa-image"></i>
+        </button>
+        <?php endif; ?>
+        <div class="profile-content">
+            <div class="profile-picture">
+                <div class="profile-img">
+                    <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" id="profile-img" class="profile-img-preview">
+                </div>
             </div>
-        </div>
-        <div class="user-info">
-            <h2><?php echo $full_name; ?></h2>
-            <p class="username">@<?php echo $username; ?></p>
-            <div class="user-stats">
-                <!-- Stats content -->
+            <div class="user-info">
+                <h2><?php echo $full_name; ?></h2>
+                <p class="username">@<?php echo $username; ?></p>
+                <div class="user-stats">
+                    <!-- Stats content -->
+                </div>
+                <a href="edit-profile.php" class="edit-profile-link">
+                    <button class="edit-profile-btn">Edit Profile</button>
+                </a>
             </div>
-            <a href="edit-profile.php" class="edit-profile-link">
-                <button class="edit-profile-btn">Edit Profile</button>
-            </a>
         </div>
     </div>
 
@@ -150,18 +161,7 @@ $premium_class = $is_premium ? 'premium-user' : '';
       <div id="friends-section" class="content-section">
         <h3>Friends</h3>
         <div class="friends-list">
-          <div class="friend">
-            <img src="https://via.placeholder.com/100" alt="Friend 1">
-            <p>Friend 1</p>
-          </div>
-          <div class="friend">
-            <img src="https://via.placeholder.com/100" alt="Friend 2">
-            <p>Friend 2</p>
-          </div>
-          <div class="friend">
-            <img src="https://via.placeholder.com/100" alt="Friend 3">
-            <p>Friend 3</p>
-          </div>
+          <!-- Remove placeholder images or update with actual image paths -->
         </div>
       </div>
     </div>
@@ -169,27 +169,30 @@ $premium_class = $is_premium ? 'premium-user' : '';
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
     $(document).ready(function() {
-        // Fetch and display posts
         function loadPosts() {
             $.ajax({
                 url: 'posts.php',
                 method: 'GET',
-                data: {
-                    action: 'fetch',
-                    // post_id: postId
-                },
+                data: { action: 'fetch' },
                 dataType: 'json',
-                success: function(posts) {
-                    console.log(posts)
+                success: function(response) {
+                    console.log('Response:', response); // Debug log
+                    
+                    if (response.error) {
+                        console.error('Server error:', response.error);
+                        $('#posts-container').html(`<p class="error-message">Error: ${response.error}</p>`);
+                        return;
+                    }
+
                     const postsContainer = $('#posts-container');
                     postsContainer.empty();
 
-                    if (posts.length === 0) {
+                    if (!Array.isArray(response) || response.length === 0) {
                         postsContainer.append('<p>No posts yet.</p>');
                         return;
                     }
 
-                    posts.forEach(function(post) {
+                    response.forEach(function(post) {
                         const postHtml = `
                             <div class="post" data-post-id="${post.id}">
                                 <div class="post-header">
@@ -205,7 +208,6 @@ $premium_class = $is_premium ? 'premium-user' : '';
                                         <span class="three-dots">&#x22EE;</span>
                                         <div class="post-options-menu">
                                             <ul>
-                                          
                                                 <li class="delete-post">Delete Post</li>
                                             </ul>
                                         </div>
@@ -214,7 +216,7 @@ $premium_class = $is_premium ? 'premium-user' : '';
                                 <div class="post-content">
                                     <h4>${post.title}</h4>
                                     <p>${post.description}</p>
-                                    ${post.file_path ? `<img src="${post.file_path}" alt="Post Image">` : ''}
+                                    ${getFilePreviewHtml(post)}
                                     <div class="post-stats">
                                         <span>${post.like_count} Likes</span>
                                         <span>${post.comment_count} Comments</span>
@@ -224,41 +226,76 @@ $premium_class = $is_premium ? 'premium-user' : '';
                         `;
                         postsContainer.append(postHtml);
                     });
-
-                    // Attach delete post event
-                    $('.delete-post').on('click', function() {
-                        const postElement = $(this).closest('.post');
-                        const postId = postElement.data('post-id');
-
-                        if (confirm('Are you sure you want to delete this post?')) {
-                            $.ajax({
-                                url: 'posts.php',
-                                method: 'POST',
-                                data: {
-                                    action: 'delete',
-                                    post_id: postId
-                                },
-                                dataType: 'json',
-                                success: function(response) {
-                                    if (response.success) {
-                                        postElement.remove();
-                                        alert('Post deleted successfully');
-                                    } else {
-                                        alert(response.error);
-                                    }
-                                },
-                                error: function() {
-                                    alert('Error deleting post');
-                                }
-                            });
-                        }
-                    });
                 },
-                error: function() {
-                    $('#posts-container').html('<p>Error loading posts.</p>');
+                error: function(xhr, status, error) {
+                    console.error('Ajax error:', error);
+                    console.error('Response text:', xhr.responseText);
+                    $('#posts-container').html(`
+                        <p class="error-message">
+                            Error loading posts. Please try again later.
+                        </p>
+                    `);
                 }
             });
         }
+
+        // Helper function to determine file type and return appropriate HTML
+        function getFilePreviewHtml(post) {
+            if (!post.file_path) return '';
+
+            // Try to determine file type from file extension if mime type is not available
+            const fileExtension = post.file_path.split('.').pop().toLowerCase();
+            
+            // Image extensions
+            if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
+                return `<img src="${post.file_path}" alt="Post Image" class="post-media">`;
+            }
+            
+            // Video extensions
+            if (['mp4', 'webm', 'mov'].includes(fileExtension)) {
+                return `<video controls class="post-media">
+                    <source src="${post.file_path}" type="video/${fileExtension}">
+                    Your browser does not support the video tag.
+                </video>`;
+            }
+            
+            // Document extensions
+            const documentExtensions = {
+                'pdf': 'fas fa-file-pdf',
+                'doc': 'fas fa-file-word',
+                'docx': 'fas fa-file-word',
+                'xls': 'fas fa-file-excel',
+                'xlsx': 'fas fa-file-excel',
+                'txt': 'fas fa-file-alt'
+            };
+
+            if (documentExtensions[fileExtension]) {
+                return `<div class="document-preview">
+                    <i class="${documentExtensions[fileExtension]}"></i>
+                    <a href="${post.file_path}" target="_blank" class="document-link">View Document</a>
+                </div>`;
+            }
+
+            // Default case: just show a link to the file
+            return `<div class="document-preview">
+                <i class="fas fa-file"></i>
+                <a href="${post.file_path}" target="_blank" class="document-link">View File</a>
+            </div>`;
+        }
+
+        // Add some CSS for error messages
+        $('<style>')
+            .text(`
+                .error-message {
+                    color: #dc3545;
+                    padding: 15px;
+                    background-color: #f8d7da;
+                    border-radius: 4px;
+                    margin: 10px 0;
+                    text-align: center;
+                }
+            `)
+            .appendTo('head');
 
         // Initial load
         loadPosts();
@@ -686,9 +723,9 @@ $premium_class = $is_premium ? 'premium-user' : '';
 /* Premium User Styling with Flowery Design */
 .premium-user {
     border: 2px solid gold;
-    background-color: #f0f8ff;
     position: relative;
     overflow: visible;
+    background-color: transparent;
 }
 
 .premium-user::before,
@@ -738,6 +775,266 @@ $premium_class = $is_premium ? 'premium-user' : '';
 .premium-user::after {
     animation: floralSpin 20s linear infinite;
 }
+
+/* Adjust the profile-overlay opacity */
+.profile-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.3); /* Changed from 0.85 to 0.3 for more visibility */
+    z-index: 1;
+}
+
+/* Add text shadow to ensure readability */
+.profile-content {
+    position: relative;
+    z-index: 2;
+}
+
+.profile-content h2,
+.profile-content .username,
+.profile-content .user-info::before {
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* Add shadow to make text readable */
+}
+
+/* Adjust text colors for better contrast */
+.premium-user .user-info h2 {
+    color: #fff;
+}
+
+.premium-user .user-info .username {
+    color: #f0f0f0;
+}
+
+/* Add these new styles */
+.change-background-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.7);  /* White with 70% opacity */
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+.change-background-btn:hover {
+    background: rgba(255, 255, 255, 0.9);  /* Increase opacity on hover */
+}
+
+.change-background-btn i {
+    font-size: 18px;
+    color: rgba(0, 0, 0, 0.7);  /* Slightly transparent black for the icon */
+}
+
+/* Remove the premium-specific gradient styles */
+.premium-user .change-background-btn {
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.premium-user .change-background-btn:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 30px;
+    border: none;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: black;
+}
+
+#backgroundForm {
+    margin-top: 20px;
+}
+
+/* Add these styles */
+.upload-info {
+    background-color: #F7F9FC;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border: 1px dashed #CBD5E0;
+}
+
+.upload-info p {
+    margin: 8px 0;
+    color: #4A5568;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.upload-info p::before {
+    content: '•';
+    color: #4299E1;
+}
+
+.file-upload-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.file-upload-input {
+    position: absolute;
+    left: -9999px;
+}
+
+.file-upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #F7FAFC;
+    border: 2px dashed #CBD5E0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.file-upload-label:hover {
+    background-color: #EDF2F7;
+    border-color: #4299E1;
+}
+
+.upload-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.upload-text {
+    color: #4A5568;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.selected-file-name {
+    display: block;
+    margin-top: 10px;
+    color: #2D3748;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.upload-submit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #4299E1 0%, #667EEA 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    gap: 8px;
+}
+
+.upload-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+}
+
+.upload-submit-btn:active {
+    transform: translateY(0);
+}
+
+.btn-icon {
+    font-size: 20px;
+}
+
+.btn-text {
+    margin-left: 8px;
+}
+
+/* Loading state */
+.upload-submit-btn.loading {
+    background: #A0AEC0;
+    cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        margin: 10% auto;
+        padding: 20px;
+    }
+
+    .upload-text {
+        font-size: 14px;
+    }
+}
+
+/* Add these styles to your existing CSS */
+.post-media {
+    max-width: 100%;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.document-preview {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.document-preview i {
+    font-size: 24px;
+    color: #365486;
+}
+
+.document-link {
+    color: #365486;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.document-link:hover {
+    text-decoration: underline;
+}
   </style>
 
 <!-- Sidebar -->
@@ -752,3 +1049,129 @@ $premium_class = $is_premium ? 'premium-user' : '';
 // Move database connection close to the end of the file
 $conn->close(); 
 ?>
+
+<?php if ($is_premium): ?>
+<div id="backgroundModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Change Profile Background</h2>
+        <form id="backgroundForm" enctype="multipart/form-data">
+            <div class="upload-info">
+                <p>Accepted file types: JPG, PNG, GIF</p>
+                <p>Maximum file size: 10MB</p>
+            </div>
+            <div class="file-upload-wrapper">
+                <input type="file" name="background" id="file-upload" class="file-upload-input" accept="image/jpeg,image/png,image/gif" required>
+                <label for="file-upload" class="file-upload-label">
+                    <span class="upload-icon">📷</span>
+                    <span class="upload-text">Choose your artistic background</span>
+                </label>
+                <span class="selected-file-name"></span>
+            </div>
+            <button type="submit" class="upload-submit-btn">
+                <span class="btn-text">Submit</span>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+// Define the function globally
+function openBackgroundModal() {
+    const modal = document.getElementById('backgroundModal');
+    if (modal) {
+        modal.style.display = 'block';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click event listener to the button
+    const changeBackgroundBtn = document.getElementById('changeBackgroundBtn');
+    if (changeBackgroundBtn) {
+        changeBackgroundBtn.addEventListener('click', openBackgroundModal);
+    }
+
+    // Close modal when clicking the X
+    const closeBtn = document.querySelector('.close');
+    if (closeBtn) {
+        closeBtn.onclick = function() {
+            const modal = document.getElementById('backgroundModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('backgroundModal');
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    // Handle file selection display
+    const fileInput = document.getElementById('file-upload');
+    const fileNameDisplay = document.querySelector('.selected-file-name');
+    const uploadLabel = document.querySelector('.upload-text');
+    const originalLabelText = uploadLabel.textContent;
+
+    fileInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+            const fileName = this.files[0].name;
+            fileNameDisplay.textContent = fileName;
+            uploadLabel.textContent = 'Change selection';
+        } else {
+            fileNameDisplay.textContent = '';
+            uploadLabel.textContent = originalLabelText;
+        }
+    });
+
+    // Handle form submission
+    const backgroundForm = document.getElementById('backgroundForm');
+    if (backgroundForm) {
+        backgroundForm.onsubmit = function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitButton = this.querySelector('.upload-submit-btn');
+            const originalText = submitButton.querySelector('.btn-text').textContent;
+            
+            // Show loading state
+            submitButton.classList.add('loading');
+            submitButton.querySelector('.btn-text').textContent = 'Uploading...';
+            submitButton.disabled = true;
+
+            fetch('update_profile_background.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(text => {
+                try {
+                    const data = JSON.parse(text);
+                    if (data.success) {
+                        alert('Background updated successfully!');
+                        location.reload();
+                    } else {
+                        throw new Error(data.error || 'Unknown error occurred');
+                    }
+                } catch (e) {
+                    throw new Error('Invalid JSON response from server');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+            })
+            .finally(() => {
+                // Reset button state
+                submitButton.classList.remove('loading');
+                submitButton.querySelector('.btn-text').textContent = originalText;
+                submitButton.disabled = false;
+            });
+        };
+    }
+});
+</script>
+<?php endif; ?>
