@@ -107,7 +107,8 @@ if (isset($_SESSION['user_id'])) {
                 $top_style = $styles_result->fetch_assoc();
                 
                 // Get total posts
-                $total_posts = $conn->query("SELECT COUNT(*) as total FROM posts")->fetch_assoc()['total'];
+                $total_posts_result = $conn->query("SELECT COUNT(*) as total FROM posts");
+                $total_posts = $total_posts_result->fetch_assoc()['total'] ?? 0;
                 ?>
                 
                 <div class="stat-item">
@@ -121,7 +122,7 @@ if (isset($_SESSION['user_id'])) {
                 <div class="stat-item">
                     <div class="stat-icon"><i class="fas fa-user"></i></div>
                     <div class="stat-info">
-                        <span class="stat-value"><?php echo $most_active_user['username']; ?></span>
+                        <span class="stat-value"><?php echo $most_active_user['username'] ?? 'N/A'; ?></span>
                         <span class="stat-label">Most Active User</span>
                     </div>
                 </div>
@@ -129,7 +130,7 @@ if (isset($_SESSION['user_id'])) {
                 <div class="stat-item">
                     <div class="stat-icon"><i class="fas fa-brain"></i></div>
                     <div class="stat-info">
-                        <span class="stat-value"><?php echo $top_style['style']; ?></span>
+                        <span class="stat-value"><?php echo $top_style['style'] ?? 'N/A'; ?></span>
                         <span class="stat-label">Top Learning Style</span>
                     </div>
                 </div>
