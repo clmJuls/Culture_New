@@ -143,15 +143,15 @@ $premium_class = $is_premium ? 'premium-user' : '';
               <div class="detail" style="margin-bottom: 10px;">
                   <strong>Birthday:</strong> <span><?php echo $birthday ? $birthday : "Not specified."; ?></span>
               </div>
-              <div class="detail" style="margin-bottom: 10px;">
+              <!-- <div class="detail" style="margin-bottom: 10px;">
                   <strong>Website:</strong> <span>
                       <?php 
                           echo $website ? "<a href='$website' target='_blank'>$website</a>" : "Not provided.";
                       ?>
                   </span>
-              </div>
+              </div> -->
               <div class="detail" style="margin-bottom: 10px;">
-                  <strong>Skills:</strong> <span><?php echo $skills ? $skills : "No skills listed."; ?></span>
+                  <strong>Hobbies:</strong> <span><?php echo $skills ? $skills : "No hobbies listed."; ?></span>
               </div>
           </div>
       </div>

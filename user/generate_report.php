@@ -10,13 +10,13 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-if (!isset($_SESSION['isAdmin']) || $_SESSION['isAdmin'] != 1) {
-    echo "<script>
-            alert('Access denied. Admins only.');
-            window.location.href = 'home.php'; // Redirect to the homepage or another appropriate page
-          </script>";
-    exit();
-}
+// if (!isset($_SESSION['isAdmin']) || $_SESSION['isAdmin'] != 1) {
+//     echo "<script>
+//             alert('Access denied. Admins only.');
+//             window.location.href = 'home.php'; // Redirect to the homepage or another appropriate page
+//           </script>";
+//     exit();
+// }
 ?>
 
 <!DOCTYPE html>
