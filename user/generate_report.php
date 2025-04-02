@@ -45,26 +45,76 @@ if (!isset($_SESSION['isAdmin']) || $_SESSION['isAdmin'] != 1) {
             line-height: 1.6;
             padding-top: 80px;
         }
+        
+        .explore-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Stats Cards */
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            flex: 1;
+            min-width: 250px;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #365486;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        /* Rankings */
         .rankings-container {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
         }
 
         .ranking-box {
             background: white;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 25px;
+            height: 100%;
         }
 
         .ranking-title {
             color: #365486;
             font-size: 1.5rem;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-align: center;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
         }
 
         .ranking-table {
@@ -74,7 +124,7 @@ if (!isset($_SESSION['isAdmin']) || $_SESSION['isAdmin'] != 1) {
 
         .ranking-table th,
         .ranking-table td {
-            padding: 12px;
+            padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #eee;
         }
@@ -92,7 +142,7 @@ if (!isset($_SESSION['isAdmin']) || $_SESSION['isAdmin'] != 1) {
         .rank {
             font-weight: bold;
             color: #365486;
-            width: 50px;
+            width: 60px;
             text-align: center;
         }
 
@@ -101,52 +151,53 @@ if (!isset($_SESSION['isAdmin']) || $_SESSION['isAdmin'] != 1) {
             height: 20px;
             border-radius: 10px;
             overflow: hidden;
+            margin-bottom: 5px;
         }
 
         .usage-fill {
-            background: #365486;
+            background: linear-gradient(90deg, #365486, #7FC7D9);
             height: 100%;
-            transition: width 0.3s ease;
+            transition: width 0.5s ease;
         }
 
         .percentage {
             color: #666;
             font-size: 0.9em;
+            display: block;
+            text-align: right;
         }
-        .chart-container {
-            width: 45%;
-            margin: 20px;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: inline-block;
-            vertical-align: top;
-        }
-        .stats-container {
+        
+        /* Charts */
+        .charts-wrapper {
             display: flex;
-            justify-content: space-around;
             flex-wrap: wrap;
-            margin: 20px;
-            gap: 20px;
+            justify-content: space-between;
+            gap: 25px;
+            margin-bottom: 30px;
         }
-        .stat-card {
+        
+        .chart-container {
             background: white;
-            padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 25px;
             flex: 1;
-            min-width: 200px;
+            min-width: 500px;
+            margin-bottom: 25px;
         }
-        .stat-number {
-            font-size: 24px;
-            font-weight: bold;
-            color: #365486;
+        
+        canvas {
+            max-width: 100%;
         }
-        .stat-label {
-            color: #666;
-            margin-top: 5px;
+        
+        @media (max-width: 1024px) {
+            .rankings-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                min-width: 100%;
+            }
         }
     </style>
     
@@ -154,76 +205,79 @@ if (!isset($_SESSION['isAdmin']) || $_SESSION['isAdmin'] != 1) {
     <?php include 'components/layout/admin/navbar.php'; ?>
     <?php
 
-        $culture_query = "SELECT 
-                            SUBSTRING_INDEX(SUBSTRING_INDEX(culture_elements, ',', n.n), ',', -1) as element,
-                            COUNT(*) as count
-                        FROM posts
-                        JOIN (
-                            SELECT 1 + units.i + tens.i * 10 n
-                            FROM (SELECT 0 i UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) units
-                            CROSS JOIN (SELECT 0 i UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) tens
-                        ) n
-                        WHERE n.n <= 1 + (LENGTH(culture_elements) - LENGTH(REPLACE(culture_elements, ',', '')))
-                        GROUP BY element";
+        // Get posts by month for trend data
+        $posts_by_month_query = "SELECT 
+                                DATE_FORMAT(created_at, '%Y-%m') as month,
+                                COUNT(*) as count
+                            FROM posts
+                            GROUP BY month
+                            ORDER BY month ASC";
 
-        $culture_result = $conn->query($culture_query);
-        $culture_labels = [];
-        $culture_data = [];
+        $posts_by_month_result = $conn->query($posts_by_month_query);
+        $month_labels = [];
+        $month_data = [];
 
-        while ($row = $culture_result->fetch_assoc()) {
-            if (!empty($row['element'])) {
-                $culture_labels[] = $row['element'];
-                $culture_data[] = $row['count'];
-            }
+        while ($row = $posts_by_month_result->fetch_assoc()) {
+            $month_labels[] = $row['month'];
+            $month_data[] = $row['count'];
+        }
+
+        // Get most liked posts
+        $popular_posts_query = "SELECT p.title, COUNT(l.id) as like_count
+                            FROM posts p
+                            JOIN likes l ON p.id = l.post_id AND l.is_active = 1
+                            GROUP BY p.id
+                            ORDER BY like_count DESC
+                            LIMIT 10";
+
+        $popular_posts_result = $conn->query($popular_posts_query);
+        $post_titles = [];
+        $post_likes = [];
+
+        while ($row = $popular_posts_result->fetch_assoc()) {
+            $post_titles[] = $row['title'];
+            $post_likes[] = $row['like_count'];
         }
 
         // Get learning styles data
-        $styles_query = "SELECT 
-                            SUBSTRING_INDEX(SUBSTRING_INDEX(learning_styles, ',', n.n), ',', -1) as style,
-                            COUNT(*) as count
-                        FROM posts
-                        JOIN (
-                            SELECT 1 + units.i + tens.i * 10 n
-                            FROM (SELECT 0 i UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) units
-                            CROSS JOIN (SELECT 0 i UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9) tens
-                        ) n
-                        WHERE n.n <= 1 + (LENGTH(learning_styles) - LENGTH(REPLACE(learning_styles, ',', '')))
-                        GROUP BY style";
+        $learning_styles_query = "SELECT 
+                                learning_styles as style,
+                                COUNT(*) as count
+                            FROM posts
+                            GROUP BY style
+                            ORDER BY count DESC";
+                            
+        $learning_styles_result = $conn->query($learning_styles_query);
+        $style_labels = [];
+        $style_data = [];
+        $style_names = [];
+        $style_counts = [];
 
-        $styles_result = $conn->query($styles_query);
-        $styles_labels = [];
-        $styles_data = [];
-
-        while ($row = $styles_result->fetch_assoc()) {
-            if (!empty($row['style'])) {
-                $styles_labels[] = $row['style'];
-                $styles_data[] = $row['count'];
-            }
+        while ($row = $learning_styles_result->fetch_assoc()) {
+            $style_labels[] = $row['style'];
+            $style_data[] = $row['count'];
+            $style_names[] = $row['style'];
+            $style_counts[] = $row['count'];
         }
 
         // Get total posts
         $total_posts = $conn->query("SELECT COUNT(*) as total FROM posts")->fetch_assoc()['total'];
 
-        // Get most popular element
-        $popular_element = array_combine($culture_labels, $culture_data);
-        arsort($popular_element);
-        $top_element = key($popular_element);
+        // Get most liked post
+        $most_liked_post = $conn->query("SELECT p.title, COUNT(l.id) as like_count 
+                                        FROM posts p 
+                                        JOIN likes l ON p.id = l.post_id AND l.is_active = 1 
+                                        GROUP BY p.id 
+                                        ORDER BY like_count DESC 
+                                        LIMIT 1")->fetch_assoc();
 
-        // Get most used learning style
-        $popular_style = array_combine($styles_labels, $styles_data);
-        arsort($popular_style);
-        $top_style = key($popular_style);
-
-        $total_element_uses = array_sum($culture_data);
-        $element_percentages = array_map(function($count) use ($total_element_uses) {
-            return round(($count / $total_element_uses) * 100, 1);
-        }, $culture_data);
-
-        // Calculate percentages for styles
-        $total_style_uses = array_sum($styles_data);
-        $style_percentages = array_map(function($count) use ($total_style_uses) {
-            return round(($count / $total_style_uses) * 100, 1);
-        }, $styles_data);
+        // Get most active user
+        $most_active_user = $conn->query("SELECT u.username, COUNT(p.id) as post_count 
+                                        FROM users u 
+                                        JOIN posts p ON u.id = p.user_id 
+                                        GROUP BY u.id 
+                                        ORDER BY post_count DESC 
+                                        LIMIT 1")->fetch_assoc();
     ?>
 
     <div class="explore-container">
@@ -233,139 +287,289 @@ if (!isset($_SESSION['isAdmin']) || $_SESSION['isAdmin'] != 1) {
                 <div class="stat-label">Total Posts</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number"><?php echo $top_element; ?></div>
-                <div class="stat-label">Most Popular Element</div>
+                <div class="stat-number"><?php echo $most_liked_post ? htmlspecialchars($most_liked_post['title']) : 'N/A'; ?></div>
+                <div class="stat-label">Most Liked Post</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number"><?php echo $top_style; ?></div>
-                <div class="stat-label">Most Used Learning Style</div>
+                <div class="stat-number"><?php echo $most_active_user ? htmlspecialchars($most_active_user['username']) : 'N/A'; ?></div>
+                <div class="stat-label">Most Active User</div>
             </div>
         </div>
 
         <div class="rankings-container">
-        <!-- Culture Elements Rankings -->
-        <div class="ranking-box">
-            <h2 class="ranking-title">Culture Elements Rankings</h2>
-            <table class="ranking-table">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Element</th>
-                        <th>Usage</th>
-                        <th>Distribution</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php 
-                    // Sort elements by count while maintaining index association
-                    arsort($culture_data);
-                    $rank = 1;
-                    foreach($culture_data as $index => $count) {
-                        $element = $culture_labels[$index];
-                        $percentage = $element_percentages[$index];
-                        echo "<tr>
-                                <td class='rank'>#{$rank}</td>
-                                <td>{$element}</td>
-                                <td>{$count} posts</td>
-                                <td>
-                                    <div class='usage-bar'>
-                                        <div class='usage-fill' style='width: {$percentage}%'></div>
-                                    </div>
-                                    <span class='percentage'>{$percentage}%</span>
-                                </td>
-                              </tr>";
-                        $rank++;
-                    }
-                    ?>
-                </tbody>
-            </table>
-        </div>
+            <!-- Popular Posts Rankings -->
+            <div class="ranking-box">
+                <h2 class="ranking-title">Most Popular Posts</h2>
+                <table class="ranking-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Post Title</th>
+                            <th>Likes</th>
+                            <th>Distribution</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $total_likes = array_sum($post_likes);
+                        $rank = 1;
+                        foreach($post_likes as $index => $count) {
+                            if (isset($post_titles[$index])) {
+                                $title = htmlspecialchars($post_titles[$index]);
+                                $percentage = $total_likes > 0 ? round(($count / $total_likes) * 100, 1) : 0;
+                                echo "<tr>
+                                        <td class='rank'>#{$rank}</td>
+                                        <td>{$title}</td>
+                                        <td>{$count} likes</td>
+                                        <td>
+                                            <div class='usage-bar'>
+                                                <div class='usage-fill' style='width: {$percentage}%'></div>
+                                            </div>
+                                            <span class='percentage'>{$percentage}%</span>
+                                        </td>
+                                      </tr>";
+                                $rank++;
+                            }
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
 
-        <!-- Learning Styles Rankings -->
-        <div class="ranking-box">
-            <h2 class="ranking-title">Learning Styles Rankings</h2>
-            <table class="ranking-table">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Style</th>
-                        <th>Usage</th>
-                        <th>Distribution</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php 
-                    // Sort styles by count while maintaining index association
-                    arsort($styles_data);
-                    $rank = 1;
-                    foreach($styles_data as $index => $count) {
-                        $style = $styles_labels[$index];
-                        $percentage = $style_percentages[$index];
-                        echo "<tr>
-                                <td class='rank'>#{$rank}</td>
-                                <td>{$style}</td>
-                                <td>{$count} posts</td>
-                                <td>
-                                    <div class='usage-bar'>
-                                        <div class='usage-fill' style='width: {$percentage}%'></div>
-                                    </div>
-                                    <span class='percentage'>{$percentage}%</span>
-                                </td>
-                              </tr>";
-                        $rank++;
-                    }
-                    ?>
-                </tbody>
-            </table>
+            <!-- User Activity Rankings -->
+            <div class="ranking-box">
+                <h2 class="ranking-title">Most Active Users</h2>
+                <table class="ranking-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Username</th>
+                            <th>Posts</th>
+                            <th>Activity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $active_users_query = "SELECT u.username, COUNT(p.id) as post_count 
+                                            FROM users u 
+                                            JOIN posts p ON u.id = p.user_id 
+                                            GROUP BY u.id 
+                                            ORDER BY post_count DESC 
+                                            LIMIT 10";
+                        $active_users_result = $conn->query($active_users_query);
+                        $total_user_posts = 0;
+                        $usernames = [];
+                        $post_counts = [];
+                        
+                        while ($row = $active_users_result->fetch_assoc()) {
+                            $usernames[] = $row['username'];
+                            $post_counts[] = $row['post_count'];
+                            $total_user_posts += $row['post_count'];
+                        }
+                        
+                        $rank = 1;
+                        foreach($post_counts as $index => $count) {
+                            if (isset($usernames[$index])) {
+                                $username = htmlspecialchars($usernames[$index]);
+                                $percentage = $total_user_posts > 0 ? round(($count / $total_user_posts) * 100, 1) : 0;
+                                echo "<tr>
+                                        <td class='rank'>#{$rank}</td>
+                                        <td>{$username}</td>
+                                        <td>{$count} posts</td>
+                                        <td>
+                                            <div class='usage-bar'>
+                                                <div class='usage-fill' style='width: {$percentage}%'></div>
+                                            </div>
+                                            <span class='percentage'>{$percentage}%</span>
+                                        </td>
+                                      </tr>";
+                                $rank++;
+                            }
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Learning Styles Rankings -->
+            <div class="ranking-box">
+                <h2 class="ranking-title">Learning Styles Distribution</h2>
+                <table class="ranking-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Learning Style</th>
+                            <th>Posts</th>
+                            <th>Distribution</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $total_style_posts = array_sum($style_counts);
+                        $rank = 1;
+                        foreach($style_counts as $index => $count) {
+                            if (isset($style_names[$index])) {
+                                $style = htmlspecialchars($style_names[$index]);
+                                $percentage = $total_style_posts > 0 ? round(($count / $total_style_posts) * 100, 1) : 0;
+                                echo "<tr>
+                                        <td class='rank'>#{$rank}</td>
+                                        <td>{$style}</td>
+                                        <td>{$count} posts</td>
+                                        <td>
+                                            <div class='usage-bar'>
+                                                <div class='usage-fill' style='width: {$percentage}%'></div>
+                                            </div>
+                                            <span class='percentage'>{$percentage}%</span>
+                                        </td>
+                                      </tr>";
+                                $rank++;
+                            }
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-    
-        <div class="chart-container">
-            <canvas id="cultureChart"></canvas>
+        
+        <div class="charts-wrapper">
+            <div class="chart-container">
+                <canvas id="postsTimelineChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="popularPostsChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="learningStylesChart"></canvas>
+            </div>
         </div>
-        <div class="chart-container">
-            <canvas id="stylesChart"></canvas>
-        </div>
-
     </div>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
-        // Culture Elements Chart
-        new Chart(document.getElementById('cultureChart'), {
-            type: 'bar',
+        // Posts Timeline Chart
+        new Chart(document.getElementById('postsTimelineChart'), {
+            type: 'line',
             data: {
-                labels: <?php echo json_encode($culture_labels); ?>,
+                labels: <?php echo json_encode($month_labels); ?>,
                 datasets: [{
-                    label: 'Posts by Culture Elements',
-                    data: <?php echo json_encode($culture_data); ?>,
-                    backgroundColor: '#365486',
+                    label: 'Posts by Month',
+                    data: <?php echo json_encode($month_data); ?>,
+                    backgroundColor: 'rgba(54, 84, 134, 0.2)',
+                    borderColor: '#365486',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Posts Timeline',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        }
+                    },
+                    legend: {
+                        position: 'top'
+                    }
+                },
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
                     }
                 }
             }
         });
 
-        // Learning Styles Chart
-        new Chart(document.getElementById('stylesChart'), {
-            type: 'pie',
+        // Popular Posts Chart
+        new Chart(document.getElementById('popularPostsChart'), {
+            type: 'bar',
             data: {
-                labels: <?php echo json_encode($styles_labels); ?>,
+                labels: <?php echo json_encode($post_titles); ?>,
                 datasets: [{
-                    data: <?php echo json_encode($styles_data); ?>,
-                    backgroundColor: ['#365486', '#7FC7D9', '#DCF2F1', '#0F1035']
+                    label: 'Likes per Post',
+                    data: <?php echo json_encode($post_likes); ?>,
+                    backgroundColor: '#365486',
+                    borderRadius: 5
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
                 plugins: {
+                    title: {
+                        display: true,
+                        text: 'Most Popular Posts',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        }
+                    },
                     legend: {
-                        position: 'bottom'
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Learning Styles Chart
+        new Chart(document.getElementById('learningStylesChart'), {
+            type: 'pie',
+            data: {
+                labels: <?php echo json_encode($style_labels); ?>,
+                datasets: [{
+                    label: 'Learning Styles',
+                    data: <?php echo json_encode($style_data); ?>,
+                    backgroundColor: [
+                        '#365486',
+                        '#7FC7D9',
+                        '#DCF2F1',
+                        '#0F1035',
+                        '#5D8AA8',
+                        '#9BC4E2'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Learning Styles Distribution',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        }
+                    },
+                    legend: {
+                        position: 'right'
                     }
                 }
             }
