@@ -1688,7 +1688,7 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
                     <ul id="learning-styles-filter">
                         <li><input type="checkbox" id="visual-filter" value="visual">Visual</li>
                         <li><input type="checkbox" id="auditory-filter" value="auditory">Auditory & Oral</li>
-                        <li><input type="checkbox" id="read-write-filter" value="read_write">Read & Write</li>
+                        <li><input type="checkbox" id="read-write-filter" value="Read & Write">Read & Write</li>
                         <li><input type="checkbox" id="kinesthetic-filter" value="kinesthetic">Kinesthetic</li>
                     </ul>
                 </div>
