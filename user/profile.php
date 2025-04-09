@@ -13,8 +13,15 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Fetch user information from the database
-$query = "SELECT full_name, profile_picture, username, about, location, birthday, website, skills, isPremium, profile_background FROM users WHERE id = '$user_id'";
-$result = $conn->query($query);
+$query = "SELECT u.*, 
+          (SELECT COUNT(*) FROM user_follows WHERE following_id = u.id) as followers_count,
+          (SELECT COUNT(*) FROM user_follows WHERE follower_id = u.id) as following_count
+          FROM users u 
+          WHERE u.id = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     $user = $result->fetch_assoc();
@@ -28,6 +35,8 @@ if ($result->num_rows > 0) {
     $profile_picture = $user['profile_picture'] ? htmlspecialchars($user['profile_picture']) : 'assets/hero/v07_20@Shanks.png';
     $is_premium = $user['isPremium'];
     $profile_background = $user['profile_background'] ? htmlspecialchars($user['profile_background']) : '';
+    $follower_count = $user['followers_count'];
+    $following_count = $user['following_count'];
 } else {
     echo "<script>
             alert('User not found.');
@@ -107,11 +116,31 @@ $premium_class = $is_premium ? 'premium-user' : '';
                 <h2><?php echo $full_name; ?></h2>
                 <p class="username">@<?php echo $username; ?></p>
                 <div class="user-stats">
-                    <!-- Stats content -->
+                    <?php
+                    // Check if current user is following this profile
+                    $is_following = false;
+                    if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != $user_id) {
+                        $check_follow = "SELECT * FROM user_follows WHERE follower_id = ? AND following_id = ?";
+                        $stmt = $conn->prepare($check_follow);
+                        $stmt->bind_param("ii", $_SESSION['user_id'], $user_id);
+                        $stmt->execute();
+                        $is_following = $stmt->get_result()->num_rows > 0;
+                    }
+                    ?>
+                    <span><strong class="follower-count"><?php echo $follower_count; ?></strong> Followers</span>
+                    <span><strong class="following-count"><?php echo $following_count; ?></strong> Following</span>
                 </div>
+                <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] != $user_id): ?>
+                    <button class="follow-btn <?php echo $is_following ? 'following' : ''; ?>" 
+                            data-user-id="<?php echo $user_id; ?>">
+                        <?php echo $is_following ? 'Following' : 'Follow'; ?>
+                    </button>
+                <?php endif; ?>
+                <?php if (isset($_SESSION['user_id']) && $_SESSION['user_id'] == $user_id): ?>
                 <a href="edit-profile.php" class="edit-profile-link">
                     <button class="edit-profile-btn">Edit Profile</button>
                 </a>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -299,6 +328,65 @@ $premium_class = $is_premium ? 'premium-user' : '';
 
         // Initial load
         loadPosts();
+
+        // Follow button click handler
+        $('.follow-btn').on('click', function() {
+            const userId = $(this).data('user-id');
+            const isFollowing = $(this).hasClass('following');
+            const action = isFollowing ? 'unfollow' : 'follow';
+            const $button = $(this);
+            const $followerCount = $('.follower-count');
+            const $followingCount = $('.following-count');
+
+            $.ajax({
+                url: 'follow_management.php',
+                type: 'POST',
+                data: {
+                    user_id: userId,
+                    action: action
+                },
+                success: function(response) {
+                    try {
+                        const data = typeof response === 'object' ? response : JSON.parse(response);
+                        if (data.status === 'success') {
+                            if (action === 'follow') {
+                                $button.addClass('following').text('Following');
+                                $followerCount.text(parseInt($followerCount.text()) + 1);
+                                // Update the following count for the current user if this is their profile
+                                if (userId === currentUserId) {
+                                    $followingCount.text(parseInt($followingCount.text()) + 1);
+                                }
+                            } else {
+                                $button.removeClass('following').text('Follow');
+                                $followerCount.text(Math.max(0, parseInt($followerCount.text()) - 1));
+                                // Update the following count for the current user if this is their profile
+                                if (userId === currentUserId) {
+                                    $followingCount.text(Math.max(0, parseInt($followingCount.text()) - 1));
+                                }
+                            }
+                        } else {
+                            alert(data.message || 'An error occurred');
+                        }
+                    } catch (e) {
+                        console.error('Error processing response:', e);
+                        alert('An error occurred');
+                    }
+                },
+                error: function() {
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        });
+
+        // Hover effect for following button
+        $('.follow-btn.following').hover(
+            function() {
+                $(this).text('Unfollow');
+            },
+            function() {
+                $(this).text('Following');
+            }
+        );
     });
     </script>
   <script>
@@ -1034,6 +1122,51 @@ $premium_class = $is_premium ? 'premium-user' : '';
 
 .document-link:hover {
     text-decoration: underline;
+}
+
+/* Add these styles for the follow button */
+.follow-btn {
+    background-color: #1877f2;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin: 10px 0;
+    transition: all 0.2s ease;
+}
+
+.follow-btn:hover {
+    background-color: #166fe5;
+}
+
+.follow-btn.following {
+    background-color: #e4e6eb;
+    color: #1a1a1a;
+}
+
+.follow-btn.following:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+.user-stats {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin: 15px 0;
+}
+
+.user-stats span {
+    color: #65676b;
+    font-size: 14px;
+}
+
+.user-stats strong {
+    color: #1a1a1a;
+    font-weight: 600;
 }
   </style>
 

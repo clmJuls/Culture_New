@@ -2,82 +2,92 @@
 require_once 'db_conn.php';
 session_start();
 
-// Ensure no HTML errors are output
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 
-// Set JSON header
 header('Content-Type: application/json');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         if ($_POST['action'] === 'fetch_posts') {
             $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
-            $per_page = isset($_POST['per_page']) ? (int)$_POST['per_page'] : 6;
+            $per_page = isset($_POST['per_page']) ? (int)$_POST['per_page'] : 10;
+            $offset = ($page - 1) * $per_page;
+            $filter = isset($_POST['filter']) ? $_POST['filter'] : '';
             $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
             
-            // Debug the received learning styles
-            error_log("Received learning styles: " . print_r($_POST['learning_styles'], true));
-            
-            // Get learning styles filter
             $learning_styles = isset($_POST['learning_styles']) && is_array($_POST['learning_styles']) 
                 ? array_map('strval', $_POST['learning_styles']) 
                 : [];
             
-            // Base query without LIMIT clause
-            $query = "SELECT DISTINCT p.*, u.username, u.profile_picture, u.isPremium as is_premium,
-                     COUNT(DISTINCT l.id) as like_count,
-                     IF(? > 0, EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_id = ?), 0) as user_liked
-                     FROM posts p
-                     LEFT JOIN users u ON p.user_id = u.id
-                     LEFT JOIN likes l ON p.id = l.post_id
-                     WHERE p.status = 'approved'";
-            
-            // Add WHERE clause if learning styles are selected
-            if (!empty($learning_styles)) {
-                $query .= " AND (";
-                $conditions = array();
-                foreach ($learning_styles as $style) {
-                    $conditions[] = "p.learning_styles LIKE ?";
-                }
-                $query .= implode(" OR ", $conditions) . ")";
-            }
-            
-            $query .= " GROUP BY p.id, u.username, u.profile_picture
-                       ORDER BY p.created_at DESC";
-            
-            // Add LIMIT clause only if per_page is not 0
-            if ($per_page > 0) {
-                $offset = ($page - 1) * $per_page;
-                $query .= " LIMIT ? OFFSET ?";
+            if ($filter === 'following' && isset($_SESSION['user_id'])) {
+                $query = "SELECT p.*, u.username, u.full_name, u.profile_picture, u.isPremium,
+                         COUNT(DISTINCT l.id) as like_count,
+                         COUNT(DISTINCT c.id) as comment_count,
+                         IF(? > 0, EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_id = ?), 0) as user_liked,
+                         DATE_FORMAT(p.created_at, '%M %d, %Y') as formatted_date
+                         FROM posts p
+                         INNER JOIN users u ON p.user_id = u.id
+                         INNER JOIN user_follows f ON p.user_id = f.following_id
+                         LEFT JOIN likes l ON p.id = l.post_id
+                         LEFT JOIN comments c ON p.id = c.post_id
+                         WHERE f.follower_id = ? AND p.status = 'approved'
+                         GROUP BY p.id, u.username, u.profile_picture
+                         ORDER BY p.created_at DESC
+                         LIMIT ? OFFSET ?";
                 
-                if (!empty($learning_styles)) {
-                    // Prepare parameter types for currentUserId (2) + learning styles + per_page + offset
-                    $types = "ii" . str_repeat('s', count($learning_styles)) . "ii";
-                    $params = array_merge(
-                        [$currentUserId, $currentUserId],
-                        array_map(function($style) { return "%$style%"; }, $learning_styles),
-                        [$per_page, $offset]
-                    );
-                    $stmt = $conn->prepare($query);
-                    $stmt->bind_param($types, ...$params);
-                } else {
-                    $stmt = $conn->prepare($query);
-                    $stmt->bind_param("iiii", $currentUserId, $currentUserId, $per_page, $offset);
-                }
+                $stmt = $conn->prepare($query);
+                $stmt->bind_param("iiiii", $_SESSION['user_id'], $_SESSION['user_id'], $_SESSION['user_id'], $per_page, $offset);
             } else {
-                // No pagination - fetch all posts
+                $query = "SELECT DISTINCT p.*, u.username, u.profile_picture, u.isPremium as is_premium,
+                         COUNT(DISTINCT l.id) as like_count,
+                         IF(? > 0, EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_id = ?), 0) as user_liked
+                         FROM posts p
+                         LEFT JOIN users u ON p.user_id = u.id
+                         LEFT JOIN likes l ON p.id = l.post_id
+                         WHERE p.status = 'approved'";
                 if (!empty($learning_styles)) {
-                    $types = "ii" . str_repeat('s', count($learning_styles));
-                    $params = array_merge(
-                        [$currentUserId, $currentUserId],
-                        array_map(function($style) { return "%$style%"; }, $learning_styles)
-                    );
-                    $stmt = $conn->prepare($query);
-                    $stmt->bind_param($types, ...$params);
+                    $query .= " AND (";
+                    $conditions = array();
+                    foreach ($learning_styles as $style) {
+                        $conditions[] = "p.learning_styles LIKE ?";
+                    }
+                    $query .= implode(" OR ", $conditions) . ")";
+                }
+                
+                $query .= " GROUP BY p.id, u.username, u.profile_picture
+                           ORDER BY p.created_at DESC";
+                
+                if ($per_page > 0) {
+                    $offset = ($page - 1) * $per_page;
+                    $query .= " LIMIT ? OFFSET ?";
+                    
+                    if (!empty($learning_styles)) {
+                        $types = "ii" . str_repeat('s', count($learning_styles)) . "ii";
+                        $params = array_merge(
+                            [$currentUserId, $currentUserId],
+                            array_map(function($style) { return "%$style%"; }, $learning_styles),
+                            [$per_page, $offset]
+                        );
+                        $stmt = $conn->prepare($query);
+                        $stmt->bind_param($types, ...$params);
+                    } else {
+                        $stmt = $conn->prepare($query);
+                        $stmt->bind_param("iiii", $currentUserId, $currentUserId, $per_page, $offset);
+                    }
                 } else {
-                    $stmt = $conn->prepare($query);
-                    $stmt->bind_param("ii", $currentUserId, $currentUserId);
+                    if (!empty($learning_styles)) {
+                        $types = "ii" . str_repeat('s', count($learning_styles));
+                        $params = array_merge(
+                            [$currentUserId, $currentUserId],
+                            array_map(function($style) { return "%$style%"; }, $learning_styles)
+                        );
+                        $stmt = $conn->prepare($query);
+                        $stmt->bind_param($types, ...$params);
+                    } else {
+                        $stmt = $conn->prepare($query);
+                        $stmt->bind_param("ii", $currentUserId, $currentUserId);
+                    }
                 }
             }
             
@@ -93,7 +103,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $posts = [];
             
             while ($row = $result->fetch_assoc()) {
-                // Fetch comments for each post
+                $comment_query = "SELECT c.*, u.username, u.profile_picture 
+                                 FROM comments c 
+                                 LEFT JOIN users u ON c.user_id = u.id 
+                                 WHERE c.post_id = ? 
+                                 ORDER BY c.created_at DESC";
+                $comment_stmt = $conn->prepare($comment_query);
+                $comment_stmt->bind_param("i", $row['id']);
+                $comment_stmt->execute();
+                $comments_result = $comment_stmt->get_result();
+                
+                $row['comments'] = [];
+                while ($comment = $comments_result->fetch_assoc()) {
+                    $row['comments'][] = $comment;
+                }
+                
+                $posts[] = $row;
+            }
+            
+            echo json_encode([
+                'status' => 'success',
+                'posts' => $posts,
+                'current_user_id' => $_SESSION['user_id'] ?? null
+            ]);
+            
+        } elseif ($_POST['action'] === 'fetch_user_posts') {
+            if (!isset($_POST['user_id'])) {
+                throw new Exception("User ID is required");
+            }
+            
+            $user_id = (int)$_POST['user_id'];
+            $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
+            
+            $query = "SELECT p.*, u.username, u.full_name, u.profile_picture, u.isPremium as is_premium,
+                     COUNT(DISTINCT l.id) as like_count,
+                     COUNT(DISTINCT c.id) as comment_count,
+                     IF(? > 0, EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_id = ?), 0) as user_liked,
+                     DATE_FORMAT(p.created_at, '%M %d, %Y') as formatted_date
+                     FROM posts p
+                     LEFT JOIN users u ON p.user_id = u.id
+                     LEFT JOIN likes l ON p.id = l.post_id
+                     LEFT JOIN comments c ON p.id = c.post_id
+                     WHERE p.user_id = ? AND p.status = 'approved'
+                     GROUP BY p.id, u.username, u.profile_picture
+                     ORDER BY p.created_at DESC";
+            
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("iii", $currentUserId, $currentUserId, $user_id);
+            
+            if (!$stmt->execute()) {
+                throw new Exception("Error fetching user posts: " . $stmt->error);
+            }
+            
+            $result = $stmt->get_result();
+            $posts = [];
+            
+            while ($row = $result->fetch_assoc()) {
                 $comment_query = "SELECT c.*, u.username, u.profile_picture 
                                  FROM comments c 
                                  LEFT JOIN users u ON c.user_id = u.id 
@@ -124,8 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $post_id = (int)$_POST['post_id'];
             $user_id = $_SESSION['user_id'];
-            
-            // Check if like exists
+
             $check_query = "SELECT id FROM likes WHERE post_id = ? AND user_id = ?";
             $check_stmt = $conn->prepare($check_query);
             $check_stmt->bind_param("ii", $post_id, $user_id);
@@ -133,13 +197,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $check_result = $check_stmt->get_result();
             
             if ($check_result->num_rows > 0) {
-                // Unlike
                 $delete_query = "DELETE FROM likes WHERE post_id = ? AND user_id = ?";
                 $stmt = $conn->prepare($delete_query);
                 $stmt->bind_param("ii", $post_id, $user_id);
                 $stmt->execute();
             } else {
-                // Like
                 $insert_query = "INSERT INTO likes (post_id, user_id) VALUES (?, ?)";
                 $stmt = $conn->prepare($insert_query);
                 $stmt->bind_param("ii", $post_id, $user_id);
@@ -155,7 +217,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $post_id = (int)$_POST['post_id'];
             $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
             
-            // Get like count and user's like status
             $query = "SELECT 
                 COUNT(DISTINCT l.id) as like_count,
                 IF(? > 0, EXISTS(SELECT 1 FROM likes WHERE post_id = ? AND user_id = ?), 0) as user_liked
@@ -187,7 +248,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user_id = $_SESSION['user_id'];
             $isAdmin = isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1;
             
-            // Check if user owns the post or is admin
             $check_query = "SELECT user_id FROM posts WHERE id = ?";
             $check_stmt = $conn->prepare($check_query);
             $check_stmt->bind_param("i", $post_id);
@@ -203,7 +263,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
-            // Check if user is authorized to delete the post
             if ($post['user_id'] != $user_id && !$isAdmin) {
                 echo json_encode([
                     'status' => 'error',
@@ -212,29 +271,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
-            // Begin transaction
             $conn->begin_transaction();
 
             try {
-                // Delete likes first (due to foreign key constraints)
                 $delete_likes = "DELETE FROM likes WHERE post_id = ?";
                 $stmt = $conn->prepare($delete_likes);
                 $stmt->bind_param("i", $post_id);
                 $stmt->execute();
 
-                // Delete comments if you have a comments table
                 $delete_comments = "DELETE FROM comments WHERE post_id = ?";
                 $stmt = $conn->prepare($delete_comments);
                 $stmt->bind_param("i", $post_id);
                 $stmt->execute();
 
-                // Finally delete the post
                 $delete_post = "DELETE FROM posts WHERE id = ?";
                 $stmt = $conn->prepare($delete_post);
                 $stmt->bind_param("i", $post_id);
                 $stmt->execute();
 
-                // Commit transaction
                 $conn->commit();
 
                 echo json_encode([
@@ -258,7 +312,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Comment text cannot be empty");
             }
             
-            // Insert the new comment
             $query = "INSERT INTO comments (post_id, user_id, comment_text) VALUES (?, ?, ?)";
             $stmt = $conn->prepare($query);
             $stmt->bind_param("iis", $post_id, $user_id, $comment_text);
@@ -267,7 +320,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Error adding comment: " . $stmt->error);
             }
             
-            // Fetch the newly added comment with user data
             $new_comment_id = $stmt->insert_id;
             $fetch_query = "SELECT 
                 c.id as comment_id,
@@ -302,7 +354,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($_POST['action'] === 'get_comments') {
             $post_id = (int)$_POST['post_id'];
             
-            // Updated query to include all necessary user and comment data
             $query = "SELECT 
                 c.id as comment_id,
                 c.post_id,
@@ -328,7 +379,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $comments = [];
             
             while ($row = $result->fetch_assoc()) {
-                // Format the data for each comment
                 $comments[] = [
                     'id' => $row['comment_id'],
                     'post_id' => $row['post_id'],
@@ -357,7 +407,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user_id = $_SESSION['user_id'];
             $isAdmin = isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1;
 
-            // First, get the comment details to check ownership
             $query = "SELECT user_id FROM comments WHERE id = ?";
             $stmt = $conn->prepare($query);
             $stmt->bind_param("i", $comment_id);
@@ -373,7 +422,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
-            // Check if user is authorized to delete the comment
             if ($comment['user_id'] != $user_id && !$isAdmin) {
                 echo json_encode([
                     'status' => 'error',
@@ -382,7 +430,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
-            // Delete the comment
             $delete_query = "DELETE FROM comments WHERE id = ?";
             $stmt = $conn->prepare($delete_query);
             $stmt->bind_param("i", $comment_id);
@@ -396,12 +443,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Error deleting comment: " . $stmt->error);
             }
         } elseif ($_POST['action'] === 'update_status') {
-            // Verify admin privileges
             if (!isset($_SESSION['user_id']) || !isset($_SESSION['isAdmin']) || !$_SESSION['isAdmin']) {
                 throw new Exception("Unauthorized access");
             }
             
-            // Validate inputs
             if (!isset($_POST['post_id']) || !isset($_POST['status'])) {
                 throw new Exception("Missing required parameters");
             }
@@ -409,12 +454,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $post_id = (int)$_POST['post_id'];
             $status = $_POST['status'];
             
-            // Validate status value
             if (!in_array($status, ['pending', 'approved', 'rejected'])) {
                 throw new Exception("Invalid status value");
             }
             
-            // Update the post status
             $query = "UPDATE posts SET status = ? WHERE id = ?";
             $stmt = $conn->prepare($query);
             $stmt->bind_param("si", $status, $post_id);

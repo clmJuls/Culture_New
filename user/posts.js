@@ -1,4 +1,20 @@
 $(document).ready(function() {
+    // Add CSS for username link
+    $('<style>')
+        .text(`
+            .username-link {
+                color: #1877f2;
+                text-decoration: none;
+                font-weight: 600;
+                transition: color 0.2s ease;
+            }
+            .username-link:hover {
+                color: #166fe5;
+                text-decoration: underline;
+            }
+        `)
+        .appendTo('head');
+
     let currentUserId = null;
     let allPosts = []; // Store all posts for filtering
     let activeFilters = {
@@ -9,6 +25,7 @@ $(document).ready(function() {
     const postsPerPage = 6;
     let isLoading = false;
     let hasMorePosts = true;
+    let activeFilter = '';
 
     function initializeFilters() {
         // Culture Elements filters
@@ -61,12 +78,15 @@ $(document).ready(function() {
         displayPosts(filteredPosts);
     }
 
-    // Modified fetchPosts function to handle non-logged-in users
+    // Modified fetchPosts function to handle filters
     function fetchPosts() {
         $.ajax({
             url: 'posts_management.php',
             type: 'POST',
-            data: { action: 'fetch_posts' },
+            data: { 
+                action: 'fetch_posts',
+                filter: activeFilter
+            },
             dataType: 'json',
             success: function(response) {
                 currentUserId = response.current_user_id;
@@ -110,9 +130,9 @@ $(document).ready(function() {
 
             postElement.innerHTML = `
                 <div class="post-header">
-                    <div style="display: flex; align-items: center;">
-                        <img src="${post.profile_picture || 'assets/default-profile.png'}" class="profile-pic" alt="Profile Picture">
-                        <span>${post.username}</span>
+                    <div class="post-user-info">
+                        <img src="${post.profile_pic || 'assets/images/default-avatar.png'}" alt="Profile Picture" class="post-profile-pic">
+                        <a href="user_profile.php?id=${post.user_id}" class="username-link">${post.username}</a>
                     </div>
                     ${post.user_id === currentUserId || isAdmin ? 
                         `<button class="delete-post">
@@ -133,9 +153,10 @@ $(document).ready(function() {
 
             // Add click event listeners
             postElement.addEventListener('click', function(e) {
-                // Don't open modal if clicking on interaction buttons
+                // Don't open modal if clicking on interaction buttons or username link
                 if (e.target.closest('.delete-post') || 
-                    e.target.closest('.like-btn')) {
+                    e.target.closest('.like-btn') ||
+                    e.target.closest('.username-link')) {
                     return;
                 }
                 postModal.showExpandedPost(post);
@@ -316,8 +337,10 @@ $(document).ready(function() {
         const postHtml = `
             <div class="post" data-post-id="${post.id}">
                 <div class="post-header">
-                    <img src="${post.profile_picture}" alt="${post.username}" class="profile-pic">
-                    <span>${post.username}</span>
+                    <div class="post-user-info">
+                        <img src="${post.profile_pic || 'assets/images/default-avatar.png'}" alt="Profile Picture" class="post-profile-pic">
+                        <a href="user_profile.php?id=${post.user_id}" class="username-link">${post.username}</a>
+                    </div>
                     ${post.user_id == currentUserId ? `
                         <button class="delete-post">
                             <img class="delete-post-icon" src="assets/icons/delete-svgrepo-com.svg" alt="Delete post" style="width: 20px; height: 20px;">
@@ -458,6 +481,24 @@ $(document).ready(function() {
         currentPage++;
         loadPosts();
     }
+
+    // Add filter click handler
+    $(document).on('click', '.filter-link', function(e) {
+        e.preventDefault();
+        const filter = $(this).data('filter');
+        
+        // Update active state
+        $('.filter-link').removeClass('active');
+        $(this).addClass('active');
+        
+        // Set active filter
+        activeFilter = filter;
+        
+        // Reset and reload posts
+        currentPage = 1;
+        hasMorePosts = true;
+        fetchPosts();
+    });
 
     // Initialize
     postModal.init();

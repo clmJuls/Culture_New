@@ -18,6 +18,7 @@ let hasMorePosts = true;
 let currentPostToDelete = null;
 let isSnapScrolling = false; // Add this new variable for snap scrolling
 let selectedLearningStyles = new Set();
+let showFollowingOnly = false; // Add this new variable
 
 // Modified loadPosts function to handle empty results naturally
 function loadPosts(append = false) {
@@ -29,12 +30,13 @@ function loadPosts(append = false) {
   $.ajax({
       url: 'posts_management.php',
       type: 'POST',
-      data: { 
+      data: {
           action: 'fetch_posts',
           page: currentPage,
           per_page: postsPerPage,
+          filter: showFollowingOnly ? 'following' : '',
           learning_styles: Array.from(selectedLearningStyles),
-          include_premium_status: true  // Add this to request premium status
+          include_premium_status: true
       },
       success: function(response) {
           try {
@@ -49,7 +51,7 @@ function loadPosts(append = false) {
                   if (!append) {
                       const postDisplay = document.getElementById('post-display');
                       if (postDisplay) {
-                          postDisplay.innerHTML = ''; // Simply clear the display if no posts found
+                          postDisplay.innerHTML = '<div class="no-posts-message">No posts found</div>'; // Add a message when no posts are found
                       }
                   }
               }
@@ -177,7 +179,7 @@ function displayPosts(posts, append = false) {
           <div class="post-header">
               <div style="display: flex; align-items: center;">
                   <img src="${post.profile_picture || 'assets/default-profile.png'}" class="profile-pic" alt="Profile Picture">
-                  <span>${post.username}</span>
+                  <a href="user_profile.php?id=${post.user_id}" class="username-link" style="text-decoration: none; color: #1877f2; font-weight: 600;">${post.username}</a>
                   ${premiumBadgeHtml}
               </div>
               ${deleteButtonHtml}
@@ -202,6 +204,10 @@ function displayPosts(posts, append = false) {
       const postContent = postElement.querySelector('.post-content');
       if (postContent) {
           postContent.addEventListener('click', function(e) {
+              // Don't trigger modal if clicking username link
+              if (e.target.closest('.username-link')) {
+                  return;
+              }
               e.stopPropagation();
               postModal.showExpandedPost({
                   ...post,
@@ -212,7 +218,7 @@ function displayPosts(posts, append = false) {
       }
 
       // Make sure interaction buttons don't trigger modal
-      const interactionButtons = postElement.querySelectorAll('.like-btn, .delete-post');
+      const interactionButtons = postElement.querySelectorAll('.like-btn, .delete-post, .username-link');
       interactionButtons.forEach(button => {
           button.addEventListener('click', (e) => {
               e.stopPropagation();
@@ -593,9 +599,24 @@ function initializeLearningStyleFilters() {
     });
 }
 
+// Add following filter handler
+function initializeFollowingFilter() {
+    const followingCheckbox = document.querySelector('#following-checkbox');
+    if (!followingCheckbox) return;
+
+    followingCheckbox.addEventListener('change', function() {
+        showFollowingOnly = this.checked;
+        // Reset pagination and reload posts with new filter
+        currentPage = 1;
+        hasMorePosts = true;
+        loadPosts(false); // false to clear existing posts
+    });
+}
+
 // Add event listeners
 $(document).ready(function() {
     initializeLearningStyleFilters();
+    initializeFollowingFilter(); // Add this new initialization
     loadPosts();
     
     // Initialize snap scroll

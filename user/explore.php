@@ -1695,9 +1695,11 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
             </div>
 
             <div class="menu-section">
-                <h3>Location</h3>
+                <h3>Following</h3>
                 <div class="menu-item">
-                    <a href="choose-loc.php"><span>+</span> Choose a location</a>
+                    <ul id="following-filter">
+                        <li><input type="checkbox" id="following-checkbox" value="following">Show Following Posts</li>
+                    </ul>
                 </div>
             </div>
 
