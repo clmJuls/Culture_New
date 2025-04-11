@@ -170,7 +170,6 @@ $premium_class = $is_premium ? 'premium-user' : '';
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script>
     $(document).ready(function() {
-        // Load user's posts
         function loadUserPosts() {
             $.ajax({
                 url: 'posts_management.php',
@@ -181,7 +180,7 @@ $premium_class = $is_premium ? 'premium-user' : '';
                 },
                 dataType: 'json',
                 success: function(response) {
-                    console.log('Response:', response); // Debug log
+                    console.log('Response:', response);
                     
                     if (response.error) {
                         console.error('Server error:', response.error);
@@ -236,19 +235,15 @@ $premium_class = $is_premium ? 'premium-user' : '';
             });
         }
 
-        // Helper function to determine file type and return appropriate HTML
         function getFilePreviewHtml(post) {
             if (!post.file_path) return '';
 
-            // Try to determine file type from file extension if mime type is not available
             const fileExtension = post.file_path.split('.').pop().toLowerCase();
             
-            // Image extensions
             if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
                 return `<img src="${post.file_path}" alt="Post Image" class="post-media">`;
             }
-            
-            // Video extensions
+          
             if (['mp4', 'webm', 'mov'].includes(fileExtension)) {
                 return `<video controls class="post-media">
                     <source src="${post.file_path}" type="video/${fileExtension}">
@@ -256,7 +251,6 @@ $premium_class = $is_premium ? 'premium-user' : '';
                 </video>`;
             }
             
-            // Document extensions
             const documentExtensions = {
                 'pdf': 'fas fa-file-pdf',
                 'doc': 'fas fa-file-word',
@@ -273,14 +267,12 @@ $premium_class = $is_premium ? 'premium-user' : '';
                 </div>`;
             }
 
-            // Default case: just show a link to the file
             return `<div class="document-preview">
                 <i class="fas fa-file"></i>
                 <a href="${post.file_path}" target="_blank" class="document-link">View File</a>
             </div>`;
         }
 
-        // Add some CSS for error messages
         $('<style>')
             .text(`
                 .error-message {
@@ -294,10 +286,8 @@ $premium_class = $is_premium ? 'premium-user' : '';
             `)
             .appendTo('head');
 
-        // Initial load
         loadUserPosts();
 
-        // Tab navigation
         $('#posts-tab').click(function() {
             $('#posts-tab').addClass('active-tab');
             $('#about-tab').removeClass('active-tab');
