@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 09, 2025 at 05:05 PM
+-- Generation Time: Jun 02, 2025 at 02:46 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -138,6 +138,7 @@ CREATE TABLE `posts` (
   `culture_elements` varchar(255) DEFAULT NULL,
   `learning_styles` varchar(255) DEFAULT NULL,
   `status` enum('pending','approved','rejected') DEFAULT 'pending',
+  `message` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -174,10 +175,7 @@ INSERT INTO `users` (`id`, `email`, `username`, `password`, `full_name`, `about`
 (1, 'superadmin@gmail.com', 'admin', '$2y$10$GUeBKow2oHnd6EpwSZ.I/OSP26532YiTySW6FUGkvCC12RhiTbwJS', 'admin account', NULL, '', NULL, '', NULL, 'uploads/RobloxScreenShot20241027_124339467.png', 1, 0, NULL, 0, 0),
 (2, 'jamesdy02@gmail.com', 'james', '$2y$10$AjiUxyVF3OiJx4bkZ6mBv.eBQOjZoaOxlltzLKBF1RbckLZeNSfO.', '', NULL, '', NULL, '', NULL, 'uploads/Screenshot 2025-02-12 205955.png', 0, 0, NULL, 0, 0),
 (3, 'clmjuls25@gmail.com', 'clmjuls', '$2y$10$aKByFvJ0pBhQ52be94Cn8OtThOltI7NSNIMw.oEnXlrTrYT4xaXf2', '', NULL, 'Baguio, Benguet, Cordillera, PHL', NULL, 'http://localhost/Culture_New/user/settings.php', NULL, 'uploads/41a357c3028363d1b6962ab77e0bbdc5.jpg', 1, 0, 'uploads/backgrounds/67ed240571aee_I Love You Hearts GIF by Chippy the Dog.gif', 1, 1),
-(4, 'mjbcoloma@gmail.com', 'juls', '$2y$10$0wagoH.wrH.goPBV30aTsOmCB3E3YF1Tv3ei6j/Jj/zsrDK85Vo0O', '', NULL, '', NULL, '', NULL, 'uploads/I Love You Hearts GIF by Chippy the Dog.gif', 0, 0, 'uploads/backgrounds/67ed3a97e3827_I Love You Hearts GIF by Chippy the Dog.gif', 1, 1),
-(5, 'clmjuls@gmail.com', 'testtest', '$2y$10$/98I0lHWEqgKQvyCZjmRE.qEk2H.9IwwECT/zqgeyAiOMzcxWZ792', '', NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, 0, 0),
-(6, 'jamesdy03@gmail.com', 'James3', '$2y$10$JoSm77EkRSBDbTJmgXoEweypPuJ0A33pkmPwcFDIddLDzc1cRbEGm', '', NULL, NULL, NULL, NULL, NULL, NULL, 1, 1, NULL, 0, 0),
-(7, 'asdasd@asdasd.com', 'James4', '$2y$10$zE/7klEQb9muzTI2IyndTupwe1AnKBo6qIl244tZqyL7iszi4X8w2', '', NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, NULL, 0, 0);
+(4, 'mjbcoloma@gmail.com', 'juls', '$2y$10$0wagoH.wrH.goPBV30aTsOmCB3E3YF1Tv3ei6j/Jj/zsrDK85Vo0O', '', NULL, '', NULL, '', NULL, 'uploads/I Love You Hearts GIF by Chippy the Dog.gif', 0, 1, 'uploads/backgrounds/67ed3a97e3827_I Love You Hearts GIF by Chippy the Dog.gif', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -267,7 +265,7 @@ ALTER TABLE `user_follows`
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `culture_posts`
@@ -297,13 +295,13 @@ ALTER TABLE `history_posts`
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
 
 --
 -- AUTO_INCREMENT for table `users`

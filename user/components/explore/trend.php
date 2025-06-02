@@ -18,12 +18,14 @@ function getTrendingPosts($conn, $limit = 5) {
 }
 
 // Check if user is logged in
-$show_premium_section = true;
+$show_premium_section = !isset($_SESSION['user_id']);
 if (isset($_SESSION['user_id'])) {
     // Check if user is premium or admin
     if ((isset($_SESSION['isPremium']) && $_SESSION['isPremium'] == 1) || 
         (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1)) {
         $show_premium_section = false;
+    } else {
+        $show_premium_section = true;
     }
 }
 ?>

@@ -177,12 +177,21 @@ function displayPosts(posts, append = false) {
 
       postElement.innerHTML = `
           <div class="post-header">
-              <div style="display: flex; align-items: center;">
+              <div class="post-header-left">
                   <img src="${post.profile_picture || 'assets/default-profile.png'}" class="profile-pic" alt="Profile Picture">
-                  <a href="user_profile.php?id=${post.user_id}" class="username-link" style="text-decoration: none; color: #1877f2; font-weight: 600;">${post.username}</a>
-                  ${premiumBadgeHtml}
+                  <div class="user-info">
+                      <a href="user_profile.php?id=${post.user_id}" class="username-link" style="text-decoration: none; color: #1877f2; font-weight: 600;">${post.username}</a>
+                      ${premiumBadgeHtml}
+                  </div>
               </div>
-              ${deleteButtonHtml}
+              <div class="post-header-right">
+                  ${currentUserId && post.user_id !== currentUserId ? `
+                      <button class="follow-btn" onclick="handleFollow(${post.user_id}, this)" data-user-id="${post.user_id}">
+                          <i class="fas fa-user-plus"></i> Follow
+                      </button>
+                  ` : ''}
+                  ${deleteButtonHtml}
+              </div>
           </div>
           <div class="post-content">
               <span class="post-title">${post.title}</span>
@@ -224,6 +233,19 @@ function displayPosts(posts, append = false) {
               e.stopPropagation();
           });
       });
+
+      // Add this after appending the post element
+      if (currentUserId && post.user_id !== currentUserId) {
+          const followBtn = postElement.querySelector('.follow-btn');
+          if (followBtn) {
+              checkFollowStatus(post.user_id).then(isFollowing => {
+                  if (isFollowing) {
+                      followBtn.classList.add('following');
+                      followBtn.innerHTML = '<i class="fas fa-user-check"></i> Following';
+                  }
+              });
+          }
+      }
 
       postDisplay.appendChild(postElement);
   });
@@ -680,4 +702,142 @@ function handleSnapScroll() {
             isSnapScrolling = false;
         }, 500);
     }
+}
+
+// Function to check if current user is following another user
+async function checkFollowStatus(userId) {
+    try {
+        const response = await fetch('check_follow_status.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `user_id=${userId}`
+        });
+        const data = await response.json();
+        return data.is_following;
+    } catch (error) {
+        console.error('Error checking follow status:', error);
+        return false;
+    }
+}
+
+// Function to handle follow/unfollow
+async function handleFollow(userId, button) {
+    if (!currentUserId) {
+        if (confirm('Please log in to follow users. Click OK to go to login page.')) {
+            window.location.href = 'auth/login.php';
+        }
+        return;
+    }
+
+    const isFollowing = button.classList.contains('following');
+    const action = isFollowing ? 'unfollow' : 'follow';
+
+    try {
+        const response = await fetch('follow_management.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `user_id=${userId}&action=${action}`
+        });
+
+        const data = await response.json();
+        if (data.status === 'success') {
+            if (action === 'follow') {
+                button.classList.add('following');
+                button.innerHTML = '<i class="fas fa-user-check"></i> Following';
+            } else {
+                button.classList.remove('following');
+                button.innerHTML = '<i class="fas fa-user-plus"></i> Follow';
+            }
+        } else {
+            alert(data.message || 'An error occurred');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    }
+}
+
+// Add hover effect for the follow button
+$(document).on('mouseenter', '.follow-btn.following', function() {
+    this.innerHTML = '<i class="fas fa-user-times"></i> Unfollow';
+}).on('mouseleave', '.follow-btn.following', function() {
+    this.innerHTML = '<i class="fas fa-user-check"></i> Following';
+});
+
+// Modify the createPostElement function to include the follow button
+function createPostElement(post) {
+    const postElement = document.createElement('div');
+    postElement.className = `post ${post.isPremium ? 'premium-post' : ''}`;
+    postElement.setAttribute('data-post-id', post.id);
+
+    // Create post header with follow button
+    const postHeader = document.createElement('div');
+    postHeader.className = 'post-header';
+
+    const headerLeft = document.createElement('div');
+    headerLeft.className = 'post-header-left';
+
+    const profilePic = document.createElement('img');
+    profilePic.src = post.profile_picture || 'default-avatar.png';
+    profilePic.alt = 'Profile Picture';
+    profilePic.className = 'profile-pic';
+
+    const userInfo = document.createElement('div');
+    userInfo.innerHTML = `
+        <strong>${post.full_name}</strong>
+        <div>@${post.username}</div>
+    `;
+
+    headerLeft.appendChild(profilePic);
+    headerLeft.appendChild(userInfo);
+
+    const headerRight = document.createElement('div');
+    headerRight.className = 'post-header-right';
+
+    // Only show follow button if it's not the current user's post
+    if (currentUserId && post.user_id !== currentUserId) {
+        const followBtn = document.createElement('button');
+        followBtn.className = 'follow-btn';
+        followBtn.textContent = 'Follow';
+        
+        // Check initial follow status
+        checkFollowStatus(post.user_id).then(isFollowing => {
+            if (isFollowing) {
+                followBtn.classList.add('following');
+                followBtn.textContent = 'Following';
+            }
+        });
+
+        followBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleFollow(post.user_id, followBtn);
+        });
+
+        // Add hover effect for "Following" state
+        followBtn.addEventListener('mouseenter', () => {
+            if (followBtn.classList.contains('following')) {
+                followBtn.textContent = 'Unfollow';
+            }
+        });
+
+        followBtn.addEventListener('mouseleave', () => {
+            if (followBtn.classList.contains('following')) {
+                followBtn.textContent = 'Following';
+            }
+        });
+
+        headerRight.appendChild(followBtn);
+    }
+
+    postHeader.appendChild(headerLeft);
+    postHeader.appendChild(headerRight);
+
+    // Rest of your existing post content code...
+    // ... existing code ...
+
+    return postElement;
 }

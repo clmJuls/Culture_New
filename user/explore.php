@@ -304,6 +304,19 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .post-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .post-header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .profile-pic {
@@ -974,6 +987,55 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
         .document-download:hover i {
             color: #1a73e8;
+        }
+
+        /* Add these styles for the follow button */
+        .post-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .post-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .post-header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .follow-btn {
+            background-color: #365486;
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .follow-btn:hover {
+            background-color: #7FC7D9;
+            transform: translateY(-1px);
+        }
+
+        .follow-btn.following {
+            background-color: #f0f2f5;
+            color: #365486;
+            border: 1px solid #365486;
+        }
+
+        .follow-btn.following:hover {
+            background-color: #ffebee;
+            color: #dc3545;
+            border-color: #dc3545;
         }
     </style>
 
