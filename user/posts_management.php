@@ -453,14 +453,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             $post_id = (int)$_POST['post_id'];
             $status = $_POST['status'];
+            $reason = isset($_POST['reason']) ? trim($_POST['reason']) : '';
             
             if (!in_array($status, ['pending', 'approved', 'rejected'])) {
                 throw new Exception("Invalid status value");
             }
             
-            $query = "UPDATE posts SET status = ? WHERE id = ?";
+            $query = "UPDATE posts SET status = ?, message = ? WHERE id = ?";
             $stmt = $conn->prepare($query);
-            $stmt->bind_param("si", $status, $post_id);
+            $message = $status === 'rejected' ? $reason : '';
+            $stmt->bind_param("ssi", $status, $message, $post_id);
             
             if ($stmt->execute()) {
                 echo json_encode(['status' => 'success']);

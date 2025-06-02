@@ -291,9 +291,24 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Confirm Action</h3>
+                <span class="close-modal">&times;</span>
             </div>
             <div class="modal-body">
                 <p id="confirmMessage"></p>
+                <div id="rejectReasonContainer" style="display: none;">
+                    <div class="form-group">
+                        <label for="rejectReason">Rejection Reason</label>
+                        <textarea id="rejectReason" 
+                                 placeholder="Please provide a detailed reason for rejection..."
+                                 rows="4"></textarea>
+                        <p class="error-message" id="reasonError">
+                            Please provide a reason for rejection
+                        </p>
+                        <div class="textarea-footer">
+                            <span class="char-count">0/500</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="cancel-btn">Cancel</button>
@@ -822,6 +837,7 @@
     </style>
 
     <style>
+    /* Updated Modal Styles */
     .modal {
         display: none;
         position: fixed;
@@ -836,12 +852,13 @@
 
     .modal-content {
         background-color: #fefefe;
-        margin: 15% auto;
+        margin: 5% auto;
         padding: 0;
         border-radius: 12px;
-        width: 400px;
+        width: 500px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         animation: slideIn 0.3s;
+        max-width: 95%;
     }
 
     .modal-header {
@@ -857,12 +874,14 @@
     .modal-header h3 {
         margin: 0;
         font-size: 1.5rem;
+        font-weight: 500;
     }
 
     .close-modal {
         color: white;
         font-size: 24px;
         cursor: pointer;
+        transition: opacity 0.2s;
     }
 
     .close-modal:hover {
@@ -870,15 +889,70 @@
     }
 
     .modal-body {
-        padding: 30px 20px;
-        text-align: center;
+        padding: 30px;
+    }
+
+    .form-group {
+        margin-top: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #365486;
+        font-weight: 500;
+    }
+
+    #rejectReason {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        resize: vertical;
+        min-height: 120px;
+        font-family: inherit;
+        font-size: 14px;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    #rejectReason:focus {
+        outline: none;
+        border-color: #365486;
+        box-shadow: 0 0 0 3px rgba(54, 84, 134, 0.1);
+    }
+
+    .textarea-footer {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 8px;
+    }
+
+    .char-count {
+        color: #666;
+        font-size: 12px;
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 12px;
+        margin-top: 5px;
+        display: none;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .error-message.show {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
     }
 
     .modal-footer {
         padding: 20px;
         display: flex;
         gap: 10px;
-        justify-content: center;
+        justify-content: flex-end;
         border-top: 1px solid #eee;
     }
 
@@ -900,6 +974,11 @@
     .confirm-btn {
         background-color: #365486;
         color: white;
+        min-width: 100px;
+    }
+
+    .confirm-btn.reject-btn {
+        background-color: #dc3545;
     }
 
     .cancel-btn:hover {
@@ -907,7 +986,12 @@
     }
 
     .confirm-btn:hover {
-        background-color: #2a4268;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .confirm-btn:active {
+        transform: translateY(0);
     }
 
     @keyframes fadeIn {
@@ -916,8 +1000,24 @@
     }
 
     @keyframes slideIn {
-        from { transform: translateY(-20px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
+        from { 
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    .shake {
+        animation: shake 0.4s ease-in-out;
     }
     </style>
 
@@ -975,8 +1075,28 @@
             const closeModal = document.querySelector('.close-modal');
             const cancelBtn = modal.querySelector('.cancel-btn');
             const confirmBtn = document.getElementById('confirmButton');
+            const rejectReasonContainer = document.getElementById('rejectReasonContainer');
+            const rejectReason = document.getElementById('rejectReason');
+            const reasonError = document.getElementById('reasonError');
+            const charCount = document.querySelector('.char-count');
             let currentAction = null;
             let currentPostId = null;
+
+            // Character count update
+            rejectReason.addEventListener('input', function() {
+                const length = this.value.length;
+                charCount.textContent = `${length}/500`;
+                
+                if (length > 500) {
+                    this.value = this.value.substring(0, 500);
+                    charCount.style.color = '#dc3545';
+                } else {
+                    charCount.style.color = '#666';
+                }
+                
+                // Hide error message when user starts typing
+                reasonError.classList.remove('show');
+            });
 
             // Handle approve button clicks
             document.querySelectorAll('.approve-btn').forEach(button => {
@@ -1000,17 +1120,30 @@
                 const message = `Are you sure you want to ${action} this post?`;
                 document.getElementById('confirmMessage').textContent = message;
                 
+                // Show/hide reject reason based on action
+                rejectReasonContainer.style.display = action === 'reject' ? 'block' : 'none';
+                if (action === 'reject') {
+                    rejectReason.value = ''; // Clear previous reason
+                    reasonError.classList.remove('show');
+                    charCount.textContent = '0/500';
+                }
+                
                 // Update confirm button style based on action
                 confirmBtn.className = `confirm-btn ${action}-btn`;
                 confirmBtn.textContent = action.charAt(0).toUpperCase() + action.slice(1);
                 
                 modal.style.display = 'block';
+                if (action === 'reject') {
+                    rejectReason.focus();
+                }
             }
 
             function closeConfirmModal() {
                 modal.style.display = 'none';
                 currentAction = null;
                 currentPostId = null;
+                rejectReason.value = ''; // Clear reason on close
+                reasonError.classList.remove('show');
             }
 
             // Close modal events
@@ -1025,6 +1158,19 @@
             // Handle confirm button click
             confirmBtn.onclick = function() {
                 if (currentAction && currentPostId) {
+                    if (currentAction === 'reject') {
+                        const reason = rejectReason.value.trim();
+                        if (!reason) {
+                            reasonError.classList.add('show');
+                            rejectReason.classList.add('shake');
+                            setTimeout(() => rejectReason.classList.remove('shake'), 400);
+                            return;
+                        }
+                        if (reason.length > 500) {
+                            return;
+                        }
+                        reasonError.classList.remove('show');
+                    }
                     updatePostStatus(currentPostId, currentAction);
                 }
             }
@@ -1032,13 +1178,18 @@
             function updatePostStatus(postId, action) {
                 // Convert action to correct status value
                 const status = action === 'approve' ? 'approved' : 'rejected';
+                const reason = action === 'reject' ? rejectReason.value.trim() : '';
+
+                // Disable confirm button and show loading state
+                confirmBtn.disabled = true;
+                confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
                 fetch('posts_management.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: `action=update_status&post_id=${postId}&status=${status}`
+                    body: `action=update_status&post_id=${postId}&status=${status}&reason=${encodeURIComponent(reason)}`
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -1054,7 +1205,12 @@
                     console.error('Error:', error);
                     document.getElementById('confirmMessage').textContent = 
                         'An error occurred: ' + error.message;
-                    document.getElementById('confirmButton').style.display = 'none';
+                    confirmBtn.style.display = 'none';
+                })
+                .finally(() => {
+                    // Re-enable confirm button and restore text
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = action.charAt(0).toUpperCase() + action.slice(1);
                 });
             }
         });
