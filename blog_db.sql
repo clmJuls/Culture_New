@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 02, 2025 at 02:46 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Generation Time: Jun 05, 2025 at 12:18 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -26,21 +26,6 @@ SET time_zone = "+00:00";
 --
 -- Table structure for table `comments`
 --
-
-CREATE TABLE IF NOT EXISTS `user_sessions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `access_token` varchar(255) NOT NULL,
-  `last_activity` timestamp NOT NULL DEFAULT current_timestamp(),
-  `expires_at` timestamp NOT NULL DEFAULT (CURRENT_TIMESTAMP + INTERVAL 15 MINUTE),
-  `is_active` tinyint(1) DEFAULT 1,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  KEY `access_token` (`access_token`),
-  CONSTRAINT `user_sessions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
 
 CREATE TABLE `comments` (
   `id` int(11) NOT NULL,
@@ -190,7 +175,8 @@ INSERT INTO `users` (`id`, `email`, `username`, `password`, `full_name`, `about`
 (1, 'superadmin@gmail.com', 'admin', '$2y$10$GUeBKow2oHnd6EpwSZ.I/OSP26532YiTySW6FUGkvCC12RhiTbwJS', 'admin account', NULL, '', NULL, '', NULL, 'uploads/RobloxScreenShot20241027_124339467.png', 1, 0, NULL, 0, 0),
 (2, 'jamesdy02@gmail.com', 'james', '$2y$10$AjiUxyVF3OiJx4bkZ6mBv.eBQOjZoaOxlltzLKBF1RbckLZeNSfO.', '', NULL, '', NULL, '', NULL, 'uploads/Screenshot 2025-02-12 205955.png', 0, 0, NULL, 0, 0),
 (3, 'clmjuls25@gmail.com', 'clmjuls', '$2y$10$aKByFvJ0pBhQ52be94Cn8OtThOltI7NSNIMw.oEnXlrTrYT4xaXf2', '', NULL, 'Baguio, Benguet, Cordillera, PHL', NULL, 'http://localhost/Culture_New/user/settings.php', NULL, 'uploads/41a357c3028363d1b6962ab77e0bbdc5.jpg', 1, 0, 'uploads/backgrounds/67ed240571aee_I Love You Hearts GIF by Chippy the Dog.gif', 1, 1),
-(4, 'mjbcoloma@gmail.com', 'juls', '$2y$10$0wagoH.wrH.goPBV30aTsOmCB3E3YF1Tv3ei6j/Jj/zsrDK85Vo0O', '', NULL, '', NULL, '', NULL, 'uploads/I Love You Hearts GIF by Chippy the Dog.gif', 0, 1, 'uploads/backgrounds/67ed3a97e3827_I Love You Hearts GIF by Chippy the Dog.gif', 1, 1);
+(4, 'mjbcoloma@gmail.com', 'juls', '$2y$10$0wagoH.wrH.goPBV30aTsOmCB3E3YF1Tv3ei6j/Jj/zsrDK85Vo0O', '', NULL, '', NULL, '', NULL, 'uploads/I Love You Hearts GIF by Chippy the Dog.gif', 0, 1, 'uploads/backgrounds/67ed3a97e3827_I Love You Hearts GIF by Chippy the Dog.gif', 1, 1),
+(8, 'jamesdy02222@gmail.com', 'James123', '$2y$10$tMCRqvwLz0/1Hz2jdybs/ejF/8qluodRuRkVEHzqvOWI/Iy.7YGha', '', NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -203,6 +189,30 @@ CREATE TABLE `user_follows` (
   `following_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_sessions`
+--
+
+CREATE TABLE `user_sessions` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `access_token` varchar(255) NOT NULL,
+  `last_activity` timestamp NOT NULL DEFAULT current_timestamp(),
+  `expires_at` timestamp NOT NULL DEFAULT (current_timestamp() + interval 15 minute),
+  `is_active` tinyint(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_sessions`
+--
+
+INSERT INTO `user_sessions` (`id`, `user_id`, `created_at`, `access_token`, `last_activity`, `expires_at`, `is_active`) VALUES
+(26, 8, '2025-06-05 09:18:22', 'c21ce97e9de134ff7f8a2b25847d7e8a9e0605ad2bc2653b6a5dc4ae28497b77', '2025-06-05 09:21:06', '2025-06-05 03:36:06', 0),
+(27, 8, '2025-06-05 09:36:42', 'a3c8febe1713fc11357bd7def9449933ad5363df692a914c82efbbaad710307e', '2025-06-05 09:36:42', '2025-06-05 03:51:42', 1);
 
 --
 -- Indexes for dumped tables
@@ -273,6 +283,14 @@ ALTER TABLE `user_follows`
   ADD KEY `following_id` (`following_id`);
 
 --
+-- Indexes for table `user_sessions`
+--
+ALTER TABLE `user_sessions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `access_token` (`access_token`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -322,7 +340,13 @@ ALTER TABLE `posts`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `user_sessions`
+--
+ALTER TABLE `user_sessions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- Constraints for dumped tables
@@ -371,6 +395,12 @@ ALTER TABLE `posts`
 ALTER TABLE `user_follows`
   ADD CONSTRAINT `user_follows_ibfk_1` FOREIGN KEY (`follower_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `user_follows_ibfk_2` FOREIGN KEY (`following_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `user_sessions`
+--
+ALTER TABLE `user_sessions`
+  ADD CONSTRAINT `user_sessions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

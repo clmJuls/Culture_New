@@ -85,7 +85,7 @@
         <div class="posts-grid">
             <?php if ($result->num_rows > 0): ?>
                 <?php while ($post = $result->fetch_assoc()): ?>
-                    <div class="post-card">
+                    <div class="post-card" data-post-id="<?php echo $post['id']; ?>">
                         <div class="post-header">
                             <h3><?php echo htmlspecialchars($post['title']); ?></h3>
                             <span class="status <?php echo $post['status']; ?>">
@@ -187,12 +187,35 @@
                                 echo $date->format('M d, Y h:i A');
                                 ?>
                             </span>
+                            <?php if ($post['status'] === 'rejected'): ?>
+                                <button class="delete-btn" onclick="deletePost(<?php echo $post['id']; ?>)">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endwhile; ?>
             <?php else: ?>
                 <p class="no-posts">No <?php echo $status_filter === 'all' ? '' : $status_filter . ' '; ?>posts found.</p>
             <?php endif; ?>
+        </div>
+    </div>
+
+    <!-- Success/Error Modal -->
+    <div id="messageModal" class="message-modal">
+        <div class="message-modal-content">
+            <div class="message-modal-header">
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="message-modal-body">
+                <div class="message-icon">
+                    <i class="fas"></i>
+                </div>
+                <p id="modalMessage"></p>
+            </div>
+            <div class="message-modal-footer">
+                <button onclick="closeMessageModal()">OK</button>
+            </div>
         </div>
     </div>
 
@@ -456,11 +479,33 @@
             margin-top: 15px;
             padding-top: 15px;
             border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .timestamp {
             color: #888;
             font-size: 12px;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
         }
 
         .no-posts {
@@ -513,6 +558,105 @@
                 width: 100%;
             }
         }
+
+        /* Message Modal Styles */
+        .message-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translate(-50%, -60%); opacity: 0; }
+            to { transform: translate(-50%, -50%); opacity: 1; }
+        }
+
+        .message-modal-content {
+            background-color: #fff;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message-modal-header {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .close-modal {
+            color: #aaa;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: #666;
+        }
+
+        .message-modal-body {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .message-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .message-icon.success i {
+            color: #28a745;
+        }
+
+        .message-icon.error i {
+            color: #dc3545;
+        }
+
+        .message-modal-body p {
+            color: #333;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .message-modal-footer {
+            text-align: center;
+            padding-top: 20px;
+        }
+
+        .message-modal-footer button {
+            background-color: #365486;
+            color: white;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .message-modal-footer button:hover {
+            background-color: #2a4268;
+            transform: translateY(-2px);
+        }
     </style>
 
 <!-- Sidebar -->
@@ -520,5 +664,92 @@
 
 <!-- Include Chat Widget -->
 <?php include 'components/widgets/chat.php'; ?>
+
+<script>
+function showMessageModal(message, type = 'success') {
+    const modal = document.getElementById('messageModal');
+    const messageIcon = modal.querySelector('.message-icon');
+    const iconElement = messageIcon.querySelector('i');
+    
+    // Set icon and class based on type
+    messageIcon.className = 'message-icon ' + type;
+    iconElement.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+    
+    // Set message
+    document.getElementById('modalMessage').textContent = message;
+    
+    // Show modal
+    modal.style.display = 'block';
+}
+
+function closeMessageModal() {
+    const modal = document.getElementById('messageModal');
+    modal.style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('messageModal');
+    if (event.target === modal) {
+        closeMessageModal();
+    }
+}
+
+// Close modal when clicking X
+document.querySelector('.close-modal').onclick = closeMessageModal;
+
+function deletePost(postId) {
+    if (!confirm('Are you sure you want to delete this post?')) {
+        return;
+    }
+
+    fetch('delete_post.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `post_id=${postId}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Remove the post card from the UI
+            const postCard = document.querySelector(`.post-card[data-post-id="${postId}"]`);
+            if (postCard) {
+                postCard.remove();
+            }
+
+            // Update the counts in the tabs
+            const rejectedCountSpan = document.querySelector('a[href="?status=rejected"] .count');
+            const allCountSpan = document.querySelector('a[href="?status=all"] .count');
+            
+            if (rejectedCountSpan) {
+                let count = parseInt(rejectedCountSpan.textContent) - 1;
+                rejectedCountSpan.textContent = count;
+                
+                // Update all count
+                if (allCountSpan) {
+                    allCountSpan.textContent = parseInt(allCountSpan.textContent) - 1;
+                }
+
+                // If no more rejected posts, reload to remove the badge
+                if (count === 0) {
+                    window.location.reload();
+                }
+            }
+
+            // Show success message with custom modal
+            showMessageModal('Post deleted successfully');
+        } else {
+            // Show error message with custom modal
+            showMessageModal(data.message || 'Error deleting post', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessageModal('Error deleting post', 'error');
+    });
+}
+</script>
 </body>
 </html> 

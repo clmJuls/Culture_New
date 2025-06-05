@@ -12,7 +12,29 @@
             <a href="home.php" <?php echo basename($_SERVER['PHP_SELF']) == 'home.php' ? 'class="active"' : ''; ?>>Home</a>
             <a href="create-post.php" <?php echo basename($_SERVER['PHP_SELF']) == 'create-post.php' ? 'class="active"' : ''; ?>>+ Create</a>
             <a href="explore.php" <?php echo basename($_SERVER['PHP_SELF']) == 'explore.php' ? 'class="active"' : ''; ?>>Explore</a>
-            <a href="my-posts.php" <?php echo basename($_SERVER['PHP_SELF']) == 'my-posts.php' ? 'class="active"' : ''; ?>>My Posts</a>
+            <a href="my-posts.php" <?php echo basename($_SERVER['PHP_SELF']) == 'my-posts.php' ? 'class="active"' : ''; ?>>
+                My Posts
+                <?php
+                if (!isset($user_id) && isset($_SESSION['user_id'])) {
+                    $user_id = $_SESSION['user_id'];
+                }
+                
+                if (isset($user_id)) {
+                    // Get count of rejected posts
+                    $rejected_query = "SELECT COUNT(*) as count FROM posts WHERE user_id = ? AND status = 'rejected'";
+                    $rejected_stmt = $conn->prepare($rejected_query);
+                    $rejected_stmt->bind_param("i", $user_id);
+                    $rejected_stmt->execute();
+                    $rejected_count = $rejected_stmt->get_result()->fetch_assoc()['count'];
+                    
+                    if ($rejected_count > 0) {
+                        echo "<span class='rejected-badge'>$rejected_count</span>";
+                    }
+                } else {
+                    error_log("User ID not set in navbar.php");
+                }
+                ?>
+            </a>
             <div class="notification-dropdown">
                 <div class="notification-icon" onclick="toggleNotificationDropdown()">
                     <i class="fas fa-bell"></i>
@@ -101,6 +123,7 @@
             padding: 10px 20px;
             border-radius: 30px;
             transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
         }
 
         .navbar a:hover {
@@ -354,6 +377,28 @@
         .nav-links > a {
             display: none;
         }
+    }
+
+    /* Add rejected badge styles */
+    .rejected-badge {
+        background-color: #dc3545;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 12px;
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        min-width: 23px;
+        text-align: center;
+        font-weight: bold;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 2;
+    }
+
+    .nav-links a {
+        position: relative;
+        display: inline-block;
     }
     </style>
 

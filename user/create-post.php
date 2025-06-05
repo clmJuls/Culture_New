@@ -749,7 +749,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p>Your post has been created successfully!</p>
             </div>
             <div class="modal-footer">
-                <button onclick="redirectToExplore()" class="modal-btn explore-btn">View in Explore</button>
+                <button onclick="redirectToMyPosts()" class="modal-btn explore-btn">View My Posts</button>
                 <button onclick="createNewPost()" class="modal-btn create-btn">Create Another Post</button>
             </div>
         </div>
@@ -923,8 +923,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        function redirectToExplore() {
-            window.location.href = 'explore.php';
+        function redirectToMyPosts() {
+            window.location.href = 'my-posts.php';
         }
 
         function createNewPost() {
