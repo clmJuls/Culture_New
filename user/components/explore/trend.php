@@ -6,6 +6,7 @@ function getTrendingPosts($conn, $limit = 5) {
         FROM posts p
         JOIN users u ON p.user_id = u.id
         LEFT JOIN likes l ON p.id = l.post_id AND l.is_active = 1
+        WHERE p.status = 'approved'
         GROUP BY p.id
         ORDER BY like_count DESC, p.created_at DESC
         LIMIT ?
