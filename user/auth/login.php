@@ -1,6 +1,10 @@
 <?php
 require '../db_conn.php';
+require 'SessionManager.php';
 session_start();
+
+// Initialize SessionManager
+$sessionManager = new SessionManager($conn);
 
 // Check if the user is already logged in
 if (isset($_SESSION['user_id'])) {
@@ -44,16 +48,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // If we get here, both username and password are valid
+    // Create access token and session
+    $access_token = $sessionManager->createSession($user['id']);
+    
     // Start session and set session variables
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['username'] = $user['username'];
     $_SESSION['email'] = $user['email'];
     $_SESSION['isAdmin'] = $user['isAdmin'];
     $_SESSION['isPremium'] = $user['isPremium'];
+    $_SESSION['access_token'] = $access_token;
 
     // Remember me functionality
     if (isset($_POST['remember_me'])) {
         setcookie('username', $user['username'], time() + (86400 * 30), "/"); // 30 days
+        setcookie('access_token', $access_token, time() + (86400 * 30), "/"); // 30 days
     }
 
     header('Location: ../home.php');
