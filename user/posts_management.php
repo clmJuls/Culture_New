@@ -346,7 +346,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'post_id' => $new_comment['post_id'],
                     'user_id' => $new_comment['user_id'],
                     'username' => $new_comment['username'],
-                    'profile_picture' => $new_comment['profile_picture'] ?: 'assets/default-profile.png',
+                    'profile_picture' => $new_comment['profile_picture'] ? htmlspecialchars($new_comment['profile_picture']) : 'assets/hero/v07_20@Shanks.png',
                     'comment_text' => $new_comment['comment_text'],
                     'created_at' => $new_comment['created_at']
                 ]
@@ -384,7 +384,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'post_id' => $row['post_id'],
                     'user_id' => $row['user_id'],
                     'username' => $row['username'],
-                    'profile_picture' => $row['profile_picture'] ?: 'assets/default-profile.png',
+                    'profile_picture' => $row['profile_picture'] ? htmlspecialchars($row['profile_picture']) : 'assets/hero/v07_20@Shanks.png',
                     'comment_text' => $row['comment_text'],
                     'created_at' => $row['created_at']
                 ];

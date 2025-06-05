@@ -164,7 +164,10 @@
                     ?>
                     <div class="request-card">
                         <div class="request-header">
-                            <img src="<?php echo $post['profile_picture'] ?: 'assets/hero/default-avatar.png'; ?>" 
+                            <?php
+                            $profile_picture = $post['profile_picture'] ? htmlspecialchars($post['profile_picture']) : 'assets/hero/v07_20@Shanks.png';
+                            ?>
+                            <img src="<?php echo $profile_picture; ?>" 
                                  alt="User Avatar" class="user-avatar">
                             <div class="user-info">
                                 <h3><?php echo htmlspecialchars($post['username']); ?></h3>

@@ -1,3 +1,6 @@
+<?php
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'guest_' . uniqid();
+?>
 <script type="text/javascript">
   (function(d, t) {
       var v = d.createElement(t), s = d.getElementsByTagName(t)[0];
@@ -6,11 +9,16 @@
           verify: { projectID: '68412c0d4786ab36564c0875' },
           url: 'https://general-runtime.voiceflow.com',
           versionID: 'production',
-          voice: {
-            url: "https://runtime-api.voiceflow.com"
+          userID: '<?php echo $user_id; ?>', 
+          assistant: {
+            persistence: 'sessionStorage'
+          },
+          user: {
+            id: '<?php echo $user_id; ?>', 
+            name: '<?php echo isset($_SESSION["username"]) ? $_SESSION["username"] : "Guest"; ?>' 
           }
         });
       }
       v.src = "https://cdn.voiceflow.com/widget-next/bundle.mjs"; v.type = "text/javascript"; s.parentNode.insertBefore(v, s);
-  })(document, 'script');</script>
-        }
+  })(document, 'script');
+</script>

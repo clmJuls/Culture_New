@@ -38,10 +38,11 @@ if (isset($_SESSION['user_id'])) {
             <?php
             $trending_posts = getTrendingPosts($conn);
             while ($post = $trending_posts->fetch_assoc()) {
+                $profile_picture = $post['profile_picture'] ? htmlspecialchars($post['profile_picture']) : 'assets/hero/v07_20@Shanks.png';
                 echo "
                 <div class='trending-post'>
                     <div class='trending-header'>
-                        <img src='{$post['profile_picture']}' alt='Profile' class='trending-profile-pic'>
+                        <img src='{$profile_picture}' alt='Profile' class='trending-profile-pic'>
                         <span>{$post['username']}</span>
                     </div>
                     <div class='trending-content'>

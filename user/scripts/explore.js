@@ -22,51 +22,56 @@ let showFollowingOnly = false; // Add this new variable
 
 // Modified loadPosts function to handle empty results naturally
 function loadPosts(append = false) {
-  if (isLoading || (!append && !hasMorePosts)) return;
+  if (isLoading || (!append && !hasMorePosts)) return Promise.resolve();
   
   isLoading = true;
   updateViewMoreButton('Loading...');
   
-  $.ajax({
+  return new Promise((resolve, reject) => {
+    $.ajax({
       url: 'posts_management.php',
       type: 'POST',
       data: {
-          action: 'fetch_posts',
-          page: currentPage,
-          per_page: postsPerPage,
-          filter: showFollowingOnly ? 'following' : '',
-          learning_styles: Array.from(selectedLearningStyles),
-          include_premium_status: true
+        action: 'fetch_posts',
+        page: currentPage,
+        per_page: postsPerPage,
+        filter: showFollowingOnly ? 'following' : '',
+        learning_styles: Array.from(selectedLearningStyles),
+        include_premium_status: true
       },
       success: function(response) {
-          try {
-              const data = typeof response === 'object' ? response : JSON.parse(response);
-              
-              if (data.posts && data.posts.length > 0) {
-                  displayPosts(data.posts, append);
-                  currentPage++;
-                  hasMorePosts = data.posts.length === postsPerPage;
-              } else {
-                  hasMorePosts = false;
-                  if (!append) {
-                      const postDisplay = document.getElementById('post-display');
-                      if (postDisplay) {
-                          postDisplay.innerHTML = '<div class="no-posts-message">No posts found</div>'; // Add a message when no posts are found
-                      }
-                  }
+        try {
+          const data = typeof response === 'object' ? response : JSON.parse(response);
+          
+          if (data.posts && data.posts.length > 0) {
+            displayPosts(data.posts, append);
+            currentPage++;
+            hasMorePosts = data.posts.length === postsPerPage;
+          } else {
+            hasMorePosts = false;
+            if (!append) {
+              const postDisplay = document.getElementById('post-display');
+              if (postDisplay) {
+                postDisplay.innerHTML = '<div class="no-posts-message">No posts found</div>'; // Add a message when no posts are found
               }
-              updateViewMoreButton();
-          } catch (e) {
-              console.error('Error parsing response:', e);
-              updateViewMoreButton('Try Again');
+            }
           }
-          isLoading = false;
+          updateViewMoreButton();
+          resolve();
+        } catch (e) {
+          console.error('Error parsing response:', e);
+          updateViewMoreButton('Try Again');
+          reject(e);
+        }
+        isLoading = false;
       },
       error: function(xhr, status, error) {
-          console.error('Ajax error:', error);
-          isLoading = false;
-          updateViewMoreButton('Try Again');
+        console.error('Ajax error:', error);
+        isLoading = false;
+        updateViewMoreButton('Try Again');
+        reject(error);
       }
+    });
   });
 }
 
@@ -178,18 +183,20 @@ function displayPosts(posts, append = false) {
       postElement.innerHTML = `
           <div class="post-header">
               <div class="post-header-left">
-                  <img src="${post.profile_picture || 'assets/default-profile.png'}" class="profile-pic" alt="Profile Picture">
+                  <img src="${post.profile_picture || 'assets/hero/v07_20@Shanks.png'}" class="profile-pic" alt="Profile Picture">
                   <div class="user-info">
-                      <a href="user_profile.php?id=${post.user_id}" class="username-link" style="text-decoration: none; color: #1877f2; font-weight: 600;">${post.username}</a>
+                      <div class="username-container">
+                          <a href="user_profile.php?id=${post.user_id}" class="username-link" style="text-decoration: none; color: #1877f2; font-weight: 600;">${post.username}</a>
+                          ${currentUserId && post.user_id !== currentUserId ? `
+                              <button class="follow-btn-icon" onclick="handleFollow(${post.user_id}, this)" data-user-id="${post.user_id}" title="Follow" style="color: #6c757d;">
+                                  <i class="fas fa-user-plus"></i>
+                              </button>
+                          ` : ''}
+                      </div>
                       ${premiumBadgeHtml}
                   </div>
               </div>
               <div class="post-header-right">
-                  ${currentUserId && post.user_id !== currentUserId ? `
-                      <button class="follow-btn" onclick="handleFollow(${post.user_id}, this)" data-user-id="${post.user_id}">
-                          <i class="fas fa-user-plus"></i> Follow
-                      </button>
-                  ` : ''}
                   ${deleteButtonHtml}
               </div>
           </div>
@@ -220,7 +227,7 @@ function displayPosts(posts, append = false) {
               e.stopPropagation();
               postModal.showExpandedPost({
                   ...post,
-                  profile_picture: post.profile_picture || 'assets/default-profile.png',
+                  profile_picture: post.profile_picture || 'assets/hero/v07_20@Shanks.png',
                   comments: post.comments || []
               });
           });
@@ -236,12 +243,13 @@ function displayPosts(posts, append = false) {
 
       // Add this after appending the post element
       if (currentUserId && post.user_id !== currentUserId) {
-          const followBtn = postElement.querySelector('.follow-btn');
+          const followBtn = postElement.querySelector('.follow-btn-icon');
           if (followBtn) {
               checkFollowStatus(post.user_id).then(isFollowing => {
                   if (isFollowing) {
                       followBtn.classList.add('following');
-                      followBtn.innerHTML = '<i class="fas fa-user-check"></i> Following';
+                      followBtn.innerHTML = '<i class="fas fa-user-check"></i>';
+                      followBtn.title = 'Following';
                   }
               });
           }
@@ -336,6 +344,34 @@ function normalizePostCardHeights() {
     badge.style.marginLeft = '8px';
     badge.style.fontWeight = 'bold';
   });
+
+  // Add new styles for the username container and follow button
+  const usernameContainers = document.querySelectorAll('.username-container');
+  usernameContainers.forEach(container => {
+    container.style.display = 'flex';
+    container.style.alignItems = 'center';
+    container.style.gap = '8px';
+  });
+
+  const followBtnIcons = document.querySelectorAll('.follow-btn-icon');
+  followBtnIcons.forEach(btn => {
+    btn.style.background = 'none';
+    btn.style.border = 'none';
+    btn.style.padding = '4px';
+    btn.style.cursor = 'pointer';
+    btn.style.color = '#6c757d'; // Default gray color for follow state
+    btn.style.fontSize = '14px';
+    btn.style.display = 'flex';
+    btn.style.alignItems = 'center';
+    btn.style.justifyContent = 'center';
+    btn.style.minWidth = 'auto';
+    btn.style.transition = 'color 0.2s ease';
+
+    // Add different colors for different states
+    if (btn.classList.contains('following')) {
+      btn.style.color = '#28a745'; // Green color for following state
+    }
+  });
 }
 
 function renderComments(comments) {
@@ -347,7 +383,7 @@ function renderComments(comments) {
     return comments.map(comment => `
         <div class="comment">
             <div class="comment-user-info">
-                <img src="${comment.profile_picture || 'assets/default-profile.png'}" class="comment-profile-pic" alt="${comment.username}'s profile">
+                <img src="${comment.profile_picture || 'assets/hero/v07_20@Shanks.png'}" class="comment-profile-pic" alt="${comment.username}'s profile">
                 <div class="comment-content">
                     <div class="comment-header">
                         <strong class="comment-username">${comment.username}</strong>
@@ -639,18 +675,24 @@ function initializeFollowingFilter() {
 $(document).ready(function() {
     initializeLearningStyleFilters();
     initializeFollowingFilter(); // Add this new initialization
-    loadPosts();
-    
-    // Initialize snap scroll
-    initSnapScroll();
+    loadPosts().then(() => {
+        // Initialize snap scroll
+        initSnapScroll();
+        
+        // Update all follow buttons on page load
+        updateAllFollowButtons();
 
-    // Implement infinite scroll with snap scrolling
-    $(window).scroll(function() {
-        if(!isSnapScrolling && $(window).scrollTop() + $(window).height() > $(document).height() - 200) {
-            if(!isLoading && hasMorePosts) {
-                loadPosts(true);
+        // Implement infinite scroll with snap scrolling
+        $(window).scroll(function() {
+            if(!isSnapScrolling && $(window).scrollTop() + $(window).height() > $(document).height() - 200) {
+                if(!isLoading && hasMorePosts) {
+                    loadPosts(true).then(() => {
+                        // Update follow buttons for newly loaded posts
+                        updateAllFollowButtons();
+                    });
+                }
             }
-        }
+        });
     });
 });
 
@@ -715,6 +757,23 @@ async function checkFollowStatus(userId) {
             body: `user_id=${userId}`
         });
         const data = await response.json();
+        
+        // Update button appearance based on follow status
+        const followBtn = document.querySelector(`.follow-btn-icon[data-user-id="${userId}"]`);
+        if (followBtn) {
+            if (data.is_following) {
+                followBtn.classList.add('following');
+                followBtn.innerHTML = '<i class="fas fa-user-check"></i>';
+                followBtn.title = 'Following';
+                followBtn.style.color = '#28a745'; // Green color for following state
+            } else {
+                followBtn.classList.remove('following');
+                followBtn.innerHTML = '<i class="fas fa-user-plus"></i>';
+                followBtn.title = 'Follow';
+                followBtn.style.color = '#6c757d'; // Gray color for follow state
+            }
+        }
+        
         return data.is_following;
     } catch (error) {
         console.error('Error checking follow status:', error);
@@ -747,10 +806,14 @@ async function handleFollow(userId, button) {
         if (data.status === 'success') {
             if (action === 'follow') {
                 button.classList.add('following');
-                button.innerHTML = '<i class="fas fa-user-check"></i> Following';
+                button.innerHTML = '<i class="fas fa-user-check"></i>';
+                button.title = 'Following';
+                button.style.color = '#28a745'; // Green color for following state
             } else {
                 button.classList.remove('following');
-                button.innerHTML = '<i class="fas fa-user-plus"></i> Follow';
+                button.innerHTML = '<i class="fas fa-user-plus"></i>';
+                button.title = 'Follow';
+                button.style.color = '#6c757d'; // Gray color for follow state
             }
         } else {
             alert(data.message || 'An error occurred');
@@ -761,11 +824,15 @@ async function handleFollow(userId, button) {
     }
 }
 
-// Add hover effect for the follow button
-$(document).on('mouseenter', '.follow-btn.following', function() {
-    this.innerHTML = '<i class="fas fa-user-times"></i> Unfollow';
-}).on('mouseleave', '.follow-btn.following', function() {
-    this.innerHTML = '<i class="fas fa-user-check"></i> Following';
+// Update hover effect for the follow button with color changes
+$(document).on('mouseenter', '.follow-btn-icon.following', function() {
+    this.innerHTML = '<i class="fas fa-user-times"></i>';
+    this.title = 'Unfollow';
+    this.style.color = '#dc3545'; // Red color for unfollow hover state
+}).on('mouseleave', '.follow-btn-icon.following', function() {
+    this.innerHTML = '<i class="fas fa-user-check"></i>';
+    this.title = 'Following';
+    this.style.color = '#28a745'; // Back to green for following state
 });
 
 // Modify the createPostElement function to include the follow button
@@ -801,8 +868,7 @@ function createPostElement(post) {
     // Only show follow button if it's not the current user's post
     if (currentUserId && post.user_id !== currentUserId) {
         const followBtn = document.createElement('button');
-        followBtn.className = 'follow-btn';
-        followBtn.textContent = 'Follow';
+        followBtn.className = 'follow-btn-icon';
         
         // Check initial follow status
         checkFollowStatus(post.user_id).then(isFollowing => {
@@ -840,4 +906,15 @@ function createPostElement(post) {
     // ... existing code ...
 
     return postElement;
+}
+
+// Add this new function to update all follow buttons on the page
+function updateAllFollowButtons() {
+    const followButtons = document.querySelectorAll('.follow-btn-icon');
+    followButtons.forEach(button => {
+        const userId = button.getAttribute('data-user-id');
+        if (userId) {
+            checkFollowStatus(userId);
+        }
+    });
 }
