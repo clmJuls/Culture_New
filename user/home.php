@@ -51,12 +51,12 @@ if (!isset($_SESSION['user_id'])) {
 
 <!-- Search Section -->
 <div class="search">
-    <h1 id="category-heading">Cultural Database</h1> 
+    <h1 id="category-heading">Welcome to Kulturabase</h1> 
     <p>Your gateway to a world of cultural knowledge and discussions.</p>
-    <div class="search-container">
-        <div class="search-bar">
+    <div class="">
+        <!-- <div class="search-bar">
             <input type="text" placeholder="Search articles, topics, or discussions..." />
-            <button>Search</button>
+            <button>Search</button> -->
         </div>
     </div>
 </div>
@@ -65,21 +65,30 @@ if (!isset($_SESSION['user_id'])) {
 /* Search Section */
     .search {
         background: linear-gradient(45deg, #1e3c72, #2a5298);
-        padding: 40px 20px;
-        text-align: center;
+        padding: 40px 150px;
+        text-align: right;
         width: 100%;
-        margin-bottom: 30px;
+        margin-top: 80px;
     }
 
     .search h1 {
-        font-size: 2.5rem;
+        font-size: 5.5rem;
         color: #fff;
         margin-bottom: 15px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
     }
 
     .search p {
         color: #fff;
-        margin-bottom: 25px;
+        margin-bottom: 15px;
+        font-size: 1.3rem;
+        max-width: 1000px;
+        margin-left: auto;
+        margin-right: auto;
+        opacity: 0.9;
     }
 
     .search-container {

@@ -51,7 +51,7 @@ if (isset($_SESSION['user_id'])) {
                 <a href="#" class="dropdown-btn" onclick="toggleDropdown()">Menu</a>
                 <div class="dropdown-content">
                     <a href="profile.php">Profile</a>
-                    <a href="settings.php">Settings</a>
+                    <!-- <a href="settings.php">Settings</a> -->
                 </div>
             </div>
             <a href="auth/login.php" class="active">Log Out</a>

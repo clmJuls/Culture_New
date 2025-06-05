@@ -123,10 +123,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <input type="text" id="location" name="location" placeholder="Location..." value="<?php echo $location; ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
       </div>
 
-      <div class="form-group" style="margin-bottom: 15px;">
+      <!-- <div class="form-group" style="margin-bottom: 15px;">
         <label for="website" style="display: block; margin-bottom: 5px;">Website</label>
         <input type="url" id="website" name="website" placeholder="Website..." value="<?php echo $website; ?>" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
-      </div>
+      </div> -->
 
       <button type="submit" class="save-btn" style="padding: 10px; background-color: #28a745; color: white; font-size: 16px; border: none; border-radius: 4px; cursor: pointer;">Save Changes</button>
     </form>

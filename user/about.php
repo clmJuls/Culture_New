@@ -52,7 +52,7 @@ body {
             <!-- Add the Kulturifiko logo her1e -->
              <br>
              <br>
-            <img src="https://scontent.xx.fbcdn.net/v/t1.15752-9/462567709_1724925585031052_4490126238712417040_n.png?_nc_cat=109&ccb=1-7&_nc_sid=0024fc&_nc_ohc=S9UP-k68ScQQ7kNvgFZCz8p&_nc_oc=AdhqsycKNWmfMJxi48g5Fy381arVHvFKzkd8WqJXUGXUQ2t9Orbh2q4-BGPMNRsbEbh54Op-n9ymVEFEvccPGyv1&_nc_ad=z-m&_nc_cid=0&_nc_zt=23&_nc_ht=scontent.xx&oh=03_Q7cD1gF9Fo63JcswcyKmjwBkVdKsQTDi1B7q6lvUIG4qW7KcFQ&oe=67CF02AA" alt="Kulturifiko Logo" width="300" height="250">
+            <img src="assets/logo/AboutLogo.jfif" alt="Kulturifiko Logo" width="700" height="450">
         </div>
         <h1>Kulturifiko: Empowering Structural Equity in Tourism and the Hospital Industry</h1>
     </header>
@@ -92,7 +92,8 @@ body {
 
     <section id="cta">
         <h2>Join the Kulturifiko Movement</h2>
-        <p>Be part of a global community that prioritizes sustainable and meaningful travel experiences. Together, we can create lasting change in the tourism and hospital industries!</p>
+        <p>Be part of a global community that prioritizes sustainable and meaningful 
+        <br>travel experiences. Together, we can create lasting change in the tourism and hospital industries!</p>
         <a href="join-us.html" class="cta-button">Join Us</a>
     </section>
 </div>
@@ -112,14 +113,15 @@ body {
 #header {
     text-align: center;
     margin-bottom: 50px;
-    padding: 40px;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    padding: 60px 40px;
+    background: linear-gradient(135deg, #fff, #f8f9fa);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(54, 84, 134, 0.1);
+    position: relative;
+    overflow: hidden;
 }
 
 #header .logo img {
-    border-radius: 50%;
     margin-bottom: 20px;
 }
 
@@ -134,10 +136,12 @@ body {
 /* Founder Section */
 #founder {
     margin-bottom: 60px;
-    padding: 40px;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    padding: 50px;
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(54, 84, 134, 0.1);
+    position: relative;
+    border: 1px solid rgba(54, 84, 134, 0.1);
 }
 
 #founder h2 {
@@ -193,10 +197,12 @@ body {
 /* About Section */
 #about-kulturifiko {
     margin-bottom: 60px;
-    padding: 40px;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    padding: 50px;
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(54, 84, 134, 0.1);
+    position: relative;
+    border: 1px solid rgba(54, 84, 134, 0.1);
 }
 
 #about-kulturifiko h2 {
@@ -230,40 +236,63 @@ body {
 /* Call to Action */
 #cta {
     text-align: center;
-    padding: 60px 0;
-    background-color: #0056b3;
+    padding: 80px 40px;
+    background: linear-gradient(135deg, #365486, #0F1035);
     color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(15, 16, 53, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+#cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('assets/pattern.png');
+    opacity: 0.1;
+    pointer-events: none;
 }
 
 #cta h2 {
-    font-size: 32px;
+    font-size: 36px;
     font-weight: 700;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     font-family: 'Roboto', sans-serif;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 #cta p {
-    font-size: 15px;
-    line-height: 1.7;
-    margin-bottom: 30px;
+    font-size: 18px;
+    line-height: 1.8;
+    margin-bottom: 35px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .cta-button {
-    background-color: #0F1035;
-    color: #fff;
+    background-color: #fff;
+    color: #0F1035;
     font-size: 18px;
-    padding: 15px 30px;
+    padding: 18px 40px;
     text-decoration: none;
-    border-radius: 5px;
-    font-weight: 500;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    border-radius: 30px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 2px solid transparent;
 }
 
 .cta-button:hover {
-    background-color: #365486;
+    background-color: transparent;
     color: #fff;
+    border-color: #fff;
+    transform: translateY(-2px);
 }
 
 /* Responsive Design */

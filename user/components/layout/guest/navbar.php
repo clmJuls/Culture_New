@@ -75,9 +75,9 @@
                     <a href="profile.php">
                         <i class="fas fa-user"></i> Profile
                     </a>
-                    <a href="settings.php">
+                    <!-- <a href="settings.php">
                         <i class="fas fa-cog"></i> Settings
-                    </a>
+                    </a> -->
                     <hr class="dropdown-divider">
                     <a href="#" onclick="showLogoutDialog()">
                         <i class="fas fa-sign-out-alt"></i> Log Out

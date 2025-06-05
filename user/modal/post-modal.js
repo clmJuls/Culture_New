@@ -241,7 +241,7 @@ const postModal = {
 
       return comments.map(comment => `
           <div class="comment" data-comment-id="${comment.id}">
-              <img src="${comment.profile_picture || 'assets/default-profile.png'}" class="comment-profile-pic" alt="${comment.username}">
+              <img src="${comment.profile_picture || 'assets/hero/v07_20@Shanks.png'}" class="comment-profile-pic" alt="${comment.username}">
               <div class="comment-content">
                   <div class="comment-header">
                       <strong class="comment-username">${comment.username}</strong>

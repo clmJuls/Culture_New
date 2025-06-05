@@ -131,7 +131,7 @@ $(document).ready(function() {
             postElement.innerHTML = `
                 <div class="post-header">
                     <div class="post-user-info">
-                        
+                        <img src="${post.profile_pic || 'assets/images/default-avatar.png'}" alt="Profile Picture" class="post-profile-pic">
                         <a href="user_profile.php?id=${post.user_id}" class="username-link">${post.username}</a>
                     </div>
                     ${post.user_id === currentUserId || isAdmin ? 

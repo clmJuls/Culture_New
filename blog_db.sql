@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 05, 2025 at 12:18 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Generation Time: Jun 05, 2025 at 01:08 PM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -172,11 +172,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `username`, `password`, `full_name`, `about`, `location`, `birthday`, `website`, `skills`, `profile_picture`, `isAdmin`, `isPremium`, `profile_background`, `following_count`, `followers_count`) VALUES
-(1, 'superadmin@gmail.com', 'admin', '$2y$10$GUeBKow2oHnd6EpwSZ.I/OSP26532YiTySW6FUGkvCC12RhiTbwJS', 'admin account', NULL, '', NULL, '', NULL, 'uploads/RobloxScreenShot20241027_124339467.png', 1, 0, NULL, 0, 0),
-(2, 'jamesdy02@gmail.com', 'james', '$2y$10$AjiUxyVF3OiJx4bkZ6mBv.eBQOjZoaOxlltzLKBF1RbckLZeNSfO.', '', NULL, '', NULL, '', NULL, 'uploads/Screenshot 2025-02-12 205955.png', 0, 0, NULL, 0, 0),
-(3, 'clmjuls25@gmail.com', 'clmjuls', '$2y$10$aKByFvJ0pBhQ52be94Cn8OtThOltI7NSNIMw.oEnXlrTrYT4xaXf2', '', NULL, 'Baguio, Benguet, Cordillera, PHL', NULL, 'http://localhost/Culture_New/user/settings.php', NULL, 'uploads/41a357c3028363d1b6962ab77e0bbdc5.jpg', 1, 0, 'uploads/backgrounds/67ed240571aee_I Love You Hearts GIF by Chippy the Dog.gif', 1, 1),
-(4, 'mjbcoloma@gmail.com', 'juls', '$2y$10$0wagoH.wrH.goPBV30aTsOmCB3E3YF1Tv3ei6j/Jj/zsrDK85Vo0O', '', NULL, '', NULL, '', NULL, 'uploads/I Love You Hearts GIF by Chippy the Dog.gif', 0, 1, 'uploads/backgrounds/67ed3a97e3827_I Love You Hearts GIF by Chippy the Dog.gif', 1, 1),
-(8, 'jamesdy02222@gmail.com', 'James123', '$2y$10$tMCRqvwLz0/1Hz2jdybs/ejF/8qluodRuRkVEHzqvOWI/Iy.7YGha', '', NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, NULL, 0, 0);
+(3, 'clmjuls25@gmail.com', 'clmjuls', '$2y$10$aKByFvJ0pBhQ52be94Cn8OtThOltI7NSNIMw.oEnXlrTrYT4xaXf2', '', NULL, 'Baguio, Benguet, Cordillera, PHL', NULL, 'http://localhost/Culture_New/user/settings.php', NULL, 'uploads/41a357c3028363d1b6962ab77e0bbdc5.jpg', 1, 0, 'uploads/backgrounds/67ed240571aee_I Love You Hearts GIF by Chippy the Dog.gif', 2, 1),
+(4, 'mjbcoloma@gmail.com', 'juls', '$2y$10$0wagoH.wrH.goPBV30aTsOmCB3E3YF1Tv3ei6j/Jj/zsrDK85Vo0O', '', NULL, '', NULL, '', NULL, 'uploads/I Love You Hearts GIF by Chippy the Dog.gif', 0, 1, 'uploads/backgrounds/67ed3a97e3827_I Love You Hearts GIF by Chippy the Dog.gif', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -211,8 +208,19 @@ CREATE TABLE `user_sessions` (
 --
 
 INSERT INTO `user_sessions` (`id`, `user_id`, `created_at`, `access_token`, `last_activity`, `expires_at`, `is_active`) VALUES
-(26, 8, '2025-06-05 09:18:22', 'c21ce97e9de134ff7f8a2b25847d7e8a9e0605ad2bc2653b6a5dc4ae28497b77', '2025-06-05 09:21:06', '2025-06-05 03:36:06', 0),
-(27, 8, '2025-06-05 09:36:42', 'a3c8febe1713fc11357bd7def9449933ad5363df692a914c82efbbaad710307e', '2025-06-05 09:36:42', '2025-06-05 03:51:42', 1);
+(28, 4, '2025-06-05 10:21:05', 'af338468824837b62003419ae64198c6f9771feb3726f93b501d24239d7f7177', '2025-06-05 10:21:05', '2025-06-05 04:36:05', 0),
+(30, 3, '2025-06-05 10:25:17', 'b66eb837f05d2b50ab1c84b667b12cb4024a50e2b174f6db91e4938daf85254b', '2025-06-05 10:25:17', '2025-06-05 04:40:17', 0),
+(32, 3, '2025-06-05 10:28:13', '06bd8c84e7fbcc79d28cd961946002901d9066a4ae460c153ac9704f6d526194', '2025-06-05 10:28:13', '2025-06-05 04:43:13', 0),
+(33, 4, '2025-06-05 10:43:57', '5b4ef798f2c3f94d7c87da219de44738ac01a78b2982af8de88a2a4ce6b3b825', '2025-06-05 10:43:57', '2025-06-05 04:58:57', 0),
+(34, 3, '2025-06-05 10:48:06', 'e7f0f05308d8b4991576d82d55ac250d9fdaff1601cd439ce79f7f74280e8567', '2025-06-05 10:48:06', '2025-06-05 05:03:06', 0),
+(35, 4, '2025-06-05 10:51:25', 'c2fe7b41dfee2ca515b238f171545743ad06b940a416380d4eb8f6ff2e3f6aab', '2025-06-05 10:51:25', '2025-06-05 05:06:25', 0),
+(36, 3, '2025-06-05 10:55:04', 'c2fb4d3ae5d585ba6d7a95171c4f790517cd77b52cc8a3d5a229add49b2bf987', '2025-06-05 10:55:04', '2025-06-05 05:10:04', 0),
+(37, 4, '2025-06-05 10:55:37', '44bc84bd7d7b53994344801cbed7185a30221b41f170cc26b4076508296d5029', '2025-06-05 10:55:37', '2025-06-05 05:10:37', 0),
+(38, 3, '2025-06-05 10:55:58', 'bb3bb8530800e7aae041a17d1459ddc9fa40fb98977e7fc25d53a668ca40d775', '2025-06-05 10:55:58', '2025-06-05 05:10:58', 0),
+(39, 4, '2025-06-05 10:56:13', '152a4cd6081fae2a90451da16e22c2444498ce3fdfbe2571368a5e4ada3c7097', '2025-06-05 10:56:13', '2025-06-05 05:11:13', 0),
+(40, 4, '2025-06-05 10:58:35', '7ff7b0c2bd36e3b67eb66d645b3bf089ee8c361ccd5da522d2de250663d092d9', '2025-06-05 10:58:35', '2025-06-05 05:13:35', 0),
+(41, 4, '2025-06-05 11:00:05', 'c1d459780f5da358420d80553caf75b1baa9217ea0df074dd1dd3d085ba966ff', '2025-06-05 11:00:05', '2025-06-05 05:15:05', 0),
+(42, 3, '2025-06-05 11:00:22', '800f08ca0cd131f06c648060455f693123a43be3e52bab652ff79d15ce6f0bee', '2025-06-05 11:00:22', '2025-06-05 05:15:22', 1);
 
 --
 -- Indexes for dumped tables
@@ -328,25 +336,25 @@ ALTER TABLE `history_posts`
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `user_sessions`
 --
 ALTER TABLE `user_sessions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- Constraints for dumped tables
