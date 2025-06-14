@@ -459,12 +459,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Invalid status value");
             }
             
+            // Get the user_id of the post owner before updating
+            $get_user_query = "SELECT user_id, title FROM posts WHERE id = ?";
+            $user_stmt = $conn->prepare($get_user_query);
+            $user_stmt->bind_param("i", $post_id);
+            $user_stmt->execute();
+            $post_result = $user_stmt->get_result();
+            $post_data = $post_result->fetch_assoc();
+            
+            if (!$post_data) {
+                throw new Exception("Post not found");
+            }
+            
             $query = "UPDATE posts SET status = ?, message = ? WHERE id = ?";
             $stmt = $conn->prepare($query);
             $message = $status === 'rejected' ? $reason : '';
             $stmt->bind_param("ssi", $status, $message, $post_id);
             
             if ($stmt->execute()) {
+                // Create notification after successful status update
+                require_once 'services/NotificationService.php';
+                $notificationService = new NotificationService($conn);
+                
+                $notificationTitle = "";
+                $notificationMessage = "";
+                $redirectUrl = "";
+                
+                if ($status === 'approved') {
+                    $notificationTitle = "Post Approved";
+                    $notificationMessage = "Your post \"" . $post_data['title'] . "\" has been approved!";
+                    $redirectUrl = "explore.php";
+                } else if ($status === 'rejected') {
+                    $notificationTitle = "Post Rejected";
+                    $notificationMessage = "Your post \"" . $post_data['title'] . "\" has been rejected.";
+                    if ($reason) {
+                        $notificationMessage .= " Reason: " . $reason;
+                    }
+                    $redirectUrl = "my-posts.php";
+                }
+                
+                if ($notificationTitle) {
+                    $notificationService->createNotification(
+                        $post_data['user_id'],
+                        $notificationTitle,
+                        $notificationMessage,
+                        $redirectUrl
+                    );
+                }
+                
                 echo json_encode(['status' => 'success']);
             } else {
                 throw new Exception("Database error: " . $conn->error);

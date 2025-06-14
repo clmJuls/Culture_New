@@ -338,13 +338,13 @@ function normalizePostCardHeights() {
   premiumBadges.forEach(badge => {
   badge.style.backgroundColor = '#ffd700';     // Gold background
   badge.style.color = '#333';                  // Dark icon color
-  badge.style.width = '18px';                  // Equal width and height
-  badge.style.height = '18px';
+  badge.style.width = '20px';                  // Equal width and height
+  badge.style.height = '20px';
   badge.style.borderRadius = '50%';            // Makes it a circle
   badge.style.display = 'flex';                // Flex for centering
   badge.style.alignItems = 'center';
   badge.style.justifyContent = 'center';
-  badge.style.fontSize = '18px';               // Icon size
+  badge.style.fontSize = '12px';               // Icon size
   badge.style.marginLeft = '8px';
   badge.style.fontWeight = 'bold';             // If using a text icon
   badge.style.padding = '0';                   // Remove padding

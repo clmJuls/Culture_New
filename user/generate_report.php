@@ -244,6 +244,7 @@ if (!isset($_SESSION['user_id'])) {
                                 learning_styles as style,
                                 COUNT(*) as count
                             FROM posts
+                            WHERE status = 'approved'
                             GROUP BY style
                             ORDER BY count DESC";
                             
@@ -271,10 +272,11 @@ if (!isset($_SESSION['user_id'])) {
                                         ORDER BY like_count DESC 
                                         LIMIT 1")->fetch_assoc();
 
-        // Get most active user
+        // Get most active user with approved posts only
         $most_active_user = $conn->query("SELECT u.username, COUNT(p.id) as post_count 
                                         FROM users u 
                                         JOIN posts p ON u.id = p.user_id 
+                                        WHERE p.status = 'approved'
                                         GROUP BY u.id 
                                         ORDER BY post_count DESC 
                                         LIMIT 1")->fetch_assoc();
@@ -353,6 +355,7 @@ if (!isset($_SESSION['user_id'])) {
                         $active_users_query = "SELECT u.username, COUNT(p.id) as post_count 
                                             FROM users u 
                                             JOIN posts p ON u.id = p.user_id 
+                                            WHERE p.status = 'approved'
                                             GROUP BY u.id 
                                             ORDER BY post_count DESC 
                                             LIMIT 10";

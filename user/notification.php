@@ -1,5 +1,6 @@
 <?php
 require 'db_conn.php';
+require 'services/NotificationService.php';
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
@@ -9,9 +10,25 @@ if (!isset($_SESSION['user_id'])) {
           </script>";
     exit();
 }
-$user_id = $_SESSION['user_id'];
 
+$user_id = $_SESSION['user_id'];
 $isAdmin = $_SESSION['isAdmin'];
+
+// Initialize the notification service
+$notificationService = new NotificationService($conn);
+
+// Get notifications for the current user
+$notifications = $notificationService->getUserNotifications($user_id);
+
+// Group notifications by date
+$groupedNotifications = [];
+foreach ($notifications as $notification) {
+    $date = date('Y-m-d', strtotime($notification['created_at']));
+    if (!isset($groupedNotifications[$date])) {
+        $groupedNotifications[$date] = [];
+    }
+    $groupedNotifications[$date][] = $notification;
+}
 ?>
 
 <!DOCTYPE html>
@@ -19,14 +36,70 @@ $isAdmin = $_SESSION['isAdmin'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kulturabase</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Kulturabase - Notifications</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <?php 
+    if ($isAdmin) {
+        include 'components/layout/admin/navbar.php';
+    } else {
+        include 'components/layout/guest/navbar.php';
+    }
+    ?>
+    
+    <div class="page-container">
+        <div class="notification-header">
+            <h1>Notifications</h1>
+            <button class="mark-all-read" onclick="markAllAsRead()">
+                <!-- <i class="fas fa-check"></i> Mark all as read -->
+            </button>
+        </div>
 
-    <body>
+        <div class="notification-container">
+            <?php if (!empty($groupedNotifications)): ?>
+                <?php foreach ($groupedNotifications as $date => $dayNotifications): ?>
+                    <div class="notification-group">
+                        <div class="date-header">
+                            <?php echo formatDateHeader($date); ?>
+                        </div>
+                        <?php foreach ($dayNotifications as $notification): ?>
+                            <div class="notification-item <?php echo $notification['is_read'] ? 'read' : 'unread'; ?>">
+                                <div class="notification-circle"></div>
+                                <div class="notification-content">
+                                    <div class="notification-title">
+                                        <?php echo htmlspecialchars($notification['title']); ?>
+                                    </div>
+                                    <div class="notification-message">
+                                        <?php echo htmlspecialchars($notification['message']); ?>
+                                    </div>
+                                    <div class="notification-time">
+                                        <?php echo date('h:i A', strtotime($notification['created_at'])); ?>
+                                    </div>
+                                </div>
+                                <?php if (!empty($notification['redirect_url'])): ?>
+                                    <a href="<?php echo htmlspecialchars($notification['redirect_url']); ?>" 
+                                       class="notification-action"
+                                       onclick="markAsRead(<?php echo $notification['id']; ?>)">
+                                        View
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="no-notifications">
+                    <i class="fas fa-bell-slash"></i>
+                    <p>No notifications found</p>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
     <style>
-    /* General */
         * {
             margin: 0;
             padding: 0;
@@ -35,26 +108,80 @@ $isAdmin = $_SESSION['isAdmin'];
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f7f7f7;
-            color: #4A4947;
+            background-color: #f8f9fa;
+            color: #333;
             line-height: 1.6;
             padding-top: 80px;
         }
-        .notification-container {
-            max-width: 600px;
-            margin: 20px auto;
+
+        .page-container {
+            max-width: 800px;
+            margin: 0 auto;
             padding: 20px;
-            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 50px 4px;
+        }
+
+        .notification-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .mark-all-read {
+            background: none;
+            border: none;
+            color: #365486;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .mark-all-read:hover {
+            background-color: #f0f0f0;
+        }
+
+        .notification-container {
+            background-color: white;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification-group {
+            border-bottom: 1px solid #eee;
+        }
+
+        .notification-group:last-child {
+            border-bottom: none;
+        }
+
+        .date-header {
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #666;
+            background-color: #fff;
+            border-bottom: 1px solid #eee;
         }
 
         .notification-item {
             display: flex;
-            align-items: center;
-            padding: 15px;
+            align-items: flex-start;
+            padding: 16px 20px;
             border-bottom: 1px solid #eee;
-            transition: background-color 0.3s;
+            transition: background-color 0.2s;
+            gap: 12px;
         }
 
         .notification-item:last-child {
@@ -62,494 +189,120 @@ $isAdmin = $_SESSION['isAdmin'];
         }
 
         .notification-item:hover {
-            background-color: #f5f5f5;
+            background-color: #f8f9fa;
         }
 
-        .notification-avatar {
-            width: 40px;
-            height: 40px;
+        .notification-circle {
+            width: 10px;
+            height: 10px;
+            border: 2px solid #666;
             border-radius: 50%;
-            background-color: #365486;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            color: white;
-            font-weight: bold;
+            margin-top: 6px;
+            flex-shrink: 0;
         }
 
         .notification-content {
             flex: 1;
+            min-width: 0;
         }
 
         .notification-title {
-            font-weight: bold;
+            font-weight: 500;
             color: #365486;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+
+        .notification-message {
+            color: #666;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
         }
 
         .notification-time {
-            font-size: 0.8em;
-            color: #666;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .notification-action {
+            background-color: #365486;
+            color: white;
+            text-decoration: none;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            align-self: center;
+            transition: background-color 0.2s;
+        }
+
+        .notification-action:hover {
+            background-color: #2a4268;
         }
 
         .no-notifications {
             text-align: center;
-            padding: 20px;
+            padding: 40px 20px;
             color: #666;
         }
+
+        .no-notifications i {
+            font-size: 48px;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+
+        .no-notifications p {
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 16px;
+            }
+
+            .notification-header {
+                margin-bottom: 16px;
+            }
+
+            .notification-item {
+                padding: 12px 16px;
+            }
+        }
     </style>
-    
-    <!-- Navigation Bar -->
-    <?php 
-    if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1) {
-        include 'components/layout/admin/navbar.php';
-    } else {
-        include 'components/layout/guest/navbar.php';
-    }
-    ?>
-    
-<div class="notification-container">
-    <?php
-    // Check if the user is an admin or not and adjust the query accordingly
-    if ($isAdmin) {
-        // Admin: Fetch all posts, comments, likes, and post requests
-        $query = "SELECT 
-                    p.id AS post_id,
-                    p.title AS post_title,
-                    p.created_at AS post_created_at,
-                    p.status AS post_status,
-                    u.username AS post_creator,
-                    u.profile_picture AS user_avatar,
-                    c.comment_text,
-                    c.created_at AS comment_created_at,
-                    c.user_id AS comment_user_id,
-                    cu.username AS comment_user,
-                    l.created_at AS like_created_at,
-                    l.user_id AS like_user_id,
-                    lu.username AS like_user,
-                    'post_interaction' AS notification_type
-                FROM posts p
-                JOIN users u ON p.user_id = u.id
-                LEFT JOIN comments c ON p.id = c.post_id
-                LEFT JOIN users cu ON c.user_id = cu.id
-                LEFT JOIN likes l ON p.id = l.post_id
-                LEFT JOIN users lu ON l.user_id = lu.id
-                WHERE p.status != 'approved'
-                
-                UNION ALL
-                
-                SELECT 
-                    p2.id AS post_id,
-                    p2.title AS post_title,
-                    p2.created_at AS post_created_at,
-                    p2.status AS post_status,
-                    u2.username AS post_creator,
-                    u2.profile_picture AS user_avatar,
-                    NULL as comment_text,
-                    NULL as comment_created_at,
-                    NULL as comment_user_id,
-                    NULL as comment_user,
-                    NULL as like_created_at,
-                    NULL as like_user_id,
-                    NULL as like_user,
-                    'post_request' AS notification_type
-                FROM posts p2
-                JOIN users u2 ON p2.user_id = u2.id
-                WHERE p2.status = 'pending'
-                
-                ORDER BY post_created_at DESC
-                LIMIT 20";
-        $stmt = $conn->prepare($query);
-    } else {
-        // Non-admin: Fetch posts, comments, and likes by the current user
-        $query = "SELECT 
-                    p.title AS post_title,
-                    p.created_at AS post_created_at,
-                    u.username AS post_creator,
-                    u.profile_picture AS user_avatar,
-                    c.comment_text,
-                    c.created_at AS comment_created_at,
-                    c.user_id AS comment_user_id,
-                    cu.username AS comment_user,
-                    l.created_at AS like_created_at,
-                    l.user_id AS like_user_id,
-                    lu.username AS like_user
-                FROM posts p
-                JOIN users u ON p.user_id = u.id
-                LEFT JOIN comments c ON p.id = c.post_id
-                LEFT JOIN users cu ON c.user_id = cu.id
-                LEFT JOIN likes l ON p.id = l.post_id
-                LEFT JOIN users lu ON l.user_id = lu.id
-                WHERE p.user_id = ?
-                ORDER BY GREATEST(
-                    IFNULL(p.created_at, 0),
-                    IFNULL(c.created_at, 0),
-                    IFNULL(l.created_at, 0)
-                ) DESC
-                LIMIT 20";
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("i", $user_id);
-    }
 
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $postTimeAgo = getTimeAgo(strtotime($row['post_created_at']));
-            $commentTimeAgo = isset($row['comment_created_at']) ? getTimeAgo(strtotime($row['comment_created_at'])) : null;
-            $likeTimeAgo = isset($row['like_created_at']) ? getTimeAgo(strtotime($row['like_created_at'])) : null;
-
-            echo '<div class="notification-item">
-                    <div class="notification-avatar">';
-            if (!empty($row['user_avatar'])) {
-                echo '<img src="' . htmlspecialchars($row['user_avatar']) . '" alt="User avatar" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">';
-            } else {
-                echo substr($row['post_creator'], 0, 1);
-            }
-            echo '</div>
-                    <div class="notification-content">';
-
-            // Post request notification for admins
-            if ($isAdmin && $row['notification_type'] === 'post_request') {
-                echo '<div class="notification-title">
-                        New Post Request
-                      </div>
-                      <div>' . htmlspecialchars($row['post_creator']) . ' submitted a new post: "' . htmlspecialchars($row['post_title']) . '"</div>
-                      <div class="notification-time">' . getTimeAgo(strtotime($row['post_created_at'])) . '</div>
-                      <a href="post-requests.php" class="notification-action">Review Request</a>';
-            } else {
-                // Post notification
-                echo '<div class="notification-title">
-                        ' . htmlspecialchars($row['post_creator']) . ' created a new post
-                      </div>
-                      <div>' . htmlspecialchars($row['post_title']) . '</div>
-                      <div class="notification-time">' . $postTimeAgo . '</div>';
-
-                // Comment notification
-                if (!empty($row['comment_text'])) {
-                    echo '<div class="notification-comment">
-                            <strong>' . htmlspecialchars($row['comment_user']) . '</strong> commented: "' . htmlspecialchars($row['comment_text']) . '"
-                          </div>
-                          <div class="notification-time">' . $commentTimeAgo . '</div>';
-                }
-
-                // Like notification
-                if (!empty($row['like_user'])) {
-                    echo '<div class="notification-like">
-                            <strong>' . htmlspecialchars($row['like_user']) . '</strong> liked this post
-                          </div>
-                          <div class="notification-time">' . $likeTimeAgo . '</div>';
-                }
-            }
-
-            echo '</div></div>';
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function markAsRead(notificationId) {
+            $.post('ajax/mark_notification_read.php', {
+                notification_id: notificationId
+            });
         }
-    } else {
-        echo '<div class="no-notifications">No recent activity</div>';
-    }
 
-    $stmt->close();
-
-    // Helper function to convert timestamp to "time ago" format
-    function getTimeAgo($timestamp) {
-        $time_difference = time() - $timestamp;
-
-        if ($time_difference < 60) {
-            return date("h:i A", $timestamp); 
-        } elseif ($time_difference < 3600) {
-            $minutes = round($time_difference / 60);
-            return $minutes . " minute" . ($minutes != 1 ? "s" : "") . " ago";
-        } elseif ($time_difference < 86400) {
-            $hours = round($time_difference / 3600);
-            return $hours . " hour" . ($hours != 1 ? "s" : "") . " ago";
-        } elseif ($time_difference < 604800) {
-            $days = round($time_difference / 86400);
-            return $days . " day" . ($days != 1 ? "s" : "") . " ago";
-        } else {
-            return date("M j, Y", $timestamp);
+        function markAllAsRead() {
+            $.post('ajax/mark_all_notifications_read.php', function(response) {
+                if (response.success) {
+                    location.reload();
+                }
+            });
         }
-    }
-    ?>
-</div>
-
-
-
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script>
-        setInterval(function() {
-            location.reload();
-        }, 60000);
     </script>
-  <style>
-    /* Post container */
-.post {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin: 20px 0;
-    padding: 15px;
-    /* max-width: 600px; */
-    width: 100%;
-}
 
-.post-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.profile-pic {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 10px;
-}
-
-.post-header span {
-    font-weight: bold;
-    font-size: 16px;
-}
-
-.delete-post {
-    background: transparent;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-}
-
-.post-content h3 {
-    margin: 10px 0;
-    font-size: 18px;
-}
-
-.post-content p {
-    margin-bottom: 15px;
-    font-size: 14px;
-    color: #555;
-}
-
-.post-content img {
-    max-width: 100%;
-    border-radius: 8px;
-    margin-top: 10px;
-}
-
-.post-interactions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-}
-
-.like-btn, .comment-toggle {
-    background: #007bff;
-    color: #fff;
-    border: none;
-    padding: 8px 12px;
-    font-size: 14px;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.like-btn.liked {
-    background: #28a745;
-}
-
-.comments-section {
-    margin-top: 20px;
-}
-
-.comment {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 15px;
-    padding: 10px;
-    background: #f7f7f7;
-    border-radius: 8px;
-}
-
-.comment-profile-pic {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 10px;
-}
-
-.comment-content {
-    display: flex;
-    flex-direction: column;
-}
-
-.comment-content strong {
-    font-weight: bold;
-    font-size: 14px;
-}
-
-.comment-content p {
-    margin: 5px 0;
-    font-size: 13px;
-    color: #666;
-}
-
-.delete-comment {
-    background: transparent;
-    border: none;
-    font-size: 12px;
-    color: #dc3545;
-    cursor: pointer;
-    align-self: flex-start;
-}
-
-.comment-input {
-    display: flex;
-    align-items: center;
-    margin-top: 15px;
-}
-
-.comment-text {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 14px;
-    margin-right: 10px;
-}
-
-.submit-comment {
-    background: #007bff;
-    color: #fff;
-    border: none;
-    padding: 8px 12px;
-    font-size: 14px;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-   .explore-container {
-      max-width: 1000px;
-      margin: 20px auto;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .post-container {
-      border: 1px solid #ccc;
-      padding: 15px;
-      margin-bottom: 20px;
-      border-radius: 10px;
-      background-color: #fff;
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .post-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-
-    .profile-pic {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      margin-right: 10px;
-    }
-
-    .post-header div {
-      font-size: 14px;
-    }
-
-    .post-header strong {
-      font-size: 16px;
-      color: #333;
-    }
-
-    .post-body {
-      margin-top: 10px;
-      font-size: 16px;
-      line-height: 1.6;
-    }
-
-    .post-body img {
-      width: 100%;
-      max-height: 500px;
-      object-fit: cover;
-      margin-top: 15px;
-      border-radius: 5px;
-    }
-
-    .post-footer {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 15px;
-    }
-
-    .post-footer button {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #555;
-      font-size: 16px;
-      transition: color 0.3s;
-    }
-
-    .post-footer button:hover {
-      color: #007bff;
-    }
-
-    .post-footer .like-btn,
-    .post-footer .comment-btn,
-    .post-footer .share-btn {
-      padding: 5px 10px;
-    }
-
-    /* Tag Style for Elements */
-    .tags-container {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .tag {
-      background-color: #e7f1ff;
-      color: #007bff;
-      border-radius: 20px;
-      padding: 5px 15px;
-      font-size: 14px;
-      border: 1px solid #007bff;
-      transition: all 0.3s ease;
-    }
-
-    .tag:hover {
-      background-color: #007bff;
-      color: #fff;
-    }
-
-    .notification-action {
-        display: inline-block;
-        margin-top: 8px;
-        padding: 4px 12px;
-        background-color: #365486;
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
-        font-size: 0.9em;
-    }
-    
-    .notification-action:hover {
-        background-color: #2a4268;
-    }
-  </style>
-
-<!-- Sidebar -->
-<?php include 'components/layout/guest/sidebar.php'; ?>
-<?php include 'components/widgets/chat.php'; ?>
-
+    <!-- Sidebar -->
+    <?php include 'components/layout/guest/sidebar.php'; ?>
+    <?php include 'components/widgets/chat.php'; ?>
 </body>
-</head>
 </html>
+
+<?php
+function formatDateHeader($date) {
+    $today = date('Y-m-d');
+    $yesterday = date('Y-m-d', strtotime('-1 day'));
+
+    if ($date === $today) {
+        return 'Today';
+    } elseif ($date === $yesterday) {
+        return 'Yesterday';
+    } else {
+        return date('F j, Y', strtotime($date));
+    }
+}

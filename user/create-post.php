@@ -56,6 +56,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param('issssss', $user_id, $title, $description, $uploaded_file, $culture_elements, $learning_styles, $status);
 
         if ($stmt->execute()) {
+            // Create notification after successful post creation
+            require_once 'services/NotificationService.php';
+            $notificationService = new NotificationService($conn);
+            
+            // Create notification for the user
+            $notificationTitle = "Post Submitted";
+            $notificationMessage = "Your post \"" . $title . "\" is pending for review.";
+            $redirectUrl = "my-posts.php";
+            
+            $notificationService->createNotification(
+                $user_id,
+                $notificationTitle,
+                $notificationMessage,
+                $redirectUrl
+            );
+
+            // If the user is not an admin, create notifications for all admins
+            if (!isset($_SESSION['isAdmin']) || $_SESSION['isAdmin'] != 1) {
+                // Get all admin users
+                $adminQuery = "SELECT id FROM users WHERE isAdmin = 1";
+                $adminResult = $conn->query($adminQuery);
+                
+                while ($admin = $adminResult->fetch_assoc()) {
+                    $notificationService->createNotification(
+                        $admin['id'],
+                        "New Post Request",
+                        "A new post \"" . $title . "\" needs your review.",
+                        "post-requests.php"
+                    );
+                }
+            }
+
             echo "<script>
                     document.addEventListener('DOMContentLoaded', function() {
                         showSuccessModal();
@@ -1071,17 +1103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         /* Premium user indicator */
-        .premium-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background-color: #fff3dc;
-            color: #b38600;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-        }
+        
 
         .premium-badge i {
             color: #FFD700;

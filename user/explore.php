@@ -666,178 +666,129 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
             }
         }
 
-        /* Learning Styles Section */
-        .learning-styles {
+        /* Learning Styles Section Redesign */
+        .learning-styles-section {
             margin: 15px 0;
-            padding: 0;
         }
 
-        .learning-styles h4 {
-            font-size: 16px;
-            color: #333;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .learning-styles ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .learning-styles li {
-            display: inline-block;
-            background-color: #f0f0f0;
-            padding: 6px 12px;
-            border-radius: 15px;
-            margin: 0 8px 8px 0;
-            font-size: 14px;
-            color: #555;
-        }
-
-        /* Like Button Styling */
-        .like-button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+        .learning-styles-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
             margin-top: 10px;
-            transition: background-color 0.2s ease;
         }
 
-        .like-button:hover {
-            background-color: #218838;
+        .style-option {
+            position: relative;
         }
 
-        .like-button i {
-            font-size: 16px;
+        .style-option input[type="checkbox"] {
+            display: none;
         }
 
-        .like-count {
-            font-weight: 500;
-        }
-
-        /* Post Elements Styling */
-        .post {
-            background-color: #fff;
+        .style-option label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 8px;
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin: 0 0 20px 0;
-            padding: 20px;
-            width: 100%;
-            display: inline-block;
-            break-inside: avoid;
-            word-wrap: break-word;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            gap: 6px;
         }
 
-        /* Culture Elements & Learning Styles Sections */
-        .culture-elements,
-        .learning-styles {
+        .style-option label:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .style-option input[type="checkbox"]:checked + label {
+            background: #7FC7D9;
+        }
+
+        .style-option input[type="checkbox"]:checked + label i,
+        .style-option input[type="checkbox"]:checked + label span {
+            color: #0F1035;
+        }
+
+        .style-option i {
+            font-size: 1.2rem;
+            color: #DCF2F1;
+        }
+
+        .style-option span {
+            font-size: 0.75rem;
+            color: #DCF2F1;
+            text-align: center;
+        }
+
+        /* Following Section Redesign */
+        .following-section {
             margin: 15px 0;
         }
 
-        .culture-elements h4,
-        .learning-styles h4 {
-            font-size: 16px;
-            color: #333;
-            margin-bottom: 12px;
-            font-weight: 600;
+        .following-option {
+            position: relative;
+            margin-top: 10px;
         }
 
-        .elements-list,
-        .styles-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        .following-option input[type="checkbox"] {
+            display: none;
         }
 
-        .elements-list li,
-        .styles-list li {
-            display: inline-block;
-            background-color: #f0f0f0;
-            padding: 6px 12px;
-            border-radius: 15px;
-            margin: 0 8px 8px 0;
-            font-size: 14px;
-            color: #555;
-            transition: all 0.2s ease;
-        }
-
-        .elements-list li:hover,
-        .styles-list li:hover {
-            background-color: #e0e0e0;
-            transform: translateY(-1px);
-        }
-
-        /* Like Button Styling */
-        .like-button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            cursor: pointer;
-            display: inline-flex;
+        .following-button {
+            display: flex;
             align-items: center;
-            gap: 6px;
-            margin-top: 15px;
-            transition: background-color 0.2s ease;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
         }
 
-        .like-button:hover {
-            background-color: #0056b3;
+        .button-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .like-button i {
-            font-size: 16px;
+        .following-icon {
+            color: #DCF2F1;
+            font-size: 0.9rem;
         }
 
-        .like-count {
+        .toggle-indicator {
+            width: 18px;
+            height: 18px;
+            background: #DCF2F1;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .following-text {
+            color: #DCF2F1;
+            font-size: 0.8rem;
             font-weight: 500;
         }
 
-        /* Image container */
-        .post-image {
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-            border-radius: 8px;
-            margin-bottom: 15px;
+        .following-button:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
 
-        .post-image img {
-            width: 100%;
-            height: auto;
-            display: block;
+        .following-option input[type="checkbox"]:checked + .following-button {
+            background: #7FC7D9;
         }
 
-        /* Category label */
-        .category-label {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 14px;
+        .following-option input[type="checkbox"]:checked + .following-button .following-text,
+        .following-option input[type="checkbox"]:checked + .following-button .following-icon {
+            color: #0F1035;
         }
 
-        /* Hover effects */
-        .post {
-            cursor: pointer;
-        }
-
-        .post:hover .post-image img {
-            transform: scale(1.02);
-            transition: transform 0.3s ease;
+        .following-option input[type="checkbox"]:checked + .following-button .toggle-indicator {
+            background: #0F1035;
+            transform: translateX(4px);
         }
 
         /* Like Button Animation */
@@ -915,128 +866,6 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
             opacity: 0.7;
             cursor: wait;
         }
-
-        /* Premium Post Styling */
-        .premium-post {
-            border: 2px solid #ffd700 !important;
-            background: linear-gradient(to bottom, #fffdf0, #ffffff) !important;
-            box-shadow: 0 4px 8px rgba(255, 215, 0, 0.2) !important;
-        }
-
-        .premium-badge {
-            background-color: #ffd700;
-            color: #333;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-size: 12px;
-            margin-left: 8px;
-            font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .premium-badge i {
-            font-size: 10px;
-        }
-
-        .document-container {
-            width: 100%;
-            height: 180px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
-        .document-download {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: #365486;
-            padding: 20px;
-            transition: transform 0.2s ease;
-        }
-
-        .document-download:hover {
-            transform: scale(1.05);
-        }
-
-        .document-download i {
-            font-size: 64px;
-            margin-bottom: 10px;
-        }
-
-        .document-name {
-            font-size: 14px;
-            color: #4a4a4a;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            text-align: center;
-        }
-
-        /* Add hover effect */
-        .document-container:hover {
-            background-color: #f0f2f5;
-        }
-
-        .document-download:hover i {
-            color: #1a73e8;
-        }
-
-        /* Add these styles for the follow button */
-        .post-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-
-        .post-header-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .post-header-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .follow-btn {
-            background-color: #365486;
-            color: white;
-            border: none;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .follow-btn:hover {
-            background-color: #7FC7D9;
-            transform: translateY(-1px);
-        }
-
-        .follow-btn.following {
-            background-color: #f0f2f5;
-            color: #365486;
-            border: 1px solid #365486;
-        }
-
-        .follow-btn.following:hover {
-            background-color: #ffebee;
-            color: #dc3545;
-            border-color: #dc3545;
-        }
     </style>
 
     <!-- Navigation Bar -->
@@ -1108,7 +937,7 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             margin: 0 0 5px 0;
-            padding: 5px;
+            padding: 15px;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -1477,178 +1306,129 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
             }
         }
 
-        /* Learning Styles Section */
-        .learning-styles {
+        /* Learning Styles Section Redesign */
+        .learning-styles-section {
             margin: 15px 0;
-            padding: 0;
         }
 
-        .learning-styles h4 {
-            font-size: 16px;
-            color: #333;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .learning-styles ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .learning-styles li {
-            display: inline-block;
-            background-color: #f0f0f0;
-            padding: 6px 12px;
-            border-radius: 15px;
-            margin: 0 8px 8px 0;
-            font-size: 14px;
-            color: #555;
-        }
-
-        /* Like Button Styling */
-        .like-button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+        .learning-styles-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
             margin-top: 10px;
-            transition: background-color 0.2s ease;
         }
 
-        .like-button:hover {
-            background-color: #218838;
+        .style-option {
+            position: relative;
         }
 
-        .like-button i {
-            font-size: 16px;
+        .style-option input[type="checkbox"] {
+            display: none;
         }
 
-        .like-count {
-            font-weight: 500;
-        }
-
-        /* Post Elements Styling */
-        .post {
-            background-color: #fff;
+        .style-option label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 8px;
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin: 0 0 20px 0;
-            padding: 20px;
-            width: 100%;
-            display: inline-block;
-            break-inside: avoid;
-            word-wrap: break-word;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            gap: 6px;
         }
 
-        /* Culture Elements & Learning Styles Sections */
-        .culture-elements,
-        .learning-styles {
+        .style-option label:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .style-option input[type="checkbox"]:checked + label {
+            background: #7FC7D9;
+        }
+
+        .style-option input[type="checkbox"]:checked + label i,
+        .style-option input[type="checkbox"]:checked + label span {
+            color: #0F1035;
+        }
+
+        .style-option i {
+            font-size: 1.2rem;
+            color: #DCF2F1;
+        }
+
+        .style-option span {
+            font-size: 0.75rem;
+            color: #DCF2F1;
+            text-align: center;
+        }
+
+        /* Following Section Redesign */
+        .following-section {
             margin: 15px 0;
         }
 
-        .culture-elements h4,
-        .learning-styles h4 {
-            font-size: 16px;
-            color: #333;
-            margin-bottom: 12px;
-            font-weight: 600;
+        .following-option {
+            position: relative;
+            margin-top: 10px;
         }
 
-        .elements-list,
-        .styles-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
+        .following-option input[type="checkbox"] {
+            display: none;
         }
 
-        .elements-list li,
-        .styles-list li {
-            display: inline-block;
-            background-color: #f0f0f0;
-            padding: 6px 12px;
-            border-radius: 15px;
-            margin: 0 8px 8px 0;
-            font-size: 14px;
-            color: #555;
-            transition: all 0.2s ease;
-        }
-
-        .elements-list li:hover,
-        .styles-list li:hover {
-            background-color: #e0e0e0;
-            transform: translateY(-1px);
-        }
-
-        /* Like Button Styling */
-        .like-button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            cursor: pointer;
-            display: inline-flex;
+        .following-button {
+            display: flex;
             align-items: center;
-            gap: 6px;
-            margin-top: 15px;
-            transition: background-color 0.2s ease;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
         }
 
-        .like-button:hover {
-            background-color: #0056b3;
+        .button-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .like-button i {
-            font-size: 16px;
+        .following-icon {
+            color: #DCF2F1;
+            font-size: 0.9rem;
         }
 
-        .like-count {
+        .toggle-indicator {
+            width: 18px;
+            height: 18px;
+            background: #DCF2F1;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .following-text {
+            color: #DCF2F1;
+            font-size: 0.8rem;
             font-weight: 500;
         }
 
-        /* Image container */
-        .post-image {
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-            border-radius: 8px;
-            margin-bottom: 15px;
+        .following-button:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
 
-        .post-image img {
-            width: 100%;
-            height: auto;
-            display: block;
+        .following-option input[type="checkbox"]:checked + .following-button {
+            background: #7FC7D9;
         }
 
-        /* Category label */
-        .category-label {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background-color: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 14px;
+        .following-option input[type="checkbox"]:checked + .following-button .following-text,
+        .following-option input[type="checkbox"]:checked + .following-button .following-icon {
+            color: #0F1035;
         }
 
-        /* Hover effects */
-        .post {
-            cursor: pointer;
-        }
-
-        .post:hover .post-image img {
-            transform: scale(1.02);
-            transition: transform 0.3s ease;
+        .following-option input[type="checkbox"]:checked + .following-button .toggle-indicator {
+            background: #0F1035;
+            transform: translateX(4px);
         }
 
         /* Like Button Animation */
@@ -1744,24 +1524,51 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
                 </ul>
             </div>
 
-            <div class="menu-section">
+            <div class="menu-section learning-styles-section">
                 <h3>Learning Styles</h3>
-                <div class="menu-item">
-                    <ul id="learning-styles-filter">
-                        <li><input type="checkbox" id="visual-filter" value="visual">Visual</li>
-                        <li><input type="checkbox" id="auditory-filter" value="auditory">Auditory & Oral</li>
-                        <li><input type="checkbox" id="read-write-filter" value="Read & Write">Read & Write</li>
-                        <li><input type="checkbox" id="kinesthetic-filter" value="kinesthetic">Kinesthetic</li>
-                    </ul>
+                <div class="learning-styles-grid" id="learning-styles-filter">
+                    <div class="style-option">
+                        <input type="checkbox" id="visual-filter" value="visual">
+                        <label for="visual-filter">
+                            <i class="fas fa-eye"></i>
+                            <span>Visual</span>
+                        </label>
+                    </div>
+                    <div class="style-option">
+                        <input type="checkbox" id="auditory-filter" value="auditory">
+                        <label for="auditory-filter">
+                            <i class="fas fa-headphones"></i>
+                            <span>Auditory & Oral</span>
+                        </label>
+                    </div>
+                    <div class="style-option">
+                        <input type="checkbox" id="read-write-filter" value="Read & Write">
+                        <label for="read-write-filter">
+                            <i class="fas fa-book-reader"></i>
+                            <span>Read & Write</span>
+                        </label>
+                    </div>
+                    <div class="style-option">
+                        <input type="checkbox" id="kinesthetic-filter" value="kinesthetic">
+                        <label for="kinesthetic-filter">
+                            <i class="fas fa-running"></i>
+                            <span>Kinesthetic</span>
+                        </label>
+                    </div>
                 </div>
             </div>
 
-            <div class="menu-section">
+            <div class="menu-section following-section">
                 <h3>Following</h3>
-                <div class="menu-item">
-                    <ul id="following-filter">
-                        <li><input type="checkbox" id="following-checkbox" value="following">Show Following Posts</li>
-                    </ul>
+                <div class="following-option">
+                    <input type="checkbox" id="following-checkbox" value="following">
+                    <label for="following-checkbox" class="following-button">
+                        <div class="button-content">
+                            <i class="fas fa-users following-icon"></i>
+                            <span class="following-text">All Posts</span>
+                        </div>
+                        <div class="toggle-indicator"></div>
+                    </label>
                 </div>
             </div>
 
@@ -1933,3 +1740,11 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
         </div>
     </div>
 </div>
+
+<script>
+    // Add this to your existing JavaScript
+    document.getElementById('following-checkbox').addEventListener('change', function() {
+        const textSpan = this.nextElementSibling.querySelector('.following-text');
+        textSpan.textContent = this.checked ? 'Following Posts' : 'All Posts';
+    });
+</script>

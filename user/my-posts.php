@@ -188,6 +188,9 @@
                                 ?>
                             </span>
                             <?php if ($post['status'] === 'rejected'): ?>
+                                <button class="appeal-btn" onclick="showAppealModal(<?php echo $post['id']; ?>)">
+                                    <i class="fas fa-exclamation-circle"></i> Appeal
+                                </button>
                                 <button class="delete-btn" onclick="deletePost(<?php echo $post['id']; ?>)">
                                     <i class="fas fa-trash"></i> Delete
                                 </button>
@@ -215,6 +218,24 @@
             </div>
             <div class="message-modal-footer">
                 <button onclick="closeMessageModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appeal Modal -->
+    <div id="appealModal" class="message-modal">
+        <div class="message-modal-content">
+            <div class="message-modal-header">
+                <h3>Appeal Post</h3>
+                <span class="close-modal" onclick="closeAppealModal()">&times;</span>
+            </div>
+            <div class="message-modal-body">
+                <p>Please provide a reason for your appeal:</p>
+                <textarea id="appealReason" rows="4" placeholder="Enter your appeal reason..."></textarea>
+            </div>
+            <div class="message-modal-footer">
+                <button onclick="closeAppealModal()" class="cancel-btn">Cancel</button>
+                <button onclick="submitAppeal()" class="submit-btn">Submit Appeal</button>
             </div>
         </div>
     </div>
@@ -657,99 +678,261 @@
             background-color: #2a4268;
             transform: translateY(-2px);
         }
+
+        /* Appeal Modal Specific Styles */
+        #appealModal .message-modal-content {
+            max-width: 500px;
+        }
+
+        #appealModal .message-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #appealModal .message-modal-header h3 {
+            color: #365486;
+            margin: 0;
+        }
+
+        #appealModal textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: inherit;
+            margin-top: 10px;
+        }
+
+        #appealModal textarea:focus {
+            outline: none;
+            border-color: #365486;
+        }
+
+        #appealModal .message-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .cancel-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn {
+            background-color: #365486;
+            color: white;
+            border: none;
+            padding: 8px 24px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-btn:hover, .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .appeal-btn {
+            background-color: #ffc107;
+            color: #856404;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .appeal-btn:hover {
+            background-color: #e0a800;
+            transform: translateY(-2px);
+        }
+
+        /* Adjust post footer for multiple buttons */
+        .post-footer .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
     </style>
 
-<!-- Sidebar -->
-<?php include 'components/layout/guest/sidebar.php'; ?>
+    <!-- Sidebar -->
+    <?php include 'components/layout/guest/sidebar.php'; ?>
 
-<!-- Include Chat Widget -->
-<?php include 'components/widgets/chat.php'; ?>
+    <!-- Include Chat Widget -->
+    <?php include 'components/widgets/chat.php'; ?>
 
-<script>
-function showMessageModal(message, type = 'success') {
-    const modal = document.getElementById('messageModal');
-    const messageIcon = modal.querySelector('.message-icon');
-    const iconElement = messageIcon.querySelector('i');
-    
-    // Set icon and class based on type
-    messageIcon.className = 'message-icon ' + type;
-    iconElement.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
-    
-    // Set message
-    document.getElementById('modalMessage').textContent = message;
-    
-    // Show modal
-    modal.style.display = 'block';
-}
-
-function closeMessageModal() {
-    const modal = document.getElementById('messageModal');
-    modal.style.display = 'none';
-}
-
-// Close modal when clicking outside
-window.onclick = function(event) {
-    const modal = document.getElementById('messageModal');
-    if (event.target === modal) {
-        closeMessageModal();
-    }
-}
-
-// Close modal when clicking X
-document.querySelector('.close-modal').onclick = closeMessageModal;
-
-function deletePost(postId) {
-    if (!confirm('Are you sure you want to delete this post?')) {
-        return;
+    <script>
+    function showMessageModal(message, type = 'success') {
+        const modal = document.getElementById('messageModal');
+        const messageIcon = modal.querySelector('.message-icon');
+        const iconElement = messageIcon.querySelector('i');
+        
+        // Set icon and class based on type
+        messageIcon.className = 'message-icon ' + type;
+        iconElement.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+        
+        // Set message
+        document.getElementById('modalMessage').textContent = message;
+        
+        // Show modal
+        modal.style.display = 'block';
     }
 
-    fetch('delete_post.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: `post_id=${postId}`
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            // Remove the post card from the UI
-            const postCard = document.querySelector(`.post-card[data-post-id="${postId}"]`);
-            if (postCard) {
-                postCard.remove();
-            }
+    function closeMessageModal() {
+        const modal = document.getElementById('messageModal');
+        modal.style.display = 'none';
+    }
 
-            // Update the counts in the tabs
-            const rejectedCountSpan = document.querySelector('a[href="?status=rejected"] .count');
-            const allCountSpan = document.querySelector('a[href="?status=all"] .count');
-            
-            if (rejectedCountSpan) {
-                let count = parseInt(rejectedCountSpan.textContent) - 1;
-                rejectedCountSpan.textContent = count;
-                
-                // Update all count
-                if (allCountSpan) {
-                    allCountSpan.textContent = parseInt(allCountSpan.textContent) - 1;
-                }
-
-                // If no more rejected posts, reload to remove the badge
-                if (count === 0) {
-                    window.location.reload();
-                }
-            }
-
-            // Show success message with custom modal
-            showMessageModal('Post deleted successfully');
-        } else {
-            // Show error message with custom modal
-            showMessageModal(data.message || 'Error deleting post', 'error');
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const messageModal = document.getElementById('messageModal');
+        const appealModal = document.getElementById('appealModal');
+        
+        if (event.target === messageModal) {
+            closeMessageModal();
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showMessageModal('Error deleting post', 'error');
-    });
-}
-</script>
+        if (event.target === appealModal) {
+            closeAppealModal();
+        }
+    }
+
+    // Close modal when clicking X
+    document.querySelector('.close-modal').onclick = closeMessageModal;
+
+    function deletePost(postId) {
+        if (!confirm('Are you sure you want to delete this post?')) {
+            return;
+        }
+
+        fetch('delete_post.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `post_id=${postId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Remove the post card from the UI
+                const postCard = document.querySelector(`.post-card[data-post-id="${postId}"]`);
+                if (postCard) {
+                    postCard.remove();
+                }
+
+                // Update the counts in the tabs
+                const rejectedCountSpan = document.querySelector('a[href="?status=rejected"] .count');
+                const allCountSpan = document.querySelector('a[href="?status=all"] .count');
+                
+                if (rejectedCountSpan) {
+                    let count = parseInt(rejectedCountSpan.textContent) - 1;
+                    rejectedCountSpan.textContent = count;
+                    
+                    // Update all count
+                    if (allCountSpan) {
+                        allCountSpan.textContent = parseInt(allCountSpan.textContent) - 1;
+                    }
+
+                    // If no more rejected posts, reload to remove the badge
+                    if (count === 0) {
+                        window.location.reload();
+                    }
+                }
+
+                // Show success message with custom modal
+                showMessageModal('Post deleted successfully');
+            } else {
+                // Show error message with custom modal
+                showMessageModal(data.message || 'Error deleting post', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessageModal('Error deleting post', 'error');
+        });
+    }
+
+    let currentPostId = null;
+
+    function showAppealModal(postId) {
+        currentPostId = postId;
+        document.getElementById('appealModal').style.display = 'block';
+        document.getElementById('appealReason').value = '';
+    }
+
+    function closeAppealModal() {
+        document.getElementById('appealModal').style.display = 'none';
+        currentPostId = null;
+    }
+
+    function submitAppeal() {
+        const appealReason = document.getElementById('appealReason').value.trim();
+        
+        if (!appealReason) {
+            showMessageModal('Please provide a reason for your appeal', 'error');
+            return;
+        }
+
+        fetch('appeal_post.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `post_id=${currentPostId}&appeal_reason=${encodeURIComponent(appealReason)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Update UI
+                const postCard = document.querySelector(`.post-card[data-post-id="${currentPostId}"]`);
+                if (postCard) {
+                    // Update status badge
+                    const statusBadge = postCard.querySelector('.status');
+                    statusBadge.className = 'status pending';
+                    statusBadge.textContent = 'Pending';
+
+                    // Remove action buttons
+                    const actionButtons = postCard.querySelector('.action-buttons');
+                    if (actionButtons) {
+                        actionButtons.remove();
+                    }
+                }
+
+                // Update counts
+                const pendingCountSpan = document.querySelector('a[href="?status=pending"] .count');
+                const rejectedCountSpan = document.querySelector('a[href="?status=rejected"] .count');
+                
+                if (pendingCountSpan && rejectedCountSpan) {
+                    pendingCountSpan.textContent = parseInt(pendingCountSpan.textContent) + 1;
+                    rejectedCountSpan.textContent = parseInt(rejectedCountSpan.textContent) - 1;
+                }
+
+                closeAppealModal();
+                showMessageModal('Appeal submitted successfully');
+            } else {
+                showMessageModal(data.message || 'Error submitting appeal', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessageModal('Error submitting appeal', 'error');
+        });
+    }
+    </script>
 </body>
 </html> 

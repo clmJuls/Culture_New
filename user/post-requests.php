@@ -180,6 +180,12 @@
                         <div class="post-content">
                             <h4><?php echo htmlspecialchars($post['title']); ?></h4>
                             <p><?php echo htmlspecialchars($post['description']); ?></p>
+                            <?php if ($post['appeal_reason']): ?>
+                                <div class="appeal-message">
+                                    <h4><i class="fas fa-exclamation-circle"></i> Appeal Reason:</h4>
+                                    <p><?php echo htmlspecialchars($post['appeal_reason']); ?></p>
+                                </div>
+                            <?php endif; ?>
                             <?php if ($post['file_path']): ?>
                                 <div class="post-media">
                                     <?php
@@ -1033,6 +1039,36 @@
         color: #6c757d;
         text-align: center;
         font-size: 14px;
+    }
+    </style>
+
+    <style>
+    .appeal-message {
+        background: #fff3cd;
+        border-left: 3px solid #ffc107;
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 5px;
+    }
+
+    .appeal-message h4 {
+        color: #856404;
+        margin: 0 0 10px 0;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .appeal-message p {
+        color: #666;
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .appeal-message i {
+        color: #ffc107;
     }
     </style>
 
