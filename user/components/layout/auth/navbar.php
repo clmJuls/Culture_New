@@ -49,6 +49,7 @@
             margin: 0 15px;
             font-size: 1rem;
             font-weight: 500;
+            width: 100%;
             padding: 10px 20px;
             border-radius: 30px;
             transition: background-color 0.3s ease, color 0.3s ease;

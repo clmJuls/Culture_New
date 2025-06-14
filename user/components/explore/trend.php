@@ -83,6 +83,7 @@ if (isset($_SESSION['user_id'])) {
                                     SUBSTRING_INDEX(SUBSTRING_INDEX(culture_elements, ',', 1), ',', -1) as element,
                                     COUNT(*) as count
                                 FROM posts
+                                WHERE status = 'approved'
                                 GROUP BY element
                                 ORDER BY count DESC
                                 LIMIT 1";
@@ -93,6 +94,7 @@ if (isset($_SESSION['user_id'])) {
                 $active_user_query = "SELECT u.username, COUNT(p.id) as post_count 
                                     FROM users u 
                                     JOIN posts p ON u.id = p.user_id 
+                                    WHERE p.status = 'approved'
                                     GROUP BY u.id 
                                     ORDER BY post_count DESC 
                                     LIMIT 1";
@@ -104,6 +106,7 @@ if (isset($_SESSION['user_id'])) {
                                     SUBSTRING_INDEX(SUBSTRING_INDEX(learning_styles, ',', 1), ',', -1) as style,
                                     COUNT(*) as count
                                 FROM posts
+                                WHERE status = 'approved'
                                 GROUP BY style
                                 ORDER BY count DESC
                                 LIMIT 1";
@@ -111,7 +114,7 @@ if (isset($_SESSION['user_id'])) {
                 $top_style = $styles_result->fetch_assoc();
                 
                 // Get total posts
-                $total_posts_result = $conn->query("SELECT COUNT(*) as total FROM posts");
+                $total_posts_result = $conn->query("SELECT COUNT(*) as total FROM posts WHERE status = 'approved'");
                 $total_posts = $total_posts_result->fetch_assoc()['total'] ?? 0;
                 ?>
                 

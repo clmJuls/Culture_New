@@ -18,13 +18,14 @@ $notifications = $notificationService->getUserNotifications($user_id, $limit);
 
 // Display notifications
 foreach ($notifications as $notification) {
-    echo '<div class="notification-item">';
+    $unreadClass = !$notification['is_read'] ? 'unread' : 'read';
+    echo '<div class="notification-item ' . $unreadClass . '">';
     echo '<a href="' . htmlspecialchars($notification['redirect_url']) . '" 
-             class="notification-link" 
+             class="notification-link"
              onclick="markAsRead(' . $notification['id'] . ')">';
     echo '<div class="notification-content">';
     
-    // Simple circle icon
+    // Circle icon
     echo '<div class="notification-circle"></div>';
     
     echo '<div class="notification-text">';
@@ -39,10 +40,10 @@ foreach ($notifications as $notification) {
 
 <style>
 .notification-item {
-    padding: 12px 15px;
-    width: 100%;
+    padding: 15px;
     border-bottom: 1px solid #eee;
-    transition: background-color 0.3s;
+    transition: background-color 0.2s;
+    width: 100%;
 }
 
 .notification-item:last-child {
@@ -57,56 +58,59 @@ foreach ($notifications as $notification) {
     text-decoration: none;
     color: inherit;
     display: block;
+    width: 100%;
 }
 
 .notification-content {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    align-items: flex-start;
+    gap: 15px;
+    width: 100%;
 }
 
 .notification-circle {
-    width: 40px;
-    height: 40px;
-    background-color: #e7f1ff;
+    width: 8px;
+    height: 8px;
+    background-color: #365486;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #365486;
+    margin-top: 6px;
+    flex-shrink: 0;
 }
 
 .notification-text {
     flex: 1;
-    font-size: 0.9rem;
-    color: #333;
+    min-width: 0;
+    padding-right: 10px;
 }
 
 .notification-title {
     font-weight: 600;
-    color: #365486;
+    color: #000;
     margin-bottom: 4px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    font-size: 0.95rem;
 }
 
 .notification-message {
-    color: #4a4947;
+    color: #666;
     margin-bottom: 4px;
+    font-size: 0.9rem;
 }
 
 .notification-time {
     font-size: 0.8rem;
     color: #666;
+    text-align: right;
 }
 
 .notification-item.unread {
     background-color: #f0f7ff;
-    border-left: 4px solid #365486;
 }
 
-.notification-item.read {
-    background-color: #ffffff;
+.notification-item.unread .notification-circle {
+    background-color: #365486;
+}
+
+.notification-item.read .notification-circle {
+    background-color: #ccc;
 }
 </style> 

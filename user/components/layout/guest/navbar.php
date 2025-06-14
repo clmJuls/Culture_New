@@ -5,35 +5,20 @@
             <div class="hamburger-menu" onclick="toggleSidebar()">
                 <i class="fas fa-bars"></i>
             </div>
-            <img src="assets/logo/logo.png" alt="Kulturifiko Logo">
-            <h1>Kulturabase</h1>
+            <a href="home.php" class="logo-link" style="display: flex; align-items: center; text-decoration: none;">
+                <img src="assets/logo/logo.png" alt="Kulturifiko Logo">
+                <h1>Kulturabase</h1>
+            </a>
         </div>
         <div class="nav-links">
             <a href="home.php" <?php echo basename($_SERVER['PHP_SELF']) == 'home.php' ? 'class="active"' : ''; ?>>Home</a>
             <a href="create-post.php" <?php echo basename($_SERVER['PHP_SELF']) == 'create-post.php' ? 'class="active"' : ''; ?>>+ Create</a>
             <a href="explore.php" <?php echo basename($_SERVER['PHP_SELF']) == 'explore.php' ? 'class="active"' : ''; ?>>Explore</a>
+            <?php if (isset($_SESSION['isPremium']) && $_SESSION['isPremium'] == 1): ?>
+            <a href="generate_report.php" <?php echo basename($_SERVER['PHP_SELF']) == 'generate_report.php' ? 'class="active"' : ''; ?>>Generate Report</a>
+            <?php endif; ?>
             <a href="my-posts.php" <?php echo basename($_SERVER['PHP_SELF']) == 'my-posts.php' ? 'class="active"' : ''; ?>>
                 My Posts
-                <?php
-                if (!isset($user_id) && isset($_SESSION['user_id'])) {
-                    $user_id = $_SESSION['user_id'];
-                }
-                
-                if (isset($user_id)) {
-                    // Get count of rejected posts
-                    $rejected_query = "SELECT COUNT(*) as count FROM posts WHERE user_id = ? AND status = 'rejected'";
-                    $rejected_stmt = $conn->prepare($rejected_query);
-                    $rejected_stmt->bind_param("i", $user_id);
-                    $rejected_stmt->execute();
-                    $rejected_count = $rejected_stmt->get_result()->fetch_assoc()['count'];
-                    
-                    if ($rejected_count > 0) {
-                        echo "<span class='rejected-badge'>$rejected_count</span>";
-                    }
-                } else {
-                    error_log("User ID not set in navbar.php");
-                }
-                ?>
             </a>
             <div class="notification-dropdown">
                 <div class="notification-icon" onclick="toggleNotificationDropdown()">
@@ -112,6 +97,17 @@
             font-size: 2rem;
             font-weight: 600;
             margin-left: 10px;
+        }
+
+        /* Add specific style for logo link to prevent hover effects */
+        .logo-link {
+            background-color: transparent !important;
+        }
+        
+        .logo-link:hover {
+            background-color: transparent !important;
+            color: #DCF2F1 !important;
+            transform: none !important;
         }
 
         .navbar a {
@@ -280,13 +276,14 @@
         position: absolute;
         right: 0;
         background-color: white;
-        width: 320px;
-        max-height: 400px;
+        width: 600px;
+        max-height: 600px;
         overflow-y: auto;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         border-radius: 12px;
         z-index: 1000;
         margin-top: 10px;
+        overflow-x: hidden;
     }
 
     .notification-header {

@@ -1,17 +1,26 @@
 <div class="navbar">
         <div style="display: flex; align-items: center;">
-            <img src="assets/logo/logo.png" alt="Kulturifiko Logo">
-            <h1>Kulturabase</h1>
+            <a href="home.php" class="logo-link" style="display: flex; align-items: center; text-decoration: none;">
+                <img src="assets/logo/logo.png" alt="Kulturifiko Logo">
+                <h1>Kulturabase</h1>
+            </a>
         </div>
         <div class="nav-links">
             <a href="home.php" <?php echo basename($_SERVER['PHP_SELF']) == 'home.php' ? 'class="active"' : ''; ?>>Home</a>
             <a href="create-post.php" <?php echo basename($_SERVER['PHP_SELF']) == 'create-post.php' ? 'class="active"' : ''; ?>>+ Create</a>
             <a href="explore.php" <?php echo basename($_SERVER['PHP_SELF']) == 'explore.php' ? 'class="active"' : ''; ?>>Explore</a>
             <a href="generate_report.php" <?php echo basename($_SERVER['PHP_SELF']) == 'generate_report.php' ? 'class="active"' : ''; ?>>Generate Report</a>
+            <?php if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1): ?>
             <a href="user_management.php" <?php echo basename($_SERVER['PHP_SELF']) == 'user_management.php' ? 'class="active"' : ''; ?>>User Management</a>
             <a href="post-requests.php" <?php echo basename($_SERVER['PHP_SELF']) == 'post-requests.php' ? 'class="active"' : ''; ?>>
                 <i class="fas fa-tasks"></i> Post Requests
             </a>
+            <?php endif; ?>
+            <?php if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 0): ?>
+            <a href="my-posts.php" <?php echo basename($_SERVER['PHP_SELF']) == 'my-posts.php' ? 'class="active"' : ''; ?>>
+                My Posts
+            </a>
+            <?php endif; ?>
             <div class="notification-dropdown">
                 <div class="notification-icon" onclick="toggleNotificationDropdown()">
                     <i class="fas fa-bell"></i>
@@ -89,6 +98,17 @@
             font-size: 2rem;
             font-weight: 600;
             margin-left: 10px;
+        }
+
+        /* Add specific style for logo link to prevent hover effects */
+        .logo-link {
+            background-color: transparent !important;
+        }
+        
+        .logo-link:hover {
+            background-color: transparent !important;
+            color: #DCF2F1 !important;
+            transform: none !important;
         }
 
         .navbar a {
@@ -256,33 +276,40 @@
         position: absolute;
         right: 0;
         background-color: white;
-        width: 320px;
-        max-height: 400px;
+        width: 1000px;
+        max-height: 1000px;
         overflow-y: auto;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         border-radius: 12px;
         z-index: 1000;
         margin-top: 10px;
+        padding: 0;
+        overflow-x: hidden;
     }
 
     .notification-header {
-        padding: 15px;
+        padding: 20px;
         border-bottom: 1px solid #eee;
+        background-color: white;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
     }
 
     .notification-header h3 {
         margin: 0;
-        color: #333;
-        font-size: 16px;
-        font-weight: 500;
+        color: #000;
+        font-size: 1.2rem;
+        font-weight: 600;
+        padding-left: 10px;
     }
 
     .notification-list {
         padding: 0;
+        background-color: white;
     }
 
     .notification-item {
-        padding: 15px;
+        padding: 20px;
         border-bottom: 1px solid #eee;
         transition: background-color 0.2s;
     }
@@ -302,9 +329,7 @@
     }
 
     .notification-content {
-        display: flex;
-        align-items: flex-start;
-        gap: 15px;
+        padding: 0 10px;
     }
 
     .notification-circle {
@@ -344,10 +369,13 @@
         padding: 12px;
         text-align: center;
         border-top: 1px solid #eee;
+        background-color: white;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
     }
 
     .notification-footer a {
-        color: #0066cc;
+        color: #365486;
         text-decoration: none;
         font-size: 0.9rem;
         font-weight: 500;
@@ -358,16 +386,12 @@
     .notification-footer a:hover {
         text-decoration: underline;
         background-color: transparent;
-    }
-
-    /* Show dropdown when active */
-    .notification-dropdown.active .notification-dropdown-content {
-        display: block;
+        color: #365486;
     }
 
     /* Custom scrollbar */
     .notification-dropdown-content::-webkit-scrollbar {
-        width: 6px;
+        width: 4px;
     }
 
     .notification-dropdown-content::-webkit-scrollbar-track {
@@ -375,12 +399,12 @@
     }
 
     .notification-dropdown-content::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 3px;
+        background: #ccc;
+        border-radius: 2px;
     }
 
     .notification-dropdown-content::-webkit-scrollbar-thumb:hover {
-        background: #555;
+        background: #999;
     }
     </style>
 
