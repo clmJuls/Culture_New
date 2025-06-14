@@ -1,3 +1,46 @@
+.journal-content {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.journal-content h1 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+/* Add Button Styles */
+.add-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-bottom: 2rem;
+    transition: background-color 0.3s;
+}
+
+.add-button:hover {
+    background-color: #0056b3;
+}
+
+/* Journal Container */
+.journal-container {
+    width: 100%;
+}
+
+.journal-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    margin: 0 auto;
+}
+
+/* Card Styles */
 .journal-card {
     background: #ffffff;
     border-radius: 12px;
@@ -93,69 +136,8 @@
     color: white;
 }
 
-/* Journal Grid Layout */
-.journal-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 30px;
-    padding: 20px;
-    margin: 0 auto;
-    max-width: 1400px;
-}
-
-/* Responsive Design */
-@media (max-width: 1200px) {
-    .journal-card {
-        height: 420px;
-    }
-
-    .journal-card img {
-        height: 180px;
-    }
-
-    .journal-card-content {
-        height: calc(100% - 180px);
-    }
-}
-
-@media (max-width: 768px) {
-    .journal-card {
-        height: 420px;
-    }
-
-    .journal-card img {
-        height: 180px;
-    }
-
-    .journal-card-content {
-        height: calc(100% - 180px);
-    }
-
-    .full-post-image {
-        height: 300px;
-    }
-}
-
-@media (max-width: 480px) {
-    .journal-card {
-        height: 400px;
-    }
-
-    .journal-card img {
-        height: 160px;
-    }
-
-    .journal-card-content {
-        height: calc(100% - 160px);
-    }
-
-    .full-post-image {
-        height: 250px;
-    }
-}
-
 /* Modal Styles */
-.modal {
+.journal-modal {
     display: none;
     position: fixed;
     z-index: 1000;
@@ -167,7 +149,7 @@
     overflow-y: auto;
 }
 
-.modal-content {
+.journal-modal-content {
     background-color: #fff;
     margin: 40px auto;
     padding: 30px;
@@ -177,9 +159,9 @@
     position: relative;
 }
 
-.close {
+.journal-close-button {
     position: absolute;
-    right: 25px;
+    right: 20px;
     top: 15px;
     font-size: 28px;
     font-weight: bold;
@@ -188,86 +170,99 @@
     transition: color 0.3s;
 }
 
-.close:hover {
+.journal-close-button:hover {
     color: #333;
 }
 
-/* Full Post Content Styles */
-#postContent {
-    padding: 20px 0;
+/* Form Styles */
+.journal-input-container {
+    margin-bottom: 20px;
 }
 
-#postContent h2 {
-    font-size: 2rem;
+.journal-input-container label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
     color: #333;
-    margin-bottom: 15px;
-    line-height: 1.3;
 }
 
-#postContent .subtitle {
-    font-size: 1.2rem;
-    color: #666;
-    margin-bottom: 25px;
-    line-height: 1.4;
-}
-
-.full-post-image {
+.journal-input-container input,
+.journal-input-container textarea {
     width: 100%;
-    height: 400px;
-    object-fit: cover;
-    object-position: center;
-    border-radius: 8px;
-    margin: 20px 0;
-}
-
-.post-metadata {
-    display: flex;
-    align-items: center;
-    margin: 20px 0;
-    padding: 15px 0;
-    border-bottom: 1px solid #eee;
-}
-
-.post-metadata .author {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
     font-size: 1rem;
-    color: #555;
+    font-family: inherit;
 }
 
-.post-metadata .date {
-    margin-left: 20px;
-    color: #777;
-    font-size: 0.95rem;
+.journal-input-container textarea {
+    resize: vertical;
+    min-height: 150px;
 }
 
-.post-content {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: #444;
-    margin-top: 25px;
+/* Responsive Breakpoints */
+@media (max-width: 1150px) {
+    .journal-container {
+        padding: 0;
+    }
 }
 
-.post-content p {
-    margin-bottom: 1.5em;
-}
-
-/* Responsive Modal */
 @media (max-width: 768px) {
-    .modal-content {
+    .journal-content {
+        padding: 0 15px;
+    }
+
+    .journal-content h1 {
+        font-size: 1.75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .journal-cards {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .journal-card {
+        height: 400px;
+    }
+
+    .journal-card img {
+        height: 180px;
+    }
+
+    .journal-modal-content {
         margin: 20px auto;
         padding: 20px;
-        width: 95%;
+    }
+}
+
+@media (max-width: 480px) {
+    .journal-content {
+        padding: 0 10px;
     }
 
-    #postContent h2 {
-        font-size: 1.6rem;
+    .journal-content h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
     }
 
-    #postContent .subtitle {
-        font-size: 1.1rem;
+    .journal-cards {
+        grid-template-columns: 1fr;
     }
 
-    .post-content {
-        font-size: 1rem;
+    .journal-card {
+        height: auto;
+        min-height: 380px;
+    }
+
+    .journal-card img {
+        height: 160px;
+    }
+
+    .add-button {
+        width: 100%;
+        text-align: center;
     }
 }
 
@@ -366,4 +361,4 @@
     background: rgba(0, 0, 0, 0.75);
     font-size: 14px;
     text-align: center;
-} 
+}

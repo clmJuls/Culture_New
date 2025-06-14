@@ -6,8 +6,7 @@
     <title>Kulturabase</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-    <style>
-    /* General */
+    <style>    /* General */
         * {
             margin: 0;
             padding: 0;
@@ -20,6 +19,32 @@
             color: #4A4947;
             line-height: 1.6;
             padding-top: 80px;
+            padding-left: 250px; /* Match sidebar width */
+        }
+
+        @media (max-width: 1150px) {
+            body {
+                padding-left: 0;
+            }
+        }
+
+        .main-content-wrapper {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .main-content-wrapper {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content-wrapper {
+                padding: 10px;
+            }
         }
     </style>
 </head>
@@ -47,7 +72,7 @@
         <p class="geography-description">History shapes cultural practices, beliefs, and the social structures that influence our world today. From ancient civilizations to modern history, explore the impact of past events on the present.</p>
         <br>
         <div class="geography-image">
-            <img src="https://i.pinimg.com/736x/f7/fb/96/f7fb9635d8975aa88d0f18124f862e55.jpg" alt="History and Culture" />
+            <img src="https://i.pinimg.com/736x/f7/fb/96/f7fb9635d8975aa88d0f18124f862e55.jpg" alt="History and Culture" style="margin-bottom: 40px;"/>
         </div>
     </div>
 </section>
@@ -55,7 +80,7 @@
 <section class="journals">
     <div class="container">
         <br><br><br><br>
-        <h2>History Journals</h2>
+        <h2 style="margin-top: 40px;">History Journals</h2>
         <p>History explores the past and its influence on the present. Dive into journals that focus on how historical events, movements, and people have shaped the cultures we live in today.</p>
 
         <?php if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1): ?>
@@ -219,40 +244,32 @@
 
 .journal-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 cards per row */
-    gap: 24px;
-    padding: 24px;
-    max-width: 1200px;
-    margin: 0 auto;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
 }
 
 .journal-card {
-    width: 100%;
-    height: 320px; /* Fixed height */
     background: #ffffff;
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .journal-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
-.card-image-container {
-    position: relative;
+.journal-card img {
     width: 100%;
-    height: 160px; /* Fixed height for images */
-}
-
-.card-image-container img {
-    width: 100%;
-    height: 100%;
+    height: 150px;
     object-fit: cover;
+    border-bottom: 1px solid #ddd;
 }
 
 .journal-card-content {
@@ -372,7 +389,7 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin: 20px 0;
+    margin-bottom: 20px;
     font-size: 16px;
 }
 
@@ -441,25 +458,30 @@
 }
 
 .delete-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
     display: flex;
     align-items: center;
-    gap: 5px;
-    transition: background-color 0.2s;
-    z-index: 2;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .delete-btn:hover {
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(220, 53, 69, 0.9);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.delete-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 </style>
 
@@ -667,13 +689,12 @@ function closeSuccessModal() {
 }
 
 .post-modal-content {
-    background-color: #fff;
-    margin: 40px auto;
-    padding: 0;
-    width: 90%;
-    max-width: 900px;
-    border-radius: 12px;
-    overflow: hidden;
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 5px;
+    border-radius: 8px;
+    width: 70%;
+    max-width: 1200px;
     position: relative;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
     transform: translateY(20px);

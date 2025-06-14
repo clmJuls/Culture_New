@@ -34,8 +34,7 @@ if ($result) {
     <title>Kulturabase</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-    <body>
-    <style>
+    <body>    <style>
     /* General */
         * {
             margin: 0;
@@ -49,6 +48,32 @@ if ($result) {
             color: #4A4947;
             line-height: 1.6;
             padding-top: 80px;
+            padding-left: 250px; /* Match sidebar width */
+        }
+
+        @media (max-width: 1150px) {
+            body {
+                padding-left: 0;
+            }
+        }
+
+        .main-content-wrapper {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .main-content-wrapper {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content-wrapper {
+                padding: 10px;
+            }
         }
 
         .card-image-container {
@@ -64,32 +89,42 @@ if ($result) {
         }
 
         .delete-btn {
+            display: flex;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             position: absolute;
             top: 10px;
             right: 10px;
-            background-color: rgba(255, 255, 255, 0.9);
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
             z-index: 2;
         }
 
         .delete-btn:hover {
-            background-color: #ff4444;
-            color: white;
+            background-color: rgba(220, 53, 69, 0.9);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .delete-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .delete-btn i {
             font-size: 16px;
-        }
-    </style>
+            margin-right: 4px;
+        }</style>
     
+    <div class="main-content-wrapper">
     <!-- Geography Section -->
     <section class="geography-hero">
         <div class="geography-content">
@@ -97,8 +132,8 @@ if ($result) {
             <h1 class="geography-title">The Role of Culture in Society</h1>
             <p class="geography-description">Culture plays a pivotal role in shaping societies. From language, traditions, art, and cuisine to the values and beliefs of a community, culture helps define the identity of a group of people.</p>
             <br>
-            <div class="geography-image">
-                <img src="https://i.pinimg.com/736x/c6/08/54/c60854651e7d7062fde8e1393741cdfa.jpg" alt="Culture and Society" />
+            <div class="geography-image" style="margin-bottom: 20px;">
+                <img src="https://i.pinimg.com/736x/c6/08/54/c60854651e7d7062fde8e1393741cdfa.jpg" alt="Culture and Society" style="margin-bottom: 20px;"/>
             </div>
         </div>
     </section>
@@ -106,7 +141,7 @@ if ($result) {
     <section class="journals">
         <div class="container">
             <br><br><br><br>
-            <h2>Culture Journals</h2>
+            <h2 style="margin-top: 40px;">Culture Journals</h2>
             <p>Culture shapes the way we live, interact, and perceive the world. Delve into journals exploring the diverse elements of culture, including art, tradition, language, and the practices that define societies across the globe.</p>
 
             <!-- Admin Create Button -->
@@ -275,10 +310,12 @@ if ($result) {
 
     .journal-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 30px;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
         margin-top: 20px;
-        padding: 20px;
+        padding: 24px;
+        max-width: 1200px;
+        margin: 0 auto;
     }
 
     .journal-card {
@@ -289,8 +326,7 @@ if ($result) {
         transition: transform 0.3s, box-shadow 0.3s;
         display: flex;
         flex-direction: column;
-        height: 400px;
-        width: 100%;
+        position: relative;
     }
 
     .journal-card:hover {
@@ -414,7 +450,7 @@ if ($result) {
         <?php include 'components/modals/create-culture-post-modal.php'; ?>
     <?php endif; ?>
 
-    <!-- Include sidebar and chat components -->
+    <!-- Include sidebar and chat components -->    </div> <!-- Closing main-content-wrapper -->
     <?php include 'components/layout/guest/sidebar.php'; ?>
     <?php include 'components/widgets/chat.php'; ?>
 
@@ -465,14 +501,16 @@ if ($result) {
     }
 
     .post-modal {
-        background-color: #fff;
+        background-color: #fefefe;
         margin: 5% auto;
-        padding: 0;
-        width: 90%;
-        max-width: 800px;
+        padding: 5px;
         border-radius: 8px;
+        width: 70%;
+        max-width: 1200px;
         position: relative;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
     }
 
     .modal-body {

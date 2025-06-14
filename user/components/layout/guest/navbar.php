@@ -1,5 +1,3 @@
-
-
 <div class="navbar">
         <div style="display: flex; align-items: center;">
             <div class="hamburger-menu" onclick="toggleSidebar()">
@@ -70,21 +68,22 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <style>
+    </div>    <style>
     /* Navigation Bar */
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: #365486;
-            padding: 20px 40px;
+            padding: 10px 40px;
             position: fixed;
             width: 100%;
             top: 0;
+            left: 0;
+            right: 0;
             z-index: 1000;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
         }
 
         .navbar img {
@@ -173,6 +172,7 @@
     .nav-links {
         display: flex;
         align-items: center;
+        gap: 10px;
     }
 
     .user-dropdown {
@@ -411,25 +411,90 @@
         font-size: 1.5rem;
         cursor: pointer;
         margin-right: 15px;
-        padding: 5px;
+        padding: 8px;
+        border-radius: 5px;
     }
 
     .hamburger-menu:hover {
         background-color: rgba(30, 60, 114, 0.2);
-        border-radius: 5px;
     }
 
-    /* Add media query for medium screens */
-    @media screen and (max-width: 768px) {
+    /* Media queries for responsive design */
+    @media screen and (min-width: 1151px) {
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
         .hamburger-menu {
-            display: block;
+            display: none;
         }
     }
 
-    /* Update the media query to target .nav-links a except those in dropdowns */
-    @media screen and (max-width: 768px) {
+    @media screen and (max-width: 1150px) {
+        .navbar {
+            padding: 10px 20px;
+        }
+
+        .hamburger-menu {
+            display: block;
+        }
+
+        .nav-links {
+            position: fixed;
+            right: -100%;
+            top: 60px;
+            flex-direction: column;
+            background-color: #365486;
+            width: 100%;
+            height: calc(100vh - 60px);
+            transition: 0.3s;
+            padding: 20px;
+            align-items: flex-start;
+        }
+
+        .nav-links.active {
+            right: 0;
+        }
+
         .nav-links > a {
-            display: none;
+            margin: 10px 0;
+            width: 100%;
+            padding: 15px;
+            font-size: 0.95rem;
+        }
+
+        .user-dropdown,
+        .notification-dropdown {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .notification-dropdown-content {
+            width: calc(100vw - 40px);
+            max-width: 100%;
+            left: 20px;
+            right: 20px;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .navbar {
+            padding: 10px 15px;
+        }
+
+        .navbar img {
+            height: 40px;
+            width: 40px;
+        }
+
+        .navbar h1 {
+            font-size: 1.2rem;
+        }
+
+        .nav-links > a {
+            font-size: 0.9rem;
         }
     }
 
@@ -508,15 +573,52 @@
         // Add toggle sidebar function
         function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');
+            const navLinks = document.querySelector('.nav-links');
             sidebar.classList.toggle('sidebar-active');
+            navLinks.classList.toggle('active');
         }
         
-        // Close sidebar when clicking outside
-        document.addEventListener('click', function(event) {
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
             const sidebar = document.querySelector('.sidebar');
-            const hamburger = document.querySelector('.hamburger-menu');
-            if (!sidebar.contains(event.target) && !hamburger.contains(event.target)) {
+            const navLinks = document.querySelector('.nav-links');
+            const hamburgerMenu = document.querySelector('.hamburger-menu');
+            
+            if (!sidebar.contains(e.target) && !hamburgerMenu.contains(e.target)) {
                 sidebar.classList.remove('sidebar-active');
+                navLinks.classList.remove('active');
+            }
+        });
+
+        // Toggle dropdowns
+        function toggleUserDropdown() {
+            const dropdown = document.querySelector('.user-dropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        function toggleNotificationDropdown() {
+            const dropdown = document.querySelector('.notification-dropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            const userDropdown = document.querySelector('.user-dropdown');
+            const notificationDropdown = document.querySelector('.notification-dropdown');
+            const sidebar = document.querySelector('.sidebar');
+            const hamburgerMenu = document.querySelector('.hamburger-menu');
+            
+            if (!userDropdown.contains(e.target)) {
+                userDropdown.classList.remove('active');
+            }
+            
+            if (!notificationDropdown.contains(e.target)) {
+                notificationDropdown.classList.remove('active');
+            }
+
+            if (!sidebar.contains(e.target) && !hamburgerMenu.contains(e.target)) {
+                sidebar.classList.remove('sidebar-active');
+                document.querySelector('.nav-links').classList.remove('active');
             }
         });
     </script>

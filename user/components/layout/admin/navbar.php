@@ -1,5 +1,8 @@
 <div class="navbar">
         <div style="display: flex; align-items: center;">
+            <div class="hamburger-menu" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </div>
             <a href="home.php" class="logo-link" style="display: flex; align-items: center; text-decoration: none;">
                 <img src="assets/logo/logo.png" alt="Kulturifiko Logo">
                 <h1>Kulturabase</h1>
@@ -80,12 +83,15 @@
             justify-content: space-between;
             align-items: center;
             background-color: #365486;
-            padding: 20px 40px;
+            padding: 10px 40px;
             position: fixed;
             width: 100%;
             top: 0;
+            left: 0;
+            right: 0;
             z-index: 1000;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
         }
 
         .navbar img {
@@ -162,11 +168,103 @@
 
         .dropdown-content a:hover {
             background-color: #f1f1f1;
-        }
-
-    /* Toggle class for show/hide */
+        }    /* Toggle class for show/hide */
         .show {
             display: block;
+        }
+
+        /* Add hamburger menu styles */
+        .hamburger-menu {
+            display: none;
+            color: #DCF2F1;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-right: 15px;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .hamburger-menu:hover {
+            background-color: rgba(30, 60, 114, 0.2);
+        }
+
+        /* Media queries for responsive design */
+        @media screen and (min-width: 1151px) {
+            .nav-links {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .hamburger-menu {
+                display: none;
+            }
+        }
+
+        @media screen and (max-width: 1150px) {
+            .navbar {
+                padding: 10px 20px;
+            }
+
+            .hamburger-menu {
+                display: block;
+            }
+
+            .nav-links {
+                position: fixed;
+                right: -100%;
+                top: 60px;
+                flex-direction: column;
+                background-color: #365486;
+                width: 100%;
+                height: calc(100vh - 60px);
+                transition: 0.3s;
+                padding: 20px;
+                align-items: flex-start;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .nav-links > a {
+                margin: 10px 0;
+                width: 100%;
+                padding: 15px;
+                font-size: 0.95rem;
+            }
+
+            .user-dropdown,
+            .notification-dropdown {
+                width: 100%;
+                margin: 10px 0;
+            }
+
+            .notification-dropdown-content {
+                width: calc(100vw - 40px);
+                max-width: 100%;
+                left: 20px;
+                right: 20px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .navbar {
+                padding: 10px 15px;
+            }
+
+            .navbar img {
+                height: 40px;
+                width: 40px;
+            }
+
+            .navbar h1 {
+                font-size: 1.2rem;
+            }
+
+            .nav-links > a {
+                font-size: 0.9rem;
+            }
         }
 
     /* User Dropdown Styles */
@@ -409,6 +507,14 @@
     </style>
 
     <script>
+        // Toggle mobile menu
+        function toggleSidebar() {
+            const navLinks = document.querySelector('.nav-links');
+            const sidebar = document.querySelector('.sidebar');
+            navLinks.classList.toggle('active');
+            sidebar.classList.toggle('sidebar-active');
+        }
+
         function toggleUserDropdown() {
             const dropdown = document.querySelector('.user-dropdown');
             dropdown.classList.toggle('active');
@@ -452,10 +558,18 @@
                     notificationList.innerHTML = data;
                 })
                 .catch(error => {
-                    console.error('Error loading notifications:', error);
                     notificationList.innerHTML = '<div class="notification-item">Error loading notifications</div>';
                 });
         }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const navLinks = document.querySelector('.nav-links');
+            const hamburgerMenu = document.querySelector('.hamburger-menu');
+            if (!navLinks.contains(e.target) && !hamburgerMenu.contains(e.target)) {
+                navLinks.classList.remove('active');
+            }
+        });
     </script>
 
 <?php include 'components/dialog/logout.php'; ?>

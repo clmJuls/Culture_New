@@ -35,11 +35,10 @@
     </div>
 </div>
 
-<style>
-    .sidebar {
+<style>    .sidebar {
         position: fixed;
         top: 60px;
-        left: 0;
+        left: -2px;
         width: 240px;
         height: calc(100vh - 60px);
         background-color: #365486;
@@ -51,7 +50,7 @@
         overflow-y: auto;
         box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
         border-radius: 0 5px 5px 0;
-        transition: transform 0.3s ease-in-out;
+        transition: all 0.3s ease-in-out;
     }
 
     .logo-section {
@@ -119,14 +118,39 @@
         margin-right: 8px;
     }
 
-    /* Update media query with !important to ensure it takes precedence */
-    @media screen and (max-width: 768px) {
+    /* Update media query with !important to ensure it takes precedence */    /* Medium screens and below */
+    @media screen and (max-width: 1150px) {
         .sidebar {
-            transform: translateX(-240px) !important;
+            transform: translateX(-100%);
+            left: 0;
         }
 
         .sidebar.sidebar-active {
-            transform: translateX(0) !important;
+            transform: translateX(0);
+        }
+
+        .hamburger-menu {
+            display: flex;
+        }
+
+        /* Add overlay for sidebar */
+        .sidebar::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .sidebar.sidebar-active::after {
+            opacity: 1;
+            visibility: visible;
         }
     }
 
@@ -139,6 +163,76 @@
     @media screen and (max-width: 768px) {
         .mobile-nav {
             display: block;
+        }
+    }
+
+    /* Add responsive styles for the sidebar */
+    @media screen and (max-width: 1024px) {
+        .sidebar {
+            width: 220px;
+        }
+
+        .menu-item a {
+            font-size: 0.75rem;
+            padding: 6px 14px;
+        }
+    }
+
+    @media screen and (max-width: 768px) {
+        .sidebar {
+            transform: translateX(-100%);
+            width: 280px;
+            z-index: 1001;
+        }
+
+        .sidebar.sidebar-active {
+            transform: translateX(0);
+        }
+
+        /* Show mobile nav in sidebar on smaller screens */
+        .mobile-nav {
+            display: block;
+            margin-bottom: 30px;
+        }
+
+        .menu-section h3 {
+            font-size: 14px;
+        }
+
+        .menu-item a {
+            font-size: 0.8rem;
+            padding: 10px 16px;
+        }
+
+        /* Add overlay when sidebar is active */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+    }
+
+    @media screen and (max-width: 480px) {
+        .sidebar {
+            width: 260px;
+        }
+
+        .menu-section {
+            padding: 0 15px;
+        }
+
+        .menu-item a {
+            font-size: 0.75rem;
+            padding: 8px 12px;
         }
     }
 </style>

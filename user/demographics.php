@@ -6,8 +6,7 @@
     <title>Kulturabase</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <body>
-    <style>
-    /* General */
+    <style>    /* General */
         * {
             margin: 0;
             padding: 0;
@@ -20,21 +19,39 @@
             color: #4A4947;
             line-height: 1.6;
             padding-top: 80px;
+            padding-left: 250px; /* Match sidebar width */
+        }
+
+        @media (max-width: 1150px) {
+            body {
+                padding-left: 0;
+            }
+        }
+
+        .main-content-wrapper {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .main-content-wrapper {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content-wrapper {
+                padding: 10px;
+            }
         }
     </style>
     
-    <!-- Navigation Bar -->
-    <?php
+    <!-- Navigation Bar -->    <?php
     session_start();
     require_once 'db_conn.php';
     
-    // Include navbar
-    if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1) {
-        include 'components/layout/admin/navbar.php';
-    } else {
-        include 'components/layout/guest/navbar.php';
-    }
-
     // Fetch demographics posts from database
     $query = "SELECT dp.*, u.username 
               FROM demographics_posts dp 
@@ -51,7 +68,16 @@
         }
         mysqli_free_result($result);
     }
+
+    // Include navbar
+    if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1) {
+        include 'components/layout/admin/navbar.php';
+    } else {
+        include 'components/layout/guest/navbar.php';
+    }
     ?>
+    
+<div class="main-content-wrapper">
 
 <!-- Geography Section -->
 <section class="geography-hero">
@@ -61,7 +87,7 @@
         <p class="geography-description">Demographics play a key role in shaping cultural, social, and economic structures. Understanding population trends, migration, and age distribution helps us understand the evolution of cultures across the world.</p>
         <br>
         <div class="geography-image">
-            <img src="https://i.pinimg.com/736x/41/72/e7/4172e7a64cbec1b71766bb97025cc534.jpg" alt="Demographics and Culture" />
+            <img src="https://i.pinimg.com/736x/41/72/e7/4172e7a64cbec1b71766bb97025cc534.jpg" alt="Demographics and Culture" style="margin-bottom: 40px;" />
         </div>
     </div>
 </section>
@@ -69,7 +95,7 @@
 <section class="journals">
     <div class="container">
         <br><br><br><br><br>
-        <h2>Demographics Journals</h2>
+        <h2 style="margin-top: 40px;">Demographics Journals</h2>
         <p>Demographics studies the structure of populations, including factors like age, gender, race, migration, and population density. Dive into journals that explore how these demographic factors influence culture and society.</p>
 
         <!-- Admin Create Button -->
@@ -413,10 +439,12 @@
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
     margin-top: 20px;
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .journal-card {
-    position: relative;
     background: #ffffff;
     border-radius: 10px;
     overflow: hidden;
@@ -424,6 +452,7 @@
     transition: transform 0.3s, box-shadow 0.3s;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .journal-card:hover {
@@ -562,13 +591,13 @@
 }
 
 .modal-content {
-    background: #fff;
-    margin: 2% auto;
-    width: 98%;
-    max-width: 1400px;
-    border-radius: 16px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
-    max-height: 95vh;
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 5px;
+    border-radius: 8px;
+    width: 70%;
+    max-width: 1200px;
+    max-height: 90vh;
     overflow-y: auto;
 }
 
@@ -844,25 +873,34 @@
 }
 
 .delete-btn-card {
+    display: flex;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     position: absolute;
     top: 10px;
     right: 10px;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: #fff;
-    border: none;
-    padding: 4px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.8rem;
     z-index: 2;
-    transition: background-color 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 4px;
 }
 
 .delete-btn-card:hover {
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(220, 53, 69, 0.9);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.delete-btn-card:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 </style>
 
@@ -1181,6 +1219,8 @@ newStyle.textContent = `
 `;
 document.head.appendChild(newStyle);
 </script>
+
+</div> <!-- Closing main-content-wrapper -->
 
 <!-- Sidebar -->
 <?php include 'components/layout/guest/sidebar.php'; ?>

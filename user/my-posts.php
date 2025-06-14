@@ -18,6 +18,11 @@
     }
 
     include 'components/layout/guest/navbar.php';
+    ?> 
+    
+    <!-- Main content wrapper -->
+    <div class="main-content-wrapper">
+    <?php
 
     // Get status filter from URL
     $status_filter = isset($_GET['status']) ? $_GET['status'] : 'all';
@@ -238,9 +243,7 @@
                 <button onclick="submitAppeal()" class="submit-btn">Submit Appeal</button>
             </div>
         </div>
-    </div>
-
-    <style>
+    </div>    <style>
         /* General */
         * {
             margin: 0;
@@ -252,18 +255,25 @@
             font-family: 'Poppins', sans-serif;
             background-color: #f5f5f5;
             color: #333;
-            display: flex;
-            flex-direction: row;
-            padding-top: 80px;
+            margin: 0;
+            padding: 60px 0 0 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Main Content Wrapper */
+        .main-content-wrapper {
+            margin-left: 240px;
+            transition: margin-left 0.3s ease-in-out;
+            min-height: 100vh;
+            width: calc(100% - 240px);
         }
 
         /* Main Content */
         #main-content {
-            margin-left: 400px;
             padding: 40px;
-            flex-grow: 1;
             max-width: 1300px;
-            margin-right: 200px;
+            margin: 0 auto;
         }
 
         .posts-nav {
@@ -537,9 +547,17 @@
             background: white;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+        }        /* Responsive Styles */
+        @media screen and (max-width: 1150px) {
+            .main-content-wrapper {
+                margin-left: 0;
+                width: 100%;
+            }
 
-        @media (max-width: 768px) {
+            #main-content {
+                padding: 20px;
+            }
+
             .nav-tabs {
                 flex-wrap: wrap;
             }
@@ -550,10 +568,8 @@
                 justify-content: center;
             }
 
-            #main-content {
-                margin-left: 0;
-                margin-right: 0;
-                padding: 20px;
+            .posts-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             }
 
             .media-overlay {
@@ -768,8 +784,8 @@
             display: flex;
             gap: 10px;
         }
-    </style>
-
+    </style>    </div> <!-- End of main-content-wrapper -->
+    
     <!-- Sidebar -->
     <?php include 'components/layout/guest/sidebar.php'; ?>
 
