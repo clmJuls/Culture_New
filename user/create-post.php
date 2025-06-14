@@ -555,7 +555,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Close modal when clicking outside
         window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
+            if (event.target.classList && event.target.classList.contains('modal')) {
                 event.target.style.display = 'none';
             }
         }
@@ -949,9 +949,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Close modal when clicking outside
         window.onclick = function(event) {
-            const modal = document.getElementById('successModal');
-            if (event.target == modal) {
-                modal.style.display = 'none';
+            if (event.target.classList && event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
             }
         }
 
@@ -968,11 +967,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         function confirmLogout() {
+            document.getElementById('logoutModal').style.display = 'block';
+        }
+
+        function proceedWithLogout() {
             // Show loading state
             const logoutBtn = document.querySelector('.logout-btn');
-            logoutBtn.innerHTML = '<div class="loading-spinner"></div>Logging out...';
-            logoutBtn.disabled = true;
-            document.querySelector('.cancel-btn').disabled = true;
+            if (logoutBtn) {
+                logoutBtn.innerHTML = '<div class="loading-spinner"></div>Logging out...';
+                logoutBtn.disabled = true;
+            }
+            
+            const cancelBtn = document.querySelector('.cancel-btn');
+            if (cancelBtn) {
+                cancelBtn.disabled = true;
+            }
 
             // Redirect to logout page after a brief delay
             setTimeout(() => {
@@ -981,7 +990,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         function cancelLogout() {
-            document.getElementById('logoutModal').style.display = 'none';
+            const modal = document.getElementById('logoutModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
         }
 
         function showInfo(event) {
@@ -1109,6 +1121,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #FFD700;
         }
     </style>
+
+    <!-- Add the logout modal -->
+    <div id="logoutModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Confirm Logout</h2>
+                <span class="close" onclick="cancelLogout()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <i class="fas fa-sign-out-alt" style="color: #365486; font-size: 48px; margin-bottom: 15px;"></i>
+                <p>Are you sure you want to logout?</p>
+
+                <div class="warning-message" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 15px;">
+                    <i class="fas fa-exclamation-triangle" style="color: #dc3545; font-size: 12px;"></i>
+                    <p class="warning-note" style="color: #6c757d; font-size: 12px; margin: 0;">Note: Any unsaved changes will be lost when you logout.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn logout-btn" onclick="proceedWithLogout()">Logout</button>
+                <button class="modal-btn cancel-btn" onclick="cancelLogout()">Cancel</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 </head>
