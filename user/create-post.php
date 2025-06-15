@@ -778,7 +778,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <div class="modal-body">
                 <i class="fas fa-check-circle success-icon"></i>
-                <p>Your post has been created successfully!</p>
+                <?php if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1): ?>
+                    <p>Your post has been created successfully!</p>
+                <?php else: ?>
+                    <p>Your post has been submitted and is pending approval.</p>
+                <?php endif; ?>
             </div>
             <div class="modal-footer">
                 <button onclick="redirectToMyPosts()" class="modal-btn explore-btn">View My Posts</button>
