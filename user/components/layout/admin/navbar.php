@@ -199,52 +199,19 @@
             .hamburger-menu {
                 display: none;
             }
-        }
-
-        @media screen and (max-width: 1150px) {
+        }        @media screen and (max-width: 1150px) {
             .navbar {
                 padding: 10px 20px;
             }
 
             .hamburger-menu {
-                display: block;
+                display: flex !important;
+                margin-right: 15px;
+                cursor: pointer;
             }
 
             .nav-links {
-                position: fixed;
-                right: -100%;
-                top: 60px;
-                flex-direction: column;
-                background-color: #365486;
-                width: 100%;
-                height: calc(100vh - 60px);
-                transition: 0.3s;
-                padding: 20px;
-                align-items: flex-start;
-            }
-
-            .nav-links.active {
-                right: 0;
-            }
-
-            .nav-links > a {
-                margin: 10px 0;
-                width: 100%;
-                padding: 15px;
-                font-size: 0.95rem;
-            }
-
-            .user-dropdown,
-            .notification-dropdown {
-                width: 100%;
-                margin: 10px 0;
-            }
-
-            .notification-dropdown-content {
-                width: calc(100vw - 40px);
-                max-width: 100%;
-                left: 20px;
-                right: 20px;
+                display: none !important;
             }
         }
 
@@ -504,16 +471,62 @@
     .notification-dropdown-content::-webkit-scrollbar-thumb:hover {
         background: #999;
     }
+
+    /* Hide nav-links on mobile */
+    @media screen and (max-width: 1150px) {
+        .nav-links {
+            display: none !important;
+        }
+        
+        .hamburger-menu {
+            display: flex !important;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+    }
+
+    /* Show hamburger menu only on mobile */
+    .hamburger-menu {
+        display: none;
+        font-size: 1.5rem;
+        color: #fff;
+        align-items: center;
+        justify-content: center;
+        padding: 5px;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    .hamburger-menu:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
     </style>
 
-    <script>
-        // Toggle mobile menu
+    <script>        // Toggle mobile menu
         function toggleSidebar() {
-            const navLinks = document.querySelector('.nav-links');
             const sidebar = document.querySelector('.sidebar');
-            navLinks.classList.toggle('active');
             sidebar.classList.toggle('sidebar-active');
+            
+            // Toggle body scroll
+            if (sidebar.classList.contains('sidebar-active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
         }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', (e) => {
+            const sidebar = document.querySelector('.sidebar');
+            const hamburgerMenu = document.querySelector('.hamburger-menu');
+            
+            if (sidebar && hamburgerMenu) {
+                if (!sidebar.contains(e.target) && !hamburgerMenu.contains(e.target) && sidebar.classList.contains('sidebar-active')) {
+                    sidebar.classList.remove('sidebar-active');
+                    document.body.style.overflow = '';
+                }
+            }
+        });
 
         function toggleUserDropdown() {
             const dropdown = document.querySelector('.user-dropdown');

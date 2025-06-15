@@ -430,9 +430,7 @@
         .hamburger-menu {
             display: none;
         }
-    }
-
-    @media screen and (max-width: 1150px) {
+    }    @media screen and (max-width: 1150px) {
         .navbar {
             padding: 10px 20px;
         }
@@ -442,40 +440,14 @@
         }
 
         .nav-links {
-            position: fixed;
-            right: -100%;
-            top: 60px;
-            flex-direction: column;
-            background-color: #365486;
-            width: 100%;
-            height: calc(100vh - 60px);
-            transition: 0.3s;
-            padding: 20px;
-            align-items: flex-start;
+            display: none !important;
+            opacity: 0;
+            pointer-events: none;
+            visibility: hidden;
         }
 
         .nav-links.active {
-            right: 0;
-        }
-
-        .nav-links > a {
-            margin: 10px 0;
-            width: 100%;
-            padding: 15px;
-            font-size: 0.95rem;
-        }
-
-        .user-dropdown,
-        .notification-dropdown {
-            width: 100%;
-            margin: 10px 0;
-        }
-
-        .notification-dropdown-content {
-            width: calc(100vw - 40px);
-            max-width: 100%;
-            left: 20px;
-            right: 20px;
+            display: none !important;
         }
     }
 
