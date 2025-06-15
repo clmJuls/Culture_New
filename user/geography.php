@@ -87,7 +87,6 @@
             <!-- Add New Post Button (Admin only) -->
             <button class="create-post-btn" onclick="openModal()">Create New Post</button>
             <?php endif; ?>
-
             <!-- Search Bar -->
             <div class="search-bar">
                 <input type="text" id="searchInput" placeholder="Search journals...">
@@ -848,16 +847,6 @@
         animation: modalFadeIn 0.3s ease-out;
     }
     </style>
-
-    <!-- Sidebar -->
-    <?php
-    // Include sidebar
-    if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1) {
-        include 'components/layout/admin/sidebar.php';
-    } else {
-        include 'components/layout/guest/sidebar.php';
-    }
-    ?>
     
     <div class="journal-content" style="padding-top: 20px;">
         <h1>Geography</h1>
@@ -893,5 +882,9 @@
 <script>
     // ... existing JavaScript code ...
 </script>
+
+<!-- Sidebar -->
+<?php include 'components/layout/guest/sidebar.php'; ?>
+<?php include 'components/widgets/chat.php'; ?>
 </body>
 </html>
