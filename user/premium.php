@@ -319,7 +319,7 @@ $user = $stmt->get_result()->fetch_assoc();
         <div class="plan-options">
             <div class="plan-card">
                 <h2>Monthly</h2>
-                <div class="plan-price">$9.99<span>/month</span></div>
+                <div class="plan-price">₱450<span>/month</span></div>
                 <ul class="plan-features">
                     <li><i class="fas fa-check"></i> All Premium Features</li>
                     <li><i class="fas fa-check"></i> Priority Support</li>
@@ -336,7 +336,7 @@ $user = $stmt->get_result()->fetch_assoc();
             <div class="plan-card recommended">
                 <span class="recommended-badge">BEST VALUE</span>
                 <h2>Annual</h2>
-                <div class="plan-price">$99.99<span>/year</span></div>
+                <div class="plan-price">₱4,500<span>/year</span></div>
                 <p class="savings">Save 17%</p>
                 <ul class="plan-features">
                     <li><i class="fas fa-check"></i> All Premium Features</li>

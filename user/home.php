@@ -23,6 +23,8 @@ if (!isset($_SESSION['user_id'])) {
     <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Add Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <body>
     <style>
     /* General */
@@ -201,6 +203,47 @@ if (!isset($_SESSION['user_id'])) {
             line-height: 1.6;
         }
 
+        /* Add chart styles */
+        .chart-section {
+            padding: 80px 0;
+            background: #f8f9fa;
+        }
+
+        .chart-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .chart-row {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chart-box {
+            flex: 1;
+            min-width: 0;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #003366;
+            margin-bottom: 40px;
+            font-weight: 600;
+        }
+
+        .line-charts {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
         /* Gallery Section */
         .gallery-section {
             padding: 80px 0;
@@ -350,7 +393,7 @@ if (!isset($_SESSION['user_id'])) {
             }
 
             .features h2,
-            .gallery-section h2,{
+            .gallery-section h2 {
                 font-size: 2rem;
             }
 
@@ -365,6 +408,16 @@ if (!isset($_SESSION['user_id'])) {
             .cta-btn {
                 padding: 12px 25px;
                 font-size: 0.9rem;
+            }
+        }
+
+        @media screen and (max-width: 992px) {
+            .chart-row {
+                flex-direction: column;
+            }
+            
+            .chart-box {
+                width: 100%;
             }
         }
 
@@ -384,6 +437,162 @@ if (!isset($_SESSION['user_id'])) {
 
         .main-content-wrapper::-webkit-scrollbar-thumb:hover {
             background: #555;
+        }
+
+        /* Add About section styles */
+        .about {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(54, 84, 134, 0.05) 0%, rgba(54, 84, 134, 0) 70%);
+            border-radius: 50%;
+            transform: translate(200px, -200px);
+        }
+
+        .about-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .about-content h2 {
+            font-size: 2.5rem;
+            color: #003366;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .about-content p {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 25px;
+            line-height: 1.8;
+        }
+
+        .about-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-box i {
+            font-size: 2rem;
+            color: #365486;
+            margin-bottom: 5px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            color: #365486;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1.1rem;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .about-image {
+            position: relative;
+        }
+
+        .about-image img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .about-image .floating-card {
+            position: absolute;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .floating-card.top {
+            top: 30px;
+            right: -30px;
+        }
+
+        .floating-card.bottom {
+            bottom: 30px;
+            left: -30px;
+        }
+
+        .floating-card i {
+            font-size: 2rem;
+            color: #365486;
+        }
+
+        .floating-card-content h4 {
+            color: #003366;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .floating-card-content p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media screen and (max-width: 992px) {
+            .about-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .about-image {
+                order: -1;
+            }
+
+            .floating-card {
+                position: static !important;
+                margin: 20px 0;
+                transform: none !important;
+            }
+        }
+
+        @media screen and (max-width: 576px) {
+            .about-stats {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
     
@@ -423,8 +632,54 @@ if (!isset($_SESSION['user_id'])) {
         <!-- About Section -->
         <section id="about" class="about">
             <div class="container">
-                <h2>Who We Are</h2>
-                <p>We are a platform that celebrates cultural diversity, creating a space to share stories, events, and experiences that connect us all.</p>
+                <div class="about-container">
+                    <div class="about-content">
+                        <h2>Empowering Cultural Exchange</h2>
+                        <p>Welcome to Kulturabase, where we believe in the power of sharing and preserving cultural knowledge. Our platform serves as a bridge connecting people, traditions, and stories from around the world.</p>
+                        <p>Through our innovative learning approaches and community-driven content, we're creating a space where cultural understanding flourishes and diverse perspectives are celebrated.</p>
+                        
+                        <div class="about-stats">
+                            <div class="stat-box">
+                                <i class="fas fa-book-open"></i>
+                                <div class="stat-number">1K+</div>
+                                <div class="stat-label">Cultural Articles</div>
+                            </div>
+                            <div class="stat-box">
+                                <i class="fas fa-globe-asia"></i>
+                                <div class="stat-number">50+</div>
+                                <div class="stat-label">Cultural Traditions</div>
+                            </div>
+                            <div class="stat-box">
+                                <i class="fas fa-camera"></i>
+                                <div class="stat-number">2K+</div>
+                                <div class="stat-label">Visual Stories</div>
+                            </div>
+                            <div class="stat-box">
+                                <i class="fas fa-graduation-cap"></i>
+                                <div class="stat-number">4+</div>
+                                <div class="stat-label">Learning Styles</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="about-image">
+                        <img src="assets/founder.jpg" alt="Cultural Exchange">
+                        <div class="floating-card top">
+                            <i class="fas fa-globe-americas"></i>
+                            <div class="floating-card-content">
+                                <h4>Global Reach</h4>
+                                <p>Connecting cultures worldwide</p>
+                            </div>
+                        </div>
+                        <div class="floating-card bottom">
+                            <i class="fas fa-users"></i>
+                            <div class="floating-card-content">
+                                <h4>Community Driven</h4>
+                                <p>Built by cultural enthusiasts</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -452,6 +707,24 @@ if (!isset($_SESSION['user_id'])) {
             </div>
         </section>
 
+        <!-- Learning Styles Chart Section -->
+        <section class="chart-section">
+            <div class="container">
+                <h2 class="chart-title">Analytics Overview</h2>
+                <div class="chart-container">
+                    <div class="chart-row">
+                        <div class="chart-box">
+                            <canvas id="learningStylesChart"></canvas>
+                        </div>
+                        <div class="chart-box line-charts">
+                            <canvas id="postsPerWeekChart"></canvas>
+                            <canvas id="postsPerMonthChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Gallery Section -->
         <section id="gallery" class="gallery-section">
             <div class="container">
@@ -473,6 +746,211 @@ if (!isset($_SESSION['user_id'])) {
 
     <!-- Include Chat Widget -->
     <?php include 'components/widgets/chat.php'; ?>
+
+    <script>
+        // Function to format dates
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        }
+
+        // Function to format months
+        function formatMonth(monthString) {
+            const date = new Date(monthString);
+            return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        }
+
+        // Create Learning Styles Chart
+        fetch('handlers/get_learning_styles_stats.php')
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    const data = result.data;
+                    const labels = data.map(item => item.style);
+                    const values = data.map(item => item.count);
+
+                    new Chart(document.getElementById('learningStylesChart'), {
+                        type: 'doughnut',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Number of Posts',
+                                data: values,
+                                backgroundColor: [
+                                    '#365486', // Visual
+                                    '#7FC7D9', // Auditory & Oral
+                                    '#DCF2F1', // Read & Write
+                                    '#0F1035'  // Kinesthetic
+                                ],
+                                hoverOffset: 4,
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 20,
+                                        font: {
+                                            size: 12,
+                                            family: "'Poppins', sans-serif"
+                                        }
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Learning Styles Distribution',
+                                    font: {
+                                        size: 16,
+                                        family: "'Poppins', sans-serif",
+                                        weight: '600'
+                                    },
+                                    padding: {
+                                        bottom: 20
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching learning styles data:', error));
+
+        // Create Posts Per Week Chart
+        fetch('handlers/get_posts_per_week.php')
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    const dates = result.data.dates.map(formatDate);
+                    const counts = result.data.counts;
+
+                    new Chart(document.getElementById('postsPerWeekChart'), {
+                        type: 'line',
+                        data: {
+                            labels: dates,
+                            datasets: [{
+                                label: 'Posts per Day',
+                                data: counts,
+                                fill: false,
+                                borderColor: '#365486',
+                                tension: 0.1,
+                                pointBackgroundColor: '#7FC7D9',
+                                pointBorderColor: '#365486',
+                                pointBorderWidth: 2,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 20,
+                                        font: {
+                                            size: 12,
+                                            family: "'Poppins', sans-serif"
+                                        }
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Posts Activity (Last 7 Days)',
+                                    font: {
+                                        size: 16,
+                                        family: "'Poppins', sans-serif",
+                                        weight: '600'
+                                    },
+                                    padding: {
+                                        bottom: 20
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching posts per week data:', error));
+
+        // Create Posts Per Month Chart
+        fetch('handlers/get_posts_per_month.php')
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    const months = result.data.months.map(formatMonth);
+                    const counts = result.data.counts;
+
+                    new Chart(document.getElementById('postsPerMonthChart'), {
+                        type: 'line',
+                        data: {
+                            labels: months,
+                            datasets: [{
+                                label: 'Posts per Month',
+                                data: counts,
+                                fill: false,
+                                borderColor: '#0F1035',
+                                tension: 0.1,
+                                pointBackgroundColor: '#DCF2F1',
+                                pointBorderColor: '#0F1035',
+                                pointBorderWidth: 2,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 20,
+                                        font: {
+                                            size: 12,
+                                            family: "'Poppins', sans-serif"
+                                        }
+                                    }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Posts Activity (Last 6 Months)',
+                                    font: {
+                                        size: 16,
+                                        family: "'Poppins', sans-serif",
+                                        weight: '600'
+                                    },
+                                    padding: {
+                                        bottom: 20
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching posts per month data:', error));
+    </script>
 
 </body>
 </html>

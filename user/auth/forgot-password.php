@@ -25,12 +25,143 @@ if (isset($_SESSION['user_id'])) {
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-image: url('https://socialstudieshelp.com/wp-content/uploads/2024/02/Exploring-the-Cultural-Diversity-of-Europe.webp');
-            background-size: cover;
-            background-position: center;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            background-image: url('https://socialstudieshelp.com/wp-content/uploads/2024/02/Exploring-the-Cultural-Diversity-of-Europe.webp');
+            background-size: cover;
+            background-position: center;
+            background-color: #f4e1d2;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+        }
+
+        .forgot-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(136, 67, 60, 0.2);
+            border: 2px solid #88433c;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Filipino-inspired decorative elements */
+        .forgot-container::before,
+        .forgot-container::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background-image: 
+                radial-gradient(circle at center, transparent 30%, #88433c11 30%),
+                repeating-linear-gradient(45deg, #88433c11 0px, #88433c11 2px, transparent 2px, transparent 8px);
+            border-radius: 50%;
+        }
+
+        .forgot-container::before {
+            top: -75px;
+            left: -75px;
+        }
+
+        .forgot-container::after {
+            bottom: -75px;
+            right: -75px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #88433c;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+        }
+
+        p {
+            color: #666;
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .input-container {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .input-container input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #daa520;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .input-container input:focus {
+            border-color: #88433c;
+            box-shadow: 0 0 0 3px rgba(136, 67, 60, 0.1);
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #88433c, #daa520);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #daa520, #88433c);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(136, 67, 60, 0.3);
+        }
+
+        /* Back to Login Link */
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(136, 67, 60, 0.2);
+        }
+
+        .login-link a {
+            color: #88433c;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: #daa520;
+        }
+
+        /* Input placeholder styling */
+        ::placeholder {
+            color: #999;
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -177,83 +308,6 @@ if (isset($_SESSION['user_id'])) {
             <p>Remembered your password? <a href="login.php">Log In</a></p>
         </div>
     </div>
-
-    <style>
-         .main-container {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .forgot-container {
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 40px;
-            border-radius: 15px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #333;
-        }
-
-        .input-container {
-            margin-bottom: 15px;
-            position: relative;
-        }
-
-        .input-container input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 1rem;
-            outline: none;
-            transition: border 0.3s ease;
-            background-color: #f9f9f9;
-        }
-
-        .input-container input:focus {
-            border-color: #4a6ea5;
-        }
-
-        /* Submit Button */
-        .submit-btn {
-            width: 100%;
-            padding: 15px;
-            background-color: #4a6ea5;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .submit-btn:hover {
-            background-color: #1c3d8c;
-        }
-
-        /* Back to Login Link */
-        .login-link {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .login-link a {
-            color: #4a6ea5;
-            text-decoration: none;
-        }
-
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-    </style>
-    
+    </div>
 </body>
 </html>

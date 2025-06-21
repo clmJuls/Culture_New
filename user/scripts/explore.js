@@ -19,13 +19,18 @@ let currentPostToDelete = null;
 let isSnapScrolling = false; // Add this new variable for snap scrolling
 let selectedLearningStyles = new Set();
 let showFollowingOnly = false; // Add this new variable
+let searchQuery = ''; // Add this new variable
 
-// Modified loadPosts function to handle empty results naturally
+// Modified loadPosts function to handle search
 function loadPosts(append = false) {
   if (isLoading || (!append && !hasMorePosts)) return Promise.resolve();
   
   isLoading = true;
-  updateViewMoreButton('Loading...');
+  const postDisplay = document.getElementById('post-display');
+  
+  if (!append) {
+    postDisplay.innerHTML = '<div class="loading-indicator">Loading posts...</div>';
+  }
   
   return new Promise((resolve, reject) => {
     $.ajax({
@@ -37,11 +42,21 @@ function loadPosts(append = false) {
         per_page: postsPerPage,
         filter: showFollowingOnly ? 'following' : '',
         learning_styles: Array.from(selectedLearningStyles),
-        include_premium_status: true
+        include_premium_status: true,
+        search: searchQuery
       },
       success: function(response) {
+        console.log('Raw response:', response); // Debug log
         try {
           const data = typeof response === 'object' ? response : JSON.parse(response);
+          console.log('Parsed data:', data); // Debug log
+          
+          if (data.status === 'error') {
+            console.error('Server error:', data.message);
+            postDisplay.innerHTML = `<div class="error-message">Error loading posts: ${data.message}</div>`;
+            reject(new Error(data.message));
+            return;
+          }
           
           if (data.posts && data.posts.length > 0) {
             displayPosts(data.posts, append);
@@ -50,25 +65,21 @@ function loadPosts(append = false) {
           } else {
             hasMorePosts = false;
             if (!append) {
-              const postDisplay = document.getElementById('post-display');
-              if (postDisplay) {
-                postDisplay.innerHTML = '<div class="no-posts-message">No posts found</div>'; // Add a message when no posts are found
-              }
+              postDisplay.innerHTML = '<div class="no-posts-message">No posts found</div>';
             }
           }
-          updateViewMoreButton();
           resolve();
         } catch (e) {
-          console.error('Error parsing response:', e);
-          updateViewMoreButton('Try Again');
+          console.error('Error parsing response:', e, 'Response was:', response);
+          postDisplay.innerHTML = '<div class="error-message">Error loading posts. Please try again.</div>';
           reject(e);
         }
         isLoading = false;
       },
       error: function(xhr, status, error) {
-        console.error('Ajax error:', error);
+        console.error('Ajax error:', {xhr, status, error});
+        postDisplay.innerHTML = '<div class="error-message">Error loading posts. Please try again.</div>';
         isLoading = false;
-        updateViewMoreButton('Try Again');
         reject(error);
       }
     });
@@ -676,10 +687,27 @@ function initializeFollowingFilter() {
     });
 }
 
+// Add search handler function
+function handleSearch() {
+    const searchInput = document.getElementById('post-search');
+    let debounceTimer;
+
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            searchQuery = this.value.trim();
+            currentPage = 1;
+            hasMorePosts = true;
+            loadPosts(false);
+        }, 300); // Debounce for 300ms
+    });
+}
+
 // Add event listeners
 $(document).ready(function() {
     initializeLearningStyleFilters();
-    initializeFollowingFilter(); // Add this new initialization
+    initializeFollowingFilter();
+    handleSearch(); // Initialize search handler
     loadPosts().then(() => {
         // Initialize snap scroll
         initSnapScroll();
@@ -923,3 +951,33 @@ function updateAllFollowButtons() {
         }
     });
 }
+
+// Add these styles to handle loading and error states
+$(document).ready(function() {
+    const style = `
+        <style>
+            .loading-indicator {
+                text-align: center;
+                padding: 20px;
+                color: #666;
+            }
+            .error-message {
+                text-align: center;
+                padding: 20px;
+                color: #dc3545;
+                background-color: #f8d7da;
+                border-radius: 4px;
+                margin: 10px 0;
+            }
+            .no-posts-message {
+                text-align: center;
+                padding: 20px;
+                color: #666;
+                background-color: #f8f9fa;
+                border-radius: 4px;
+                margin: 10px 0;
+            }
+        </style>
+    `;
+    $('head').append(style);
+});

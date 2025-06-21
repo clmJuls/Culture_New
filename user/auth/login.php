@@ -99,12 +99,183 @@ $conn->close();
 
         body {
             font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
             background-image: url('https://socialstudieshelp.com/wp-content/uploads/2024/02/Exploring-the-Cultural-Diversity-of-Europe.webp');
             background-size: cover;
             background-position: center;
-            min-height: 100vh;
-            display: flex;
             flex-direction: column;
+            background-color: #f4e1d2; /* Warm, earthy tone common in Filipino textiles */
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Filipino-inspired background pattern */
+       
+
+        .main-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(136, 67, 60, 0.2);
+            border: 2px solid #88433c;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Filipino-inspired decorative elements */
+        .login-container::before,
+        .login-container::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background-image: 
+                radial-gradient(circle at center, transparent 30%, #88433c11 30%),
+                repeating-linear-gradient(45deg, #88433c11 0px, #88433c11 2px, transparent 2px, transparent 8px);
+            border-radius: 50%;
+        }
+
+        .login-container::before {
+            top: -75px;
+            left: -75px;
+        }
+
+        .login-container::after {
+            bottom: -75px;
+            right: -75px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #88433c; /* Deep red-brown color common in Filipino art */
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+        }
+
+        .input-container {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .input-container input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #daa520; /* Golden color inspired by Filipino traditional ornaments */
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .input-container input:focus {
+            border-color: #88433c;
+            box-shadow: 0 0 0 3px rgba(136, 67, 60, 0.1);
+        }
+
+        .input-container .error-message {
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 5px 0;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .remember-forgot label {
+            color: #666;
+        }
+
+        .remember-forgot a {
+            color: #88433c;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .remember-forgot a:hover {
+            color: #daa520;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #88433c, #daa520);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(135deg, #daa520, #88433c);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(136, 67, 60, 0.3);
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(136, 67, 60, 0.2);
+        }
+
+        .signup-link a {
+            color: #88433c;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .signup-link a:hover {
+            color: #daa520;
+        }
+
+        .error-message {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        /* Input placeholder styling */
+        ::placeholder {
+            color: #999;
+            opacity: 0.8;
+        }
+
+        /* Checkbox styling */
+        input[type="checkbox"] {
+            accent-color: #88433c;
+            margin-right: 5px;
         }
     </style>
 </head>
@@ -142,123 +313,5 @@ $conn->close();
         </div>
     </div>
 
-    <style>
-         .main-container {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .login-container {
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 40px;
-            border-radius: 15px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #333;
-        }
-
-        .input-container {
-            margin-bottom: 15px;
-            position: relative;
-        }
-
-        .input-container input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 1rem;
-            outline: none;
-            transition: border 0.3s ease;
-            background-color: #f9f9f9;
-        }
-
-        .input-container .error-message {
-            color: #dc3545;
-            font-size: 0.8rem;
-            margin-top: 5px;
-            padding: 5px 0;
-        }
-
-        .input-container input:focus {
-            border-color: #4a6ea5;
-        }
-
-        /* When there's an error, change the input border color */
-        .input-container input.error {
-            border-color: #dc3545;
-        }
-
-        .remember-forgot {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-        }
-
-        .remember-forgot label {
-            color: #777;
-        }
-
-        .remember-forgot a {
-            color: #4a6ea5;
-            text-decoration: none;
-        }
-
-        .remember-forgot a:hover {
-            text-decoration: underline;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 15px;
-            background-color: #4a6ea5;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .login-btn:hover {
-            background-color: #1c3d8c;
-        }
-
-        .signup-link {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .signup-link a {
-            color: #4a6ea5;
-            text-decoration: none;
-        }
-
-        .signup-link a:hover {
-            text-decoration: underline;
-        }
-
-        .error-message {
-            color: #dc3545;
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            border-radius: 5px;
-            padding: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-    </style>
 </body>
 </html>

@@ -11,10 +11,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         if ($_POST['action'] === 'fetch_posts') {
             $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
-            $per_page = isset($_POST['per_page']) ? (int)$_POST['per_page'] : 10;
+            $per_page = isset($_POST['per_page']) ? (int)$_POST['per_page'] : 6;
             $offset = ($page - 1) * $per_page;
             $filter = isset($_POST['filter']) ? $_POST['filter'] : '';
             $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0;
+            $search = isset($_POST['search']) ? trim($_POST['search']) : '';
             
             $learning_styles = isset($_POST['learning_styles']) && is_array($_POST['learning_styles']) 
                 ? array_map('strval', $_POST['learning_styles']) 
@@ -31,13 +32,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                          INNER JOIN user_follows f ON p.user_id = f.following_id
                          LEFT JOIN likes l ON p.id = l.post_id
                          LEFT JOIN comments c ON p.id = c.post_id
-                         WHERE f.follower_id = ? AND p.status = 'approved'
-                         GROUP BY p.id, u.username, u.profile_picture
-                         ORDER BY p.created_at DESC
-                         LIMIT ? OFFSET ?";
+                         WHERE f.follower_id = ? AND p.status = 'approved'";
+                
+                if (!empty($search)) {
+                    $query .= " AND p.title LIKE CONCAT('%', ?, '%')";
+                }
+                
+                $query .= " GROUP BY p.id, u.username, u.profile_picture
+                           ORDER BY p.created_at DESC
+                           LIMIT ? OFFSET ?";
                 
                 $stmt = $conn->prepare($query);
-                $stmt->bind_param("iiiii", $_SESSION['user_id'], $_SESSION['user_id'], $_SESSION['user_id'], $per_page, $offset);
+                if (!empty($search)) {
+                    $stmt->bind_param("iiisii", $_SESSION['user_id'], $_SESSION['user_id'], $_SESSION['user_id'], $search, $per_page, $offset);
+                } else {
+                    $stmt->bind_param("iiiii", $_SESSION['user_id'], $_SESSION['user_id'], $_SESSION['user_id'], $per_page, $offset);
+                }
             } else {
                 $query = "SELECT DISTINCT p.*, u.username, u.profile_picture, u.isPremium as is_premium,
                          COUNT(DISTINCT l.id) as like_count,
@@ -46,6 +56,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                          LEFT JOIN users u ON p.user_id = u.id
                          LEFT JOIN likes l ON p.id = l.post_id
                          WHERE p.status = 'approved'";
+
+                if (!empty($search)) {
+                    $query .= " AND p.title LIKE CONCAT('%', ?, '%')";
+                }
+                
                 if (!empty($learning_styles)) {
                     $query .= " AND (";
                     $conditions = array();
@@ -59,44 +74,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                            ORDER BY p.created_at DESC";
                 
                 if ($per_page > 0) {
-                    $offset = ($page - 1) * $per_page;
                     $query .= " LIMIT ? OFFSET ?";
                     
                     if (!empty($learning_styles)) {
-                        $types = "ii" . str_repeat('s', count($learning_styles)) . "ii";
+                        $types = "ii" . (!empty($search) ? "s" : "") . str_repeat('s', count($learning_styles)) . "ii";
                         $params = array_merge(
                             [$currentUserId, $currentUserId],
+                            (!empty($search) ? [$search] : []),
                             array_map(function($style) { return "%$style%"; }, $learning_styles),
                             [$per_page, $offset]
                         );
                         $stmt = $conn->prepare($query);
                         $stmt->bind_param($types, ...$params);
                     } else {
-                        $stmt = $conn->prepare($query);
-                        $stmt->bind_param("iiii", $currentUserId, $currentUserId, $per_page, $offset);
-                    }
-                } else {
-                    if (!empty($learning_styles)) {
-                        $types = "ii" . str_repeat('s', count($learning_styles));
-                        $params = array_merge(
-                            [$currentUserId, $currentUserId],
-                            array_map(function($style) { return "%$style%"; }, $learning_styles)
-                        );
-                        $stmt = $conn->prepare($query);
-                        $stmt->bind_param($types, ...$params);
-                    } else {
-                        $stmt = $conn->prepare($query);
-                        $stmt->bind_param("ii", $currentUserId, $currentUserId);
+                        if (!empty($search)) {
+                            $stmt = $conn->prepare($query);
+                            $stmt->bind_param("iisii", $currentUserId, $currentUserId, $search, $per_page, $offset);
+                        } else {
+                            $stmt = $conn->prepare($query);
+                            $stmt->bind_param("iiii", $currentUserId, $currentUserId, $per_page, $offset);
+                        }
                     }
                 }
             }
             
-            if ($stmt === false) {
-                throw new Exception("Prepare failed: " . $conn->error);
-            }
-            
             if (!$stmt->execute()) {
-                throw new Exception("Execute failed: " . $stmt->error);
+                throw new Exception("Error fetching posts: " . $stmt->error);
             }
             
             $result = $stmt->get_result();
@@ -123,8 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             echo json_encode([
                 'status' => 'success',
-                'posts' => $posts,
-                'current_user_id' => $_SESSION['user_id'] ?? null
+                'posts' => $posts
             ]);
             
         } elseif ($_POST['action'] === 'fetch_user_posts') {

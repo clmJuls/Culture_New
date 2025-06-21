@@ -94,12 +94,199 @@ $conn->close();
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-image: url('https://socialstudieshelp.com/wp-content/uploads/2024/02/Exploring-the-Cultural-Diversity-of-Europe.webp');
-            background-size: cover;
-            background-position: center;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            background-image: url('https://socialstudieshelp.com/wp-content/uploads/2024/02/Exploring-the-Cultural-Diversity-of-Europe.webp');
+            background-size: cover;
+            background-position: center;
+            background-color: #f4e1d2;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+        }
+
+        .signup-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(136, 67, 60, 0.2);
+            border: 2px solid #88433c;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Filipino-inspired decorative elements */
+        .signup-container::before,
+        .signup-container::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background-image: 
+                radial-gradient(circle at center, transparent 30%, #88433c11 30%),
+                repeating-linear-gradient(45deg, #88433c11 0px, #88433c11 2px, transparent 2px, transparent 8px);
+            border-radius: 50%;
+        }
+
+        .signup-container::before {
+            top: -75px;
+            left: -75px;
+        }
+
+        .signup-container::after {
+            bottom: -75px;
+            right: -75px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #88433c;
+            text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #daa520;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .input-group input:focus {
+            border-color: #88433c;
+            box-shadow: 0 0 0 3px rgba(136, 67, 60, 0.1);
+        }
+
+        .input-group input.error {
+            border-color: #dc3545;
+        }
+
+        .error-text {
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding-left: 5px;
+            display: none;
+        }
+
+        .error-text i {
+            margin-right: 5px;
+        }
+
+        .signup-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #88433c, #daa520);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .signup-btn:hover {
+            background: linear-gradient(135deg, #daa520, #88433c);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(136, 67, 60, 0.3);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(136, 67, 60, 0.2);
+        }
+
+        .login-link a {
+            color: #88433c;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: #daa520;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            padding: 5px 0;
+        }
+
+        .general-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .password-requirements {
+            margin-top: 5px;
+            padding-left: 5px;
+        }
+
+        .requirement {
+            margin: 3px 0;
+            color: #dc3545;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            opacity: 1;
+        }
+
+        .requirement.valid {
+            color: #198754;
+        }
+
+        .requirement.fade-out {
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        .requirement i {
+            margin-right: 5px;
+        }
+
+        /* Input placeholder styling */
+        ::placeholder {
+            color: #999;
+            opacity: 0.8;
+        }
+
+        /* Checkbox styling */
+        input[type="checkbox"] {
+            accent-color: #88433c;
+            margin-right: 5px;
         }
     </style>
 </head>
@@ -183,144 +370,7 @@ $conn->close();
                 <p>Already have an account? <a href="login.php">Log In</a></p>
             </div>
         </div>
-    <style>
-        .main-container {
-           flex-grow: 1;
-           display: flex;
-           justify-content: center;
-           align-items: center;
-       }
-
-       .signup-container {
-           background-color: rgba(255, 255, 255, 0.8);
-           padding: 40px;
-           border-radius: 15px;
-           width: 100%;
-           max-width: 400px;
-           box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-       }
-
-       h2 {
-           font-size: 2rem;
-           margin-bottom: 20px;
-           text-align: center;
-           color: #333;
-       }
-
-       .input-group {
-           margin-bottom: 20px;
-           position: relative;
-       }
-
-       .input-group input {
-           width: 100%;
-           padding: 15px;
-           border: 2px solid #ddd;
-           border-radius: 10px;
-           font-size: 1rem;
-           outline: none;
-           transition: all 0.3s ease;
-           background-color: #f9f9f9;
-       }
-
-       .input-group input:focus {
-           border-color: #4a6ea5;
-       }
-
-       .input-group input.error {
-           border-color: #dc3545;
-       }
-
-       .error-text {
-           color: #dc3545;
-           font-size: 0.8rem;
-           margin-top: 5px;
-           padding-left: 5px;
-           display: none;
-       }
-
-       .error-text i {
-           margin-right: 5px;
-       }
-
-       .signup-btn {
-           width: 100%;
-           padding: 15px;
-           background-color: #4a6ea5;
-           color: white;
-           border: none;
-           border-radius: 10px;
-           font-size: 1.1rem;
-           cursor: pointer;
-           transition: background-color 0.3s ease;
-           margin-top: 10px;
-       }
-
-       .signup-btn:hover {
-           background-color: #1c3d8c;
-       }
-
-       .login-link {
-           text-align: center;
-           margin-top: 20px;
-       }
-
-       .login-link a {
-           color: #4a6ea5;
-           text-decoration: none;
-       }
-
-       .login-link a:hover {
-           text-decoration: underline;
-       }
-
-       .error-message {
-           color: #dc3545;
-           font-size: 0.8rem;
-           margin-top: 5px;
-           padding: 5px 0;
-       }
-
-       .general-error {
-           background-color: #f8d7da;
-           border: 1px solid #f5c6cb;
-           border-radius: 5px;
-           padding: 10px;
-           margin-bottom: 20px;
-           text-align: center;
-       }
-
-       .password-requirements {
-           margin-top: 5px;
-           padding-left: 5px;
-       }
-
-       .requirement {
-           margin: 3px 0;
-           color: #dc3545;
-           font-size: 0.8rem;
-           transition: all 0.3s ease;
-           opacity: 1;
-       }
-
-       .requirement.valid {
-           color: #198754;  /* Green color */
-       }
-
-       .requirement.fade-out {
-           opacity: 0;
-           transition: opacity 2s ease;
-       }
-
-       .requirement i {
-           margin-right: 5px;
-       }
-
-       @keyframes fadeOut {
-           from { opacity: 1; }
-           to { opacity: 0; }
-       }
-   </style>
+    </div>
 
    <script src="script/signup.js"></script>
 </body>

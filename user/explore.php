@@ -866,6 +866,49 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
             opacity: 0.7;
             cursor: wait;
         }
+
+        /* Search Bar Styles */
+        .search-bar-container {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        #post-search {
+            width: 100%;
+            padding: 12px 40px 12px 20px;
+            border: 2px solid #365486;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: white;
+            color: #333;
+        }
+
+        #post-search:focus {
+            outline: none;
+            border-color: #7FC7D9;
+            box-shadow: 0 0 10px rgba(127, 199, 217, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #365486;
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        #post-search::placeholder {
+            color: #999;
+        }
     </style>
 
     <!-- Navigation Bar -->
@@ -919,6 +962,12 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
     </script>
 
     <div class="explore-container">
+        <div class="search-bar-container">
+            <div class="search-input-wrapper">
+                <input type="text" id="post-search" placeholder="Search posts by title...">
+                <i class="fas fa-search search-icon"></i>
+            </div>
+        </div>
         <div id="post-display"></div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
