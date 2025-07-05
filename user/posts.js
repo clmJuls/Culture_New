@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    // Add CSS for username link
+    // Add CSS for username link and audio player
     $('<style>')
         .text(`
             .username-link {
@@ -11,6 +11,34 @@ $(document).ready(function() {
             .username-link:hover {
                 color: #166fe5;
                 text-decoration: underline;
+            }
+            .audio-player-container {
+                margin: 15px 0;
+                border-radius: 8px;
+                overflow: visible !important;
+                background: #f8f9fa;
+                border: 1px solid #dee2e6;
+                min-height: 80px;
+                width: 100%;
+                display: block !important;
+            }
+            .audio-player {
+                padding: 20px;
+                display: flex !important;
+                align-items: center;
+                gap: 15px;
+                background: #f8f9fa;
+                width: 100%;
+                min-height: 60px;
+            }
+            .audio-player i {
+                font-size: 24px;
+                color: #365486;
+                flex-shrink: 0;
+            }
+            .audio-player audio {
+                flex-grow: 1;
+                min-width: 200px;
             }
         `)
         .appendTo('head');
@@ -115,16 +143,49 @@ $(document).ready(function() {
             let mediaHTML = '';
             if (post.file_path) {
                 const fileExtension = post.file_path.split('.').pop().toLowerCase();
-                const isVideo = ['mp4', 'webm', 'mov'].includes(fileExtension);
-                
+                const isVideo = ['mp4', 'webm', 'mov', 'avi', 'mkv'].includes(fileExtension);
+                const isAudio = ['mp3', 'wav', 'ogg', 'mpeg', 'aac', 'm4a', 'flac'].includes(fileExtension);
+
+                // Debug logging - show in UI instead of console
+                if (isAudio) {
+                    console.log('AUDIO DETECTED in posts.js:', post.file_path, 'Extension:', fileExtension);
+                }
+
                 if (isVideo) {
                     mediaHTML = `
                         <video class="post-media" controls>
                             <source src="${post.file_path}" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>`;
+                } else if (isAudio) {
+                    mediaHTML = `
+                        <div class="audio-player-container" style="display: block !important; background: #f8f9fa; border: 2px solid #365486; margin: 10px 0; padding: 10px; min-height: 80px;">
+                            <div class="audio-player" style="display: flex !important; align-items: center; gap: 15px; padding: 10px;">
+                                <i class="fas fa-music" style="font-size: 24px; color: #365486;"></i>
+                                <audio class="post-media" controls style="flex-grow: 1; min-width: 200px;">
+                                    <source src="${post.file_path}" type="audio/${fileExtension}">
+                                    Your browser does not support the audio element.
+                                </audio>
+                            </div>
+                            <div style="font-size: 12px; color: #666; margin-top: 5px;">Audio file: ${post.file_path}</div>
+                        </div>`;
                 } else {
-                    mediaHTML = `<img class="post-media" src="${post.file_path}" alt="Post media">`;
+                    // Check if it might be an audio file that wasn't detected
+                    if (post.file_path && (post.file_path.includes('.mp3') || post.file_path.includes('.wav') || post.file_path.includes('.ogg') || post.file_path.includes('.mpeg'))) {
+                        mediaHTML = `
+                            <div class="audio-player-container" style="display: block !important; background: #f8f9fa; border: 2px solid #ff6b6b; margin: 10px 0; padding: 10px; min-height: 80px;">
+                                <div class="audio-player" style="display: flex !important; align-items: center; gap: 15px; padding: 10px;">
+                                    <i class="fas fa-music" style="font-size: 24px; color: #ff6b6b;"></i>
+                                    <audio class="post-media" controls style="flex-grow: 1; min-width: 200px;">
+                                        <source src="${post.file_path}">
+                                        Your browser does not support the audio element.
+                                    </audio>
+                                </div>
+                                <div style="font-size: 12px; color: #666; margin-top: 5px;">Fallback Audio: ${post.file_path}</div>
+                            </div>`;
+                    } else {
+                        mediaHTML = `<img class="post-media" src="${post.file_path}" alt="Post media">`;
+                    }
                 }
             }
 

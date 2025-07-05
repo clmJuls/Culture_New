@@ -22,29 +22,126 @@ $isPremium = $user['isPremium'];
 $stmt->close();
 
 // Define file size limits based on premium status
-$maxFileSize = $isPremium ? (10 * 1024 * 1024) : (2 * 1024 * 1024); // 10MB or 2MB in bytes
+$maxFileSize = $isPremium ? (50 * 1024 * 1024) : (25 * 1024 * 1024); // 50MB or 25MB in bytes
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $errors = array(); // Array to store validation errors
+
+    // Debug: Log file upload attempts
+    if (isset($_FILES['file']) && $_FILES['file']['error'] !== UPLOAD_ERR_NO_FILE) {
+        error_log("File upload attempt: " . $_FILES['file']['name'] . " (Size: " . $_FILES['file']['size'] . " bytes)");
+    }
+
+    // Debug: Log user info
+    error_log("User ID: " . $_SESSION['user_id']);
+    error_log("POST data keys: " . implode(', ', array_keys($_POST)));
 
     $title = htmlspecialchars($_POST['title']);
     $description = htmlspecialchars($_POST['description']);
     $culture_elements = isset($_POST['culture_elements']) ? implode(',', $_POST['culture_elements']) : '';
     $learning_styles = isset($_POST['learning_styles']) ? implode(',', $_POST['learning_styles']) : '';
-    $uploaded_file = '';
+    // Initialize uploaded_file variable
+    $uploaded_file = null;
 
     // Handle file upload with validation
-    if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
-        $file_size = $_FILES['file']['size'];
-        $max_size = $isPremium ? (10 * 1024 * 1024) : (2 * 1024 * 1024);
-        $size_limit_text = $isPremium ? "10MB" : "2MB";
+    if (isset($_FILES['file'])) {
+        $upload_error = $_FILES['file']['error'];
+        error_log("Upload error code: " . $upload_error);
 
-        if ($file_size > $max_size) {
-            $errors[] = "File size exceeds {$size_limit_text} limit" . ($isPremium ? ' for Premium users' : '');
-        } else {
-            $upload_dir = 'uploads/';
-            $uploaded_file = $upload_dir . uniqid() . '_' . basename($_FILES['file']['name']);
-            move_uploaded_file($_FILES['file']['tmp_name'], $uploaded_file);
+        // Check for upload errors
+        switch ($upload_error) {
+            case UPLOAD_ERR_OK:
+                // No error, proceed with upload
+                break;
+            case UPLOAD_ERR_INI_SIZE:
+                $errors[] = "File is too large (exceeds PHP upload_max_filesize)";
+                break;
+            case UPLOAD_ERR_FORM_SIZE:
+                $errors[] = "File is too large (exceeds form MAX_FILE_SIZE)";
+                break;
+            case UPLOAD_ERR_PARTIAL:
+                $errors[] = "File was only partially uploaded";
+                break;
+            case UPLOAD_ERR_NO_FILE:
+                // No file uploaded, this is okay
+                break;
+            case UPLOAD_ERR_NO_TMP_DIR:
+                $errors[] = "Missing temporary folder";
+                break;
+            case UPLOAD_ERR_CANT_WRITE:
+                $errors[] = "Failed to write file to disk";
+                break;
+            case UPLOAD_ERR_EXTENSION:
+                $errors[] = "File upload stopped by extension";
+                break;
+            default:
+                $errors[] = "Unknown upload error";
+                break;
+        }
+
+        if ($upload_error === UPLOAD_ERR_OK) {
+            $file_size = $_FILES['file']['size'];
+            $file_name = $_FILES['file']['name'];
+            $file_tmp = $_FILES['file']['tmp_name'];
+            $file_type = $_FILES['file']['type'];
+
+            $max_size = $isPremium ? (50 * 1024 * 1024) : (25 * 1024 * 1024);
+            $size_limit_text = $isPremium ? "50MB" : "25MB";
+
+            // Validate file size
+            if ($file_size > $max_size) {
+                $errors[] = "File size exceeds {$size_limit_text} limit" . ($isPremium ? ' for Premium users' : '');
+            } else {
+                // Validate file type
+                $allowed_types = [
+                    'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
+                    'video/mp4', 'video/webm', 'video/mov', 'video/avi', 'video/quicktime',
+                    'audio/mp3', 'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/m4a',
+                    'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    'text/plain'
+                ];
+
+                $file_extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'mp4', 'webm', 'mov', 'avi', 'mp3', 'wav', 'ogg', 'mpeg', 'aac', 'm4a', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt'];
+
+                if (!in_array($file_extension, $allowed_extensions)) {
+                    $errors[] = "File type not allowed. Supported formats: Images, Videos (MP4, WebM, MOV, AVI), Audio (MP3, WAV, OGG, AAC, M4A), Documents (PDF, DOC, DOCX, XLS, XLSX, TXT)";
+                } else {
+                    // Create uploads directory if it doesn't exist
+                    $upload_dir = 'uploads/';
+                    if (!file_exists($upload_dir)) {
+                        if (!mkdir($upload_dir, 0755, true)) {
+                            $errors[] = "Failed to create upload directory";
+                        }
+                    }
+
+                    if (empty($errors)) {
+                        // Generate unique filename
+                        $unique_name = uniqid() . '_' . time() . '.' . $file_extension;
+                        $uploaded_file = $upload_dir . $unique_name;
+
+                        // Attempt to move uploaded file
+                        if (!move_uploaded_file($file_tmp, $uploaded_file)) {
+                            $upload_error = error_get_last();
+                            error_log("File upload failed: " . print_r($upload_error, true));
+                            error_log("Source: $file_tmp, Destination: $uploaded_file");
+                            error_log("Upload dir writable: " . (is_writable($upload_dir) ? 'yes' : 'no'));
+                            $errors[] = "Failed to upload file. Please try again.";
+                            $uploaded_file = null;
+                        } else {
+                            // Verify file was actually uploaded
+                            if (!file_exists($uploaded_file)) {
+                                error_log("File upload verification failed: $uploaded_file does not exist");
+                                $errors[] = "File upload verification failed.";
+                                $uploaded_file = null;
+                            } else {
+                                error_log("File uploaded successfully: $uploaded_file");
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -52,14 +149,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
         $status = (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1) ? 'approved' : 'pending';
 
+        // Debug: Log what we're about to insert
+        error_log("Inserting post with file_path: " . ($uploaded_file ? $uploaded_file : 'NULL'));
+
         $stmt = $conn->prepare("INSERT INTO posts (user_id, title, description, file_path, culture_elements, learning_styles, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param('issssss', $user_id, $title, $description, $uploaded_file, $culture_elements, $learning_styles, $status);
 
         if ($stmt->execute()) {
+            // Debug: Log successful post creation
+            error_log("Post created successfully with file: " . ($uploaded_file ? $uploaded_file : 'no file'));
+
             // Create notification after successful post creation
             require_once 'services/NotificationService.php';
             $notificationService = new NotificationService($conn);
-            
+
             // Create notification for the user
             $notificationTitle = "Post Submitted";
             $notificationMessage = "Your post \"" . $title . "\" is pending for review.";
@@ -120,7 +223,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kulturabase</title>
+    <title>KulturaBase</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
@@ -136,7 +239,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-image: url('https://socialstudieshelp.com/wp-content/uploads/2024/02/Exploring-the-Cultural-Diversity-of-Europe.webp');
+            background-image: url('../assets/img/BG_CULTURE.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -245,16 +348,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <p>or</p>
                 <p>Click to select a file</p>
                 <input type="file" name="file" id="file-input"
-                    accept="image/*,video/mp4,video/webm,video/mov,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain"
+                    accept="image/*,video/mp4,video/webm,video/mov,audio/mp3,audio/wav,audio/ogg,audio/mpeg,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain"
                     style="display: none;">
             </div>
             <div class="file-size-info" style="color: #666;">
                 <?php if ($isPremium): ?>
                     <i class="fas fa-crown" style="color: #FFD700;"></i>
-                    <span>Premium user: Upload files up to 10MB</span>
+                    <span>Premium user: Upload files up to 50MB (images, videos, audio, documents)</span>
                 <?php else: ?>
                     <i class="fas fa-info-circle"></i>
-                    <span>Free user: Upload files up to 2MB</span>
+                    <span>Free user: Upload files up to 25MB (images, videos, audio, documents)</span>
                 <?php endif; ?>
             </div>
             <div class="file-preview" id="file-preview"></div>
@@ -371,6 +474,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const file = files[0];
             if (!file) return;
 
+            console.log('handleFiles called with:', file.name, 'Type:', file.type, 'Size:', file.size);
+
+            // Set the file in the file input
+            const fileInput = document.getElementById('file-input');
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+
+            console.log('File set in input, files count:', fileInput.files.length);
+
             // Remove size validation here to allow any file upload initially
             showPreview(file);
 
@@ -387,7 +500,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else if (file.type.startsWith('video/')) {
                 if (visualCheckbox) visualCheckbox.checked = true;
                 if (auditoryCheckbox) auditoryCheckbox.checked = true;
-            } else if (file.type === 'audio/mp3' || file.type === 'audio/mpeg') {
+            } else if (file.type.startsWith('audio/')) {
                 if (auditoryCheckbox) auditoryCheckbox.checked = true;
             } else if (
                 file.type === 'application/pdf' ||
@@ -425,6 +538,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     video.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
+            } else if (file.type.startsWith('audio/')) {
+                const audioContainer = document.createElement('div');
+                audioContainer.style.display = 'flex';
+                audioContainer.style.alignItems = 'center';
+                audioContainer.style.gap = '15px';
+                audioContainer.style.padding = '20px';
+                audioContainer.style.backgroundColor = '#f8f9fa';
+                audioContainer.style.borderRadius = '8px';
+
+                const audioIcon = document.createElement('i');
+                audioIcon.className = 'fas fa-music';
+                audioIcon.style.fontSize = '24px';
+                audioIcon.style.color = '#365486';
+
+                const audio = document.createElement('audio');
+                audio.controls = true;
+                audio.style.flexGrow = '1';
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    audio.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+
+                audioContainer.appendChild(audioIcon);
+                audioContainer.appendChild(audio);
+                filePreview.appendChild(audioContainer);
             } else {
                 // Handle documents
                 const docIcon = document.createElement('i');
@@ -518,12 +658,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Validate file size if a file is selected
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
-                const sizeLimit = userIsPremium ? (10 * 1024 * 1024) : (2 * 1024 * 1024);
-                const sizeLimitText = userIsPremium ? "10MB" : "2MB";
+                console.log('File selected for upload:', file.name, 'Size:', file.size, 'Type:', file.type);
+
+                const sizeLimit = userIsPremium ? (50 * 1024 * 1024) : (25 * 1024 * 1024);
+                const sizeLimitText = userIsPremium ? "50MB" : "25MB";
 
                 if (file.size > sizeLimit) {
                     errors.push(`File size exceeds ${sizeLimitText} limit${userIsPremium ? ' for Premium users' : ''}`);
                 }
+            } else {
+                console.log('No file selected for upload');
             }
 
             // If there are validation errors, show them in the modal
@@ -576,7 +720,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-image: url('https://socialstudieshelp.com/wp-content/uploads/2024/02/Exploring-the-Cultural-Diversity-of-Europe.webp');
+            background-image: url('./assets/img/BG_CULTURE.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -1149,7 +1293,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+    </script>
 </body>
-</head>
-
 </html>

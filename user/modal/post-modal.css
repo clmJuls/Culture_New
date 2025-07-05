@@ -65,6 +65,31 @@
     object-fit: contain;
 }
 
+/* Audio player styling for modal */
+.post-media-container .audio-player-container {
+    width: 100%;
+    background: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.post-media-container .audio-player {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #f8f9fa;
+}
+
+.post-media-container .audio-player i {
+    font-size: 24px;
+    color: #365486;
+}
+
+.post-media-container .audio-player audio {
+    flex-grow: 1;
+}
+
 /* Categories styling */
 .culture-elements,
 .learning-styles {

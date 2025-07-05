@@ -81,7 +81,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kulturabase</title>
+    <title>KulturaBase</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
@@ -97,7 +97,7 @@ $conn->close();
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            background-image: url('https://socialstudieshelp.com/wp-content/uploads/2024/02/Exploring-the-Cultural-Diversity-of-Europe.webp');
+            background-image: url('../assets/img/BG_CULTURE.png');
             background-size: cover;
             background-position: center;
             background-color: #f4e1d2;

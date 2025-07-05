@@ -55,8 +55,9 @@ const postModal = {
       if (post.file_path) {
           const fileExtension = post.file_path.split('.').pop().toLowerCase();
           const isVideo = ['mp4', 'webm', 'mov'].includes(fileExtension);
+          const isAudio = ['mp3', 'wav', 'ogg', 'mpeg'].includes(fileExtension);
           const isDocument = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt'].includes(fileExtension);
-          
+
           mediaHTML = `<div class="post-media-container">`;
           if (isVideo) {
               mediaHTML += `
@@ -64,6 +65,17 @@ const postModal = {
                       <source src="${post.file_path}" type="video/mp4">
                       Your browser does not support the video tag.
                   </video>`;
+          } else if (isAudio) {
+              mediaHTML += `
+                  <div class="audio-player-container">
+                      <div class="audio-player">
+                          <i class="fas fa-music"></i>
+                          <audio class="post-media" controls>
+                              <source src="${post.file_path}" type="audio/${fileExtension}">
+                              Your browser does not support the audio element.
+                          </audio>
+                      </div>
+                  </div>`;
           } else if (isDocument) {
               // Get appropriate icon class based on file type
               let iconClass = 'fa-file-alt'; // default document icon

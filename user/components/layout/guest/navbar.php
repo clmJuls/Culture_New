@@ -5,7 +5,7 @@
             </div>
             <a href="home.php" class="logo-link" style="display: flex; align-items: center; text-decoration: none;">
                 <img src="assets/logo/logo.png" alt="Kulturifiko Logo">
-                <h1>Kulturabase</h1>
+                <h1>KulturaBase</h1>
             </a>
         </div>
         <div class="nav-links">

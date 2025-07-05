@@ -5,7 +5,7 @@
             <?php else: ?>
                 <img src="../assets/logo/logo.png" alt="Kulturifiko Logo">
             <?php endif; ?>
-            <h1>Kulturabase</h1>
+            <h1>KulturaBase</h1>
         </div>
         <div>
             <?php if (basename($_SERVER['PHP_SELF']) === 'explore.php'): ?>

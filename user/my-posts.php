@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kulturabase</title>
+    <title>KulturaBase</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
@@ -110,7 +110,7 @@
                                     // Video files
                                     $video_extensions = ['mp4', 'webm', 'ogg'];
                                     // Audio files
-                                    $audio_extensions = ['mp3', 'wav', 'ogg'];
+                                    $audio_extensions = ['mp3', 'wav', 'ogg', 'mpeg'];
                                     // Document files
                                     $document_extensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'];
 

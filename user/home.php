@@ -15,7 +15,7 @@ if (!isset($_SESSION['user_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kulturabase</title>
+    <title>KulturaBase</title>
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
@@ -609,25 +609,44 @@ if (!isset($_SESSION['user_id'])) {
     <div class="main-content-wrapper">
         <!-- Search Section -->
         <div class="search">
-            <h1 id="category-heading">Welcome to Kulturabase</h1> 
+            <h1 id="category-heading">Welcome to KulturaBase</h1> 
             <p>Your gateway to a world of cultural knowledge and discussions.</p>
         </div>
 
         <!-- Hero Section -->
-        <section id="home" class="hero">
-            <div class="container hero-container">
-                <div class="hero-content">
-                    <h1>Experience the Culture</h1>
-                    <p>Explore the beauty of global traditions and connect with communities worldwide. Start your journey with Kulturifiko today.</p>
-                    <div class="button-container">
-                        <a href="explore.php" class="cta-btn explore-btn">Start Exploring</a>
-                    </div>
-                </div>
-                <div class="hero-image">
-                    <img src="https://i.pinimg.com/736x/be/8c/6c/be8c6cbf1d049825ffd2df0442f0c66b.jpg" alt="Cultural Exploration">
-                </div>
-            </div>
-        </section>
+                        <?php if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1): ?>
+                    <section class="chart-section">
+                        <div class="container">
+                            <h2 class="chart-title">Analytics Overview</h2>
+                            <div class="chart-container">
+                                <div class="chart-row">
+                                    <div class="chart-box">
+                                        <canvas id="learningStylesChart"></canvas>
+                                    </div>
+                                    <div class="chart-box line-charts">
+                                        <canvas id="postsPerWeekChart"></canvas>
+                                        <canvas id="postsPerMonthChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                <?php else: ?>
+                    <section id="home" class="hero">
+                        <div class="container hero-container">
+                            <div class="hero-content">
+                                <h1>Experience the Culture</h1>
+                                <p>Explore the beauty of global traditions and connect with communities worldwide. Start your journey with Kulturifiko today.</p>
+                                <div class="button-container">
+                                    <a href="explore.php" class="cta-btn explore-btn">Start Exploring</a>
+                                </div>
+                            </div>
+                            <div class="hero-image">
+                                <img src="https://i.pinimg.com/736x/be/8c/6c/be8c6cbf1d049825ffd2df0442f0c66b.jpg" alt="Cultural Exploration">
+                            </div>
+                        </div>
+                    </section>
+                <?php endif; ?>
 
         <!-- About Section -->
         <section id="about" class="about">
@@ -635,29 +654,28 @@ if (!isset($_SESSION['user_id'])) {
                 <div class="about-container">
                     <div class="about-content">
                         <h2>Empowering Cultural Exchange</h2>
-                        <p>Welcome to Kulturabase, where we believe in the power of sharing and preserving cultural knowledge. Our platform serves as a bridge connecting people, traditions, and stories from around the world.</p>
+                        <p>Welcome to KulturaBase, where we believe in the power of sharing and preserving cultural knowledge. Our platform serves as a bridge connecting people, traditions, and stories from around the world.</p>
                         <p>Through our innovative learning approaches and community-driven content, we're creating a space where cultural understanding flourishes and diverse perspectives are celebrated.</p>
                         
                         <div class="about-stats">
                             <div class="stat-box">
                                 <i class="fas fa-book-open"></i>
-                                <div class="stat-number">1K+</div>
-                                <div class="stat-label">Cultural Articles</div>
+                                <!-- <div class="stat-number">1K+</div> -->
+                                <div class="stat-label">The Travel Journals</div>
                             </div>
                             <div class="stat-box">
-                                <i class="fas fa-globe-asia"></i>
-                                <div class="stat-number">50+</div>
-                                <div class="stat-label">Cultural Traditions</div>
+                                <i class="fa-solid fa-shirt"></i>
+                                <div class="stat-label">The Travel Apparel</div>
                             </div>
                             <div class="stat-box">
-                                <i class="fas fa-camera"></i>
-                                <div class="stat-number">2K+</div>
-                                <div class="stat-label">Visual Stories</div>
+                                <i class="fa-solid fa-plane"></i>
+                                <!-- <div class="stat-number">2K+</div> -->
+                                <div class="stat-label">The Travel Community</div>
                             </div>
                             <div class="stat-box">
                                 <i class="fas fa-graduation-cap"></i>
-                                <div class="stat-number">4+</div>
-                                <div class="stat-label">Learning Styles</div>
+                                <!-- <div class="stat-number"></div> -->
+                                <div class="stat-label">4 Learning Styles </div>
                             </div>
                         </div>
                     </div>
@@ -668,7 +686,7 @@ if (!isset($_SESSION['user_id'])) {
                             <i class="fas fa-globe-americas"></i>
                             <div class="floating-card-content">
                                 <h4>Global Reach</h4>
-                                <p>Connecting cultures worldwide</p>
+                                <p>Connecting cultures nationwide</p>
                             </div>
                         </div>
                         <div class="floating-card bottom">
@@ -690,8 +708,8 @@ if (!isset($_SESSION['user_id'])) {
                 <div class="features-grid">
                     <div class="feature-card">
                         <i class="fas fa-globe"></i>
-                        <h3>Global Community</h3>
-                        <p>Connect with people from different cultures worldwide.</p>
+                        <h3>Philippine Community</h3>
+                        <p>Connect with people from different cultures nationwide.</p>
                     </div>
                     <div class="feature-card">
                         <i class="fas fa-book"></i>
@@ -708,22 +726,7 @@ if (!isset($_SESSION['user_id'])) {
         </section>
 
         <!-- Learning Styles Chart Section -->
-        <section class="chart-section">
-            <div class="container">
-                <h2 class="chart-title">Analytics Overview</h2>
-                <div class="chart-container">
-                    <div class="chart-row">
-                        <div class="chart-box">
-                            <canvas id="learningStylesChart"></canvas>
-                        </div>
-                        <div class="chart-box line-charts">
-                            <canvas id="postsPerWeekChart"></canvas>
-                            <canvas id="postsPerMonthChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        
 
         <!-- Gallery Section -->
         <section id="gallery" class="gallery-section">

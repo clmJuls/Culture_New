@@ -68,7 +68,7 @@ $premium_class = $is_premium ? 'premium-user' : '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kulturabase</title>
+    <title>KulturaBase</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <?php if ($is_premium): ?>
     <link rel="stylesheet" href="assets/css/premium-styles.css">
@@ -243,12 +243,25 @@ $premium_class = $is_premium ? 'premium-user' : '';
             if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
                 return `<img src="${post.file_path}" alt="Post Image" class="post-media">`;
             }
-          
+
             if (['mp4', 'webm', 'mov'].includes(fileExtension)) {
                 return `<video controls class="post-media">
                     <source src="${post.file_path}" type="video/${fileExtension}">
                     Your browser does not support the video tag.
                 </video>`;
+            }
+
+            // Audio extensions
+            if (['mp3', 'wav', 'ogg', 'mpeg'].includes(fileExtension)) {
+                return `<div class="audio-player-container">
+                    <div class="audio-player">
+                        <i class="fas fa-music"></i>
+                        <audio controls class="post-media">
+                            <source src="${post.file_path}" type="audio/${fileExtension}">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                </div>`;
             }
             
             const documentExtensions = {
@@ -282,6 +295,27 @@ $premium_class = $is_premium ? 'premium-user' : '';
                     border-radius: 4px;
                     margin: 10px 0;
                     text-align: center;
+                }
+                .audio-player-container {
+                    margin: 15px 0;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    background: #f8f9fa;
+                    border: 1px solid #dee2e6;
+                }
+                .audio-player {
+                    padding: 20px;
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                    background: #f8f9fa;
+                }
+                .audio-player i {
+                    font-size: 24px;
+                    color: #365486;
+                }
+                .audio-player audio {
+                    flex-grow: 1;
                 }
             `)
             .appendTo('head');

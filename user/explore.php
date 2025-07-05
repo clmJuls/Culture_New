@@ -12,7 +12,7 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kulturabase</title>
+    <title>KulturaBase</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -1522,6 +1522,77 @@ $currentUserId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
         video.post-media::-webkit-media-controls {
             background-color: rgba(0, 0, 0, 0.5);
             border-radius: 0 0 8px 8px;
+        }
+
+        /* Audio player styling */
+        .audio-player-container {
+            margin: 15px 0;
+            border-radius: 8px;
+            overflow: visible !important;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            min-height: 80px;
+            width: 100%;
+            display: block !important;
+        }
+
+        .audio-player {
+            padding: 20px;
+            display: flex !important;
+            align-items: center;
+            gap: 15px;
+            background: #f8f9fa;
+            width: 100%;
+            min-height: 60px;
+        }
+
+        .audio-player i {
+            font-size: 24px;
+            color: #365486;
+            flex-shrink: 0;
+        }
+
+        .audio-player audio {
+            flex-grow: 1;
+            min-width: 200px;
+        }
+
+        /* Ensure media containers don't hide audio players */
+        .media-container:has(.audio-player-container) {
+            height: auto !important;
+            min-height: 80px !important;
+            overflow: visible !important;
+        }
+
+        /* Force audio players to be visible with high specificity */
+        .post .media-container .audio-player-container,
+        .post-content .media-container .audio-player-container {
+            display: block !important;
+            visibility: visible !important;
+            height: auto !important;
+            min-height: 80px !important;
+            overflow: visible !important;
+            background: #f8f9fa !important;
+            border: 2px solid #365486 !important;
+            margin: 10px 0 !important;
+        }
+
+        .post .audio-player,
+        .post-content .audio-player {
+            display: flex !important;
+            visibility: visible !important;
+            padding: 15px !important;
+            align-items: center !important;
+            gap: 15px !important;
+            background: #f8f9fa !important;
+        }
+
+        .post .audio-player audio,
+        .post-content .audio-player audio {
+            display: block !important;
+            visibility: visible !important;
+            width: 100% !important;
+            min-width: 200px !important;
         }
 
         /* Ensure proper video container sizing */

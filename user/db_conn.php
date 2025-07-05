@@ -1,12 +1,12 @@
 <?php
 
-$is_production = $_SERVER['HTTP_HOST'] === 'kulturabase.xyz';
+$is_production = $_SERVER['HTTP_HOST'] === 'KulturaBase.xyz';
 
 if ($is_production) {
     $host = 'localhost'; 
     $dbname = 'u976148757_blog_db';
-    $username = 'u976148757_kulturabase';
-    $password = '1Kulturabase_db';
+    $username = 'u976148757_KulturaBase';
+    $password = '1KulturaBase_db';
 } else {
     $host = 'localhost';
     $dbname = 'blog_db';

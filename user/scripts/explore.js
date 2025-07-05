@@ -159,15 +159,33 @@ function displayPosts(posts, append = false) {
       let mediaHTML = '';
       if (post.file_path) {
           const fileExtension = post.file_path.split('.').pop().toLowerCase();
-          const isVideo = ['mp4', 'webm', 'mov'].includes(fileExtension);
+          const isVideo = ['mp4', 'webm', 'mov', 'avi', 'mkv'].includes(fileExtension);
+          const isAudio = ['mp3', 'wav', 'ogg', 'mpeg', 'aac', 'm4a', 'flac'].includes(fileExtension);
           const isDocument = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt'].includes(fileExtension);
-          
+
+          // Debug logging - show in UI instead of console
+          if (isAudio) {
+              console.log('AUDIO DETECTED:', post.file_path, 'Extension:', fileExtension);
+          }
+
           if (isVideo) {
               mediaHTML = `
                   <video class="post-media" controls>
                       <source src="${post.file_path}" type="video/mp4">
                       Your browser does not support the video tag.
                   </video>`;
+          } else if (isAudio) {
+              mediaHTML = `
+                  <div class="audio-player-container" style="display: block !important; background: #f8f9fa; border: 2px solid #365486; margin: 10px 0; padding: 10px; min-height: 80px;">
+                      <div class="audio-player" style="display: flex !important; align-items: center; gap: 15px; padding: 10px;">
+                          <i class="fas fa-music" style="font-size: 24px; color: #365486;"></i>
+                          <audio class="post-media" controls style="flex-grow: 1; min-width: 200px;">
+                              <source src="${post.file_path}" type="audio/${fileExtension}">
+                              Your browser does not support the audio element.
+                          </audio>
+                      </div>
+                      <div style="font-size: 12px; color: #666; margin-top: 5px;">Audio file: ${post.file_path}</div>
+                  </div>`;
           } else if (isDocument) {
               // Get appropriate icon class based on file type
               let iconClass = 'fa-file-alt'; // default document icon
@@ -187,7 +205,22 @@ function displayPosts(posts, append = false) {
                       </a>
                   </div>`;
           } else {
-              mediaHTML = `<img class="post-media" src="${post.file_path}" alt="Post media">`;
+              // Check if it might be an audio file that wasn't detected
+              if (post.file_path && (post.file_path.includes('.mp3') || post.file_path.includes('.wav') || post.file_path.includes('.ogg') || post.file_path.includes('.mpeg'))) {
+                  mediaHTML = `
+                      <div class="audio-player-container" style="display: block !important; background: #f8f9fa; border: 2px solid #ff6b6b; margin: 10px 0; padding: 10px; min-height: 80px;">
+                          <div class="audio-player" style="display: flex !important; align-items: center; gap: 15px; padding: 10px;">
+                              <i class="fas fa-music" style="font-size: 24px; color: #ff6b6b;"></i>
+                              <audio class="post-media" controls style="flex-grow: 1; min-width: 200px;">
+                                  <source src="${post.file_path}">
+                                  Your browser does not support the audio element.
+                              </audio>
+                          </div>
+                          <div style="font-size: 12px; color: #666; margin-top: 5px;">Fallback Audio: ${post.file_path}</div>
+                      </div>`;
+              } else {
+                  mediaHTML = `<img class="post-media" src="${post.file_path}" alt="Post media">`;
+              }
           }
       }
 
@@ -284,11 +317,23 @@ function displayPosts(posts, append = false) {
 
 // Add this new function to standardize post card heights
 function normalizePostCardHeights() {
-  // Set fixed heights for media containers
+  // Set heights for media containers, but handle audio differently
   const mediaContainers = document.querySelectorAll('.media-container');
   mediaContainers.forEach(container => {
-    container.style.height = '180px';
-    container.style.overflow = 'hidden';
+    // Check if this container has an audio player
+    const hasAudio = container.querySelector('.audio-player-container');
+
+    if (hasAudio) {
+      // For audio, use auto height to show the full player
+      container.style.height = 'auto';
+      container.style.minHeight = '80px';
+      container.style.overflow = 'visible';
+    } else {
+      // For images and videos, use fixed height
+      container.style.height = '180px';
+      container.style.overflow = 'hidden';
+    }
+
     container.style.display = 'flex';
     container.style.alignItems = 'center';
     container.style.justifyContent = 'center';
@@ -304,6 +349,28 @@ function normalizePostCardHeights() {
     } else if (media.tagName === 'VIDEO') {
       media.style.maxHeight = '100%';
       media.style.maxWidth = '100%';
+    } else if (media.tagName === 'AUDIO') {
+      // Don't restrict audio elements
+      media.style.width = '100%';
+      media.style.height = 'auto';
+    }
+  });
+
+  // Ensure audio player containers are visible
+  const audioContainers = document.querySelectorAll('.audio-player-container');
+  audioContainers.forEach(container => {
+    container.style.display = 'block';
+    container.style.visibility = 'visible';
+    container.style.height = 'auto';
+    container.style.minHeight = '80px';
+    container.style.overflow = 'visible';
+
+    // Make sure the parent media container doesn't hide it
+    const parentMediaContainer = container.closest('.media-container');
+    if (parentMediaContainer) {
+      parentMediaContainer.style.height = 'auto';
+      parentMediaContainer.style.minHeight = '80px';
+      parentMediaContainer.style.overflow = 'visible';
     }
   });
   

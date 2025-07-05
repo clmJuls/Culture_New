@@ -7,7 +7,7 @@ session_start();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kulturabase</title>
+    <title>KulturaBase</title>
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="user/assets/favicon/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="user/assets/favicon/apple-touch-icon.png">
@@ -332,7 +332,7 @@ session_start();
         <nav class="nav">
             <div class="logo-container">
             <img src="user/assets/logo/logo.png" alt="Kulturifiko Logo">
-                <a href="/" class="logo">Kulturabase</a>
+                <a href="/" class="logo">KulturaBase</a>
             </div>
             <div class="nav-links">
                 <a href="#features">Features</a>
@@ -357,7 +357,7 @@ session_start();
 
     <!-- Features Section -->
     <section class="features" id="features">
-        <h2 class="section-title">Why Choose Kulturabase?</h2>
+        <h2 class="section-title">Why Choose KulturaBase?</h2>
         <div class="features-grid">
             <div class="feature-card">
                 <i class="fas fa-globe feature-icon"></i>
@@ -418,7 +418,7 @@ session_start();
                 <a href="#"><i class="fab fa-instagram"></i></a>
                 <a href="#"><i class="fab fa-linkedin"></i></a>
             </div>
-            <p class="copyright">&copy; 2025 Kulturabase. All rights reserved.</p>
+            <p class="copyright">&copy; 2025 KulturaBase. All rights reserved.</p>
         </div>
     </footer>
 </body>
