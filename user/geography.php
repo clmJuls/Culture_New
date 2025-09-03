@@ -84,8 +84,8 @@
             <h2 class="section-title" style="margin-top: 20px;">Geography Journals</h2>
             <p class="section-description">Geography explores the Earth's landscapes, environments, and the relationships between people and their surroundings. Dive into journals that highlight the influence of physical and human geography on our world.</p>
 
-            <?php if (isset($_SESSION['user_id'])): ?>
-            <!-- Add New Post Button (Logged-in users) -->
+            <?php if (isset($_SESSION['isAdmin']) && $_SESSION['isAdmin'] == 1): ?>
+            <!-- Add New Post Button (Admin only) -->
             <button class="create-post-btn" onclick="openModal()">Create New Post</button>
             <?php endif; ?>
             <!-- Search Bar -->
