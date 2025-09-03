@@ -1,12 +1,12 @@
 <?php
 
-$is_production = $_SERVER['HTTP_HOST'] === 'KulturaBase.xyz';
+$is_production = $_SERVER['HTTP_HOST'] === 'darkturquoise-trout-965292.hostingersite.com';
 
 if ($is_production) {
     $host = 'localhost'; 
-    $dbname = 'u976148757_blog_db';
-    $username = 'u976148757_KulturaBase';
-    $password = '1KulturaBase_db';
+    $dbname = 'u707284814_blog_db';
+    $username = 'u707284814_kulturabase';
+    $password = 'Kultura1001';
 } else {
     $host = 'localhost';
     $dbname = 'blog_db';
