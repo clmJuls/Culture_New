@@ -2,9 +2,9 @@
 session_start();
 require_once 'db_conn.php';
 
-// Check if user is admin
-if (!isset($_SESSION['isAdmin']) || $_SESSION['isAdmin'] != 1) {
-    die('Unauthorized access');
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    die('Please log in to create a post');
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {

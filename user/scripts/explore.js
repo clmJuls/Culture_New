@@ -163,10 +163,7 @@ function displayPosts(posts, append = false) {
           const isAudio = ['mp3', 'wav', 'ogg', 'mpeg', 'aac', 'm4a', 'flac'].includes(fileExtension);
           const isDocument = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt'].includes(fileExtension);
 
-          // Debug logging - show in UI instead of console
-          if (isAudio) {
-              console.log('AUDIO DETECTED:', post.file_path, 'Extension:', fileExtension);
-          }
+
 
           if (isVideo) {
               mediaHTML = `
@@ -484,28 +481,7 @@ function renderComments(comments) {
     `).join('');
 }
 
-// Add this helper function to format timestamps
-function formatTimestamp(timestamp) {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffTime = Math.abs(now - date);
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) {
-        const hours = Math.floor(diffTime / (1000 * 60 * 60));
-        if (hours === 0) {
-            const minutes = Math.floor(diffTime / (1000 * 60));
-            return minutes === 0 ? 'just now' : `${minutes}m ago`;
-        }
-        return `${hours}h ago`;
-    } else if (diffDays === 1) {
-        return 'yesterday';
-    } else if (diffDays < 7) {
-        return `${diffDays} days ago`;
-    } else {
-        return date.toLocaleDateString();
-    }
-}
+
 
 function submitComment(postId) {
     if (!currentUserId) {
@@ -713,11 +689,7 @@ function deleteComment(commentId, postId) {
     }
 }
 
-// Add these new functions
-function updateViewMoreButton(text = 'View More') {
-    // This function can be removed, but we'll keep it empty for now
-    // in case it's referenced elsewhere in code we can't see
-}
+
 
 // Add learning style filter handlers
 function initializeLearningStyleFilters() {

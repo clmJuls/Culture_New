@@ -13,8 +13,11 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Fetch current user data
-$query = "SELECT username, location, website, profile_picture FROM users WHERE id = '$user_id'";
-$result = $conn->query($query);
+$query = "SELECT username, location, website, profile_picture FROM users WHERE id = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
     $user = $result->fetch_assoc();
@@ -45,14 +48,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Update user data
-    $update_query = "UPDATE users SET 
-                        username = '$new_username', 
-                        location = '$new_location', 
-                        website = '$new_website', 
-                        profile_picture = '$profile_picture' 
-                    WHERE id = '$user_id'";
+    $update_query = "UPDATE users SET
+                        username = ?,
+                        location = ?,
+                        website = ?,
+                        profile_picture = ?
+                    WHERE id = ?";
+    $stmt = $conn->prepare($update_query);
+    $stmt->bind_param("ssssi", $new_username, $new_location, $new_website, $profile_picture, $user_id);
 
-    if ($conn->query($update_query) === TRUE) {
+    if ($stmt->execute()) {
+        $stmt->close();
         echo "<script>
                 alert('Profile updated successfully!');
                 window.location.href = 'edit-profile.php';

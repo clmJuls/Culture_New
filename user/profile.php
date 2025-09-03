@@ -29,7 +29,7 @@ if ($result->num_rows > 0) {
     $username = htmlspecialchars($user['username']);
     $about = htmlspecialchars($user['about']);
     $location = htmlspecialchars($user['location']);
-    $birthday = htmlspecialchars($user['birthday']);
+
     $website = htmlspecialchars($user['website']);
     $skills = htmlspecialchars($user['skills']);
     $profile_picture = $user['profile_picture'] ? htmlspecialchars($user['profile_picture']) : 'assets/hero/v07_20@Shanks.png';
@@ -169,9 +169,7 @@ $premium_class = $is_premium ? 'premium-user' : '';
               <div class="detail" style="margin-bottom: 10px;">
                   <strong>Location:</strong> <span><?php echo $location ? $location : "Not specified."; ?></span>
               </div>
-              <div class="detail" style="margin-bottom: 10px;">
-                  <strong>Birthday:</strong> <span><?php echo $birthday ? $birthday : "Not specified."; ?></span>
-              </div>
+
               <!-- <div class="detail" style="margin-bottom: 10px;">
                   <strong>Website:</strong> <span>
                       <?php 
@@ -179,9 +177,7 @@ $premium_class = $is_premium ? 'premium-user' : '';
                       ?>
                   </span>
               </div> -->
-              <div class="detail" style="margin-bottom: 10px;">
-                  <strong>Hobbies:</strong> <span><?php echo $skills ? $skills : "No hobbies listed."; ?></span>
-              </div>
+
           </div>
       </div>
 </div>

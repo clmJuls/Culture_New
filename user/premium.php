@@ -342,7 +342,6 @@ $user = $stmt->get_result()->fetch_assoc();
                     <li><i class="fas fa-check"></i> All Premium Features</li>
                     <li><i class="fas fa-check"></i> Priority Support</li>
                     <li><i class="fas fa-check"></i> Advanced Analytics</li>
-                    <li><i class="fas fa-check"></i> Exclusive Workshops</li>
                 </ul>
                 <form method="POST">
                     <input type="hidden" name="plan_type" value="annual">

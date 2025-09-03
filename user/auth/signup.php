@@ -15,7 +15,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $confirm_password = $_POST['confirm_password'];
     
     $errors = [];
-    
+
+    // Email validation - require .com domain
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors['email'] = 'Please enter a valid email address.';
+    } elseif (!preg_match('/\.com$/i', $email)) {
+        $errors['email'] = 'Email must have a .com domain extension.';
+    }
+
     // Password validation
     $password_pattern = "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/";
     if (!preg_match($password_pattern, $password)) {
@@ -27,27 +34,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Check for duplicate email
-    $email_check_query = "SELECT * FROM users WHERE email = '$email'";
-    $email_check_result = $conn->query($email_check_query);
+    $email_check_query = "SELECT id FROM users WHERE email = ?";
+    $stmt = $conn->prepare($email_check_query);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $email_check_result = $stmt->get_result();
     if ($email_check_result->num_rows > 0) {
         $errors['email'] = 'Email is already taken!';
     }
+    $stmt->close();
 
     // Check for duplicate username
-    $username_check_query = "SELECT * FROM users WHERE username = '$username'";
-    $username_check_result = $conn->query($username_check_query);
+    $username_check_query = "SELECT id FROM users WHERE username = ?";
+    $stmt = $conn->prepare($username_check_query);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $username_check_result = $stmt->get_result();
     if ($username_check_result->num_rows > 0) {
         $errors['username'] = 'Username is already taken!';
     }
+    $stmt->close();
 
     if (empty($errors)) {
         // Hash the password
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         
         // Insert the new user
-        $query = "INSERT INTO users (email, username, password) VALUES ('$email', '$username', '$hashed_password')";
-        
-        if ($conn->query($query) === TRUE) {
+        $query = "INSERT INTO users (email, username, password) VALUES (?, ?, ?)";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("sss", $email, $username, $hashed_password);
+
+        if ($stmt->execute()) {
+            $stmt->close();
             $_SESSION['success_message'] = 'Sign Up Successful!';
             header('Location: login.php');
             exit();
@@ -304,15 +322,17 @@ $conn->close();
             <?php endif; ?>
             <form action="signup.php" method="POST" autocomplete="off">
                 <div class="input-group">
-                    <input type="email" 
-                           name="email" 
+                    <input type="email"
+                           name="email"
                            id="email"
-                           placeholder="Email Address"
+                           placeholder="Email Address (must end with .com)"
+                           pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.com$"
+                           title="Email must have a .com domain extension"
                            class="<?php echo isset($errors['email']) ? 'error' : ''; ?>"
                            value="<?php echo isset($old_data['email']) ? htmlspecialchars($old_data['email']) : ''; ?>"
                            required>
                     <div class="error-text" id="email-error" <?php echo isset($errors['email']) ? 'style="display: block;"' : ''; ?>>
-                        <?php echo isset($errors['email']) ? $errors['email'] : '<i class="fas fa-exclamation-circle"></i> Please enter a valid email'; ?>
+                        <?php echo isset($errors['email']) ? $errors['email'] : '<i class="fas fa-exclamation-circle"></i> Please enter a valid email with .com domain'; ?>
                     </div>
                 </div>
 

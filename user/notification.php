@@ -54,7 +54,7 @@ foreach ($notifications as $notification) {
         <div class="notification-header">
             <h1>Notifications</h1>
             <button class="mark-all-read" onclick="markAllAsRead()">
-                <!-- <i class="fas fa-check"></i> Mark all as read -->
+                <i class="fas fa-check"></i> Mark all as read
             </button>
         </div>
 

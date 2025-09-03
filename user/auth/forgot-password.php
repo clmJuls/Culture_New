@@ -168,26 +168,7 @@ if (isset($_SESSION['user_id'])) {
 <body>
 
     <!-- Navigation Bar -->
-    <div class="navbar">
-        <div style="display: flex; align-items: center;">
-           <img src="assets/logo/logo.png "alt="Kulturifiko Logo">
-            <h1>Kulturifiko</h1>
-        </div>
-        <div>
-            <a href="home.php">Home</a>
-            <a href="create-post.php">+ Create</a>
-            <a href="explore.php">Explore</a>
-            <a href="notification.php">Notification</a>
-            <div class="dropdown">
-                <a href="#" class="dropdown-btn" onclick="toggleDropdown()">Menu</a>
-                <div class="dropdown-content">
-                    <a href="profile.php">Profile</a>
-                    <!-- <a href="settings.php">Settings</a> -->
-                </div>
-            </div>
-            <a href="auth/login.php" class="active">Log Out</a>
-        </div>
-    </div>
+    <?php include '../components/layout/auth/navbar.php'; ?>
 
     <style>
     /* Navigation Bar */
