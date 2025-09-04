@@ -463,7 +463,7 @@ if (!isset($_SESSION['user_id'])) {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 60px;
-            align-items: center;
+            align-items: flex-start;
         }
 
         .about-content h2 {
@@ -525,35 +525,107 @@ if (!isset($_SESSION['user_id'])) {
             line-height: 1.4;
         }
 
-        .about-image {
-            position: relative;
+        .about-visual {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
         }
 
-        .about-image img {
+        .main-image-container {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .main-image {
             width: 100%;
+            max-width: 350px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-left: 100px;
         }
 
-        .about-image .floating-card {
+        .floating-card {
             position: absolute;
             background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
+            max-width: 500px;
         }
 
         .floating-card.top {
             top: 30px;
-            right: -30px;
+            right: 40px;
+            padding-right: 60px;
+            padding-left: 20px;
+            padding-top: 20px;
+            padding-bottom: 20px;
         }
 
         .floating-card.bottom {
             bottom: 30px;
             left: -30px;
+            padding: 20px;
+        }
+
+        /* Founders Section */
+        .founders-section {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .founders-section h3 {
+            font-size: 1.5rem;
+            color: #003366;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .founders-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .founder-card {
+            text-align: center;
+            padding: 15px;
+            border-radius: 15px;
+            background: #f8f9fa;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .founder-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .founder-card img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+            border: 3px solid #365486;
+        }
+
+        .founder-info h4 {
+            font-size: 0.9rem;
+            color: #003366;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .founder-info p {
+            font-size: 0.8rem;
+            color: #666;
+            margin: 0;
         }
 
         .floating-card i {
@@ -578,7 +650,7 @@ if (!isset($_SESSION['user_id'])) {
                 gap: 40px;
             }
 
-            .about-image {
+            .about-visual {
                 order: -1;
             }
 
@@ -587,11 +659,48 @@ if (!isset($_SESSION['user_id'])) {
                 margin: 20px 0;
                 transform: none !important;
             }
+
+            .founders-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+            }
+
+            .founder-card img {
+                width: 70px;
+                height: 70px;
+            }
         }
 
         @media screen and (max-width: 576px) {
             .about-stats {
                 grid-template-columns: 1fr;
+            }
+
+            .founders-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .founder-card {
+                display: flex;
+                align-items: center;
+                text-align: left;
+                gap: 15px;
+                padding: 15px;
+            }
+
+            .founder-card img {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 0;
+            }
+
+            .founder-info h4 {
+                font-size: 1rem;
+            }
+
+            .founder-info p {
+                font-size: 0.85rem;
             }
         }
     </style>
@@ -656,11 +765,10 @@ if (!isset($_SESSION['user_id'])) {
                         <h2>Empowering Cultural Exchange</h2>
                         <p>Welcome to KulturaBase, where we believe in the power of sharing and preserving cultural knowledge. Our platform serves as a bridge connecting people, traditions, and stories from around the world.</p>
                         <p>Through our innovative learning approaches and community-driven content, we're creating a space where cultural understanding flourishes and diverse perspectives are celebrated.</p>
-                        
+
                         <div class="about-stats">
                             <div class="stat-box">
                                 <i class="fas fa-book-open"></i>
-                                <!-- <div class="stat-number">1K+</div> -->
                                 <div class="stat-label">The Travel Journals</div>
                             </div>
                             <div class="stat-box">
@@ -669,31 +777,58 @@ if (!isset($_SESSION['user_id'])) {
                             </div>
                             <div class="stat-box">
                                 <i class="fa-solid fa-plane"></i>
-                                <!-- <div class="stat-number">2K+</div> -->
                                 <div class="stat-label">The Travel Community</div>
                             </div>
                             <div class="stat-box">
                                 <i class="fas fa-graduation-cap"></i>
-                                <!-- <div class="stat-number"></div> -->
-                                <div class="stat-label">4 Learning Styles </div>
+                                <div class="stat-label">4 Learning Styles</div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="about-image">
-                        <img src="assets/founder.jpg" alt="Cultural Exchange">
-                        <div class="floating-card top">
-                            <i class="fas fa-globe-americas"></i>
-                            <div class="floating-card-content">
-                                <h4>Global Reach</h4>
-                                <p>Connecting cultures nationwide</p>
+
+                    <div class="about-visual">
+                        <div class="main-image-container">
+                            <img src="assets/founder.jpg" alt="Cultural Exchange" class="main-image">
+                            <div class="floating-card top">
+                                <i class="fas fa-globe-americas"></i>
+                                <div class="floating-card-content">
+                                    <h4>Kulturifiko</h4>
+                                    <p>CEO, founder</p>
+                                </div>
+                            </div>
+                            <div class="floating-card bottom">
+                                <i class="fas fa-users"></i>
+                                <div class="floating-card-content">
+                                    <h4>Ms. Luisa Baguiwet</h4>
+                                    <p>Our partner</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="floating-card bottom">
-                            <i class="fas fa-users"></i>
-                            <div class="floating-card-content">
-                                <h4>Community Driven</h4>
-                                <p>Built by cultural enthusiasts</p>
+                        <br>
+                        <div class="founders-section">
+                            <h3>Meet Our Founders</h3>
+                            <div class="founders-grid">
+                                <div class="founder-card">
+                                    <img src="./assets/founders/ritz.jpg" alt="Founder 1">
+                                    <div class="founder-info">
+                                        <h4>Ritz Paul Madueño</h4>
+                                        <p>Project Leader</p>
+                                    </div>
+                                </div>
+                                <div class="founder-card">
+                                    <img src="./assets/founders/kim.jpg" alt="Founder 2">
+                                    <div class="founder-info">
+                                        <h4>Kimberly Cumaling</h4>
+                                        <p>Developer</p>
+                                    </div>
+                                </div>
+                                <div class="founder-card">
+                                    <img src="./assets/founders/kath.jpg" alt="Founder 3">
+                                    <div class="founder-info">
+                                        <h4>Kathleen Mae Duco</h4>
+                                        <p>Co-Developer</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -82,6 +82,11 @@ session_start();
             color: #0F1035;
         }
 
+        .nav-links a.active {
+            background-color: #1e3c72;
+            color: #fff;
+        }
+
         .auth-buttons a {
             text-decoration: none;
             padding: 10px 20px;
@@ -335,9 +340,10 @@ session_start();
                 <a href="/" class="logo">KulturaBase</a>
             </div>
             <div class="nav-links">
-                <a href="#features">Features</a>
-                <a href="#about">About</a>
-                <a href="#contact">Contact</a>
+                <a href="#hero" class="nav-link">Home</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#contact" class="nav-link">Contact</a>
             </div>
             <div class="auth-buttons">
                 <a href="user/auth/login.php" class="login-btn">Login</a>
@@ -347,7 +353,7 @@ session_start();
     </header>
 
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero" id="hero">
         <div class="hero-content">
             <h1>Discover World Cultures</h1>
             <p>Join our community to explore, learn, and share cultural experiences from around the globe. Connect with people who share your passion for cultural diversity.</p>
@@ -421,5 +427,70 @@ session_start();
             <p class="copyright">&copy; 2025 KulturaBase. All rights reserved.</p>
         </div>
     </footer>
+
+    <script>
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+
+                if (targetSection) {
+                    const headerHeight = document.querySelector('.header').offsetHeight;
+                    const targetPosition = targetSection.offsetTop - headerHeight;
+
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        function updateActiveNavLink() {
+            const sections = ['hero', 'features', 'about', 'contact'];
+            const navLinks = document.querySelectorAll('.nav-link');
+            const headerHeight = document.querySelector('.header').offsetHeight;
+            const scrollPosition = window.scrollY + headerHeight + 50; // Reduced offset for better detection
+
+            let currentSection = 'hero';
+
+            // Check if we're near the bottom of the page
+            const isNearBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100;
+
+            if (isNearBottom) {
+                currentSection = 'contact';
+            } else {
+                sections.forEach(sectionId => {
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        const sectionTop = section.offsetTop;
+                        const sectionHeight = section.offsetHeight;
+                        const sectionBottom = sectionTop + sectionHeight;
+
+                        // For the contact section, use a more lenient detection
+                        if (sectionId === 'contact') {
+                            if (scrollPosition >= sectionTop - 200) {
+                                currentSection = sectionId;
+                            }
+                        } else if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+                            currentSection = sectionId;
+                        }
+                    }
+                });
+            }
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveNavLink);
+
+        document.addEventListener('DOMContentLoaded', updateActiveNavLink);
+    </script>
 </body>
 </html>

@@ -58,6 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['isAdmin'] = $user['isAdmin'];
     $_SESSION['isPremium'] = $user['isPremium'];
     $_SESSION['access_token'] = $access_token;
+    $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT']; // For session security
 
     // Remember me functionality
     if (isset($_POST['remember_me'])) {
